@@ -14,11 +14,11 @@ import Cursor from '../components/Cursor.astro';
 
 <Base>
   <SiteNav />
-  <!-- Цветовой ритм страницы: чёрный → свет → чёрный → свет → чёрный → свет → чёрный -->
+  <!-- Ритм: чёрный старт → свет (кто я) → тьма (путь) → свет → тьма (программа) → свет → чёрный финал -->
   <main id="main">
     <Hero />
-    <Ladder />
     <Mentor />
+    <Ladder />
     <Terms />
     <Fit />
     <Program />
@@ -39,6 +39,9 @@ import Cursor from '../components/Cursor.astro';
     padding-bottom: 0.1em;
   }
   .split-word { display: inline-block; }
+
+  /* Слово в blur-появлении (порт BlurText): фильтр требует своего бокса. */
+  .bw { display: inline-block; will-change: transform, filter, opacity; }
 </style>
 
 <script>

@@ -25,8 +25,9 @@
   --fg-mute:   #6a6a62;
   /* --fg-faint не проходит AA (2.5:1): только декор, никогда не текст. */
   --fg-faint:  #9a9a91;
-  --stamp:     #1f31d6;
-  --stamp-deep:#16229c;
+  /* Акцент: тёплый оранж. Имя --stamp историческое, читать как --accent. */
+  --stamp:     #d9531e;
+  --stamp-deep:#b04012;
 
   --line:        color-mix(in srgb, var(--fg) 16%, transparent);
   --line-strong: color-mix(in srgb, var(--fg) 32%, transparent);
@@ -35,7 +36,7 @@
   /* --- Типографика ------------------------------------------------------ */
   --font-display: 'Unbounded Variable', 'Onest Variable', system-ui, sans-serif;
   --font-sans: 'Onest Variable', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
 
   /* Unbounded массивнее гротеска: заголовки держим на 500-м весе
      и на шаг меньшем кегле, чем было в Onest-версии. */
@@ -54,7 +55,7 @@
   --lh-snug:  1.12;
   --lh-text:  1.55;
 
-  --tr-mono:  0.06em;   /* трекинг моноширинных микро-подписей */
+  --tr-mono:  0.02em;   /* лёгкий трекинг моноширинных подписей */
   --tr-tight: -0.01em;  /* дисплейные заголовки: Unbounded не любит сильное сжатие */
 
   /* --- Сетка и ритм ----------------------------------------------------- */
@@ -109,9 +110,9 @@
   --fg-soft:   color-mix(in srgb, var(--paper) 80%, var(--coal));
   --fg-mute:   color-mix(in srgb, var(--paper) 60%, var(--coal));
   --fg-faint:  color-mix(in srgb, var(--paper) 38%, var(--coal));
-  /* Ультрамарин на чёрном тонет: в тёмной полосе акцент светлее. */
-  --stamp:     #5061ff;
-  --stamp-deep:#3948e0;
+  /* На чёрном оранж мягче и светлее. */
+  --stamp:     #ff9e5e;
+  --stamp-deep:#f07f34;
 
   background: var(--bg);
   color: var(--fg);

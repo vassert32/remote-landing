@@ -7,12 +7,21 @@ import { cta, offer, hero } from '../data/content';
  * стартует мгновенно вместе с первой отрисовкой и работает без JS —
  * это и есть «бесшовный типографский прелоадер» из брифа.
  */
-type Letter = { ch: string; i: number };
-const words: Letter[][] = [];
+const wordsSrc = hero.question.split(' ');
 let i = 0;
-for (const word of hero.question.split(' ')) {
-  words.push([...word].map((ch) => ({ ch, i: i++ })));
-}
+/* Пробелы между словами обязаны быть настоящими текстовыми узлами: без них
+   между inline-block-словами нет точки переноса, и длинная строка вместо
+   переноса уезжает за край экрана. Поэтому разметка собирается строкой. */
+const qHtml = wordsSrc
+  .map(
+    (word) =>
+      '<span class="hero__word">' +
+      [...word]
+        .map((ch) => `<span class="hero__ch" style="--i:${i++}">${ch}</span>`)
+        .join('') +
+      '</span>',
+  )
+  .join(' ');
 const total = i;
 ---
 
@@ -21,15 +30,7 @@ const total = i;
     <!-- Фаза 1: вопрос на чёрном -->
     <div class="hero__phase hero__question" data-hero-question>
       <h1 class="hero__q display" style={`--n:${total}`} aria-label={hero.question}>
-        <span aria-hidden="true" class="hero__q-letters">
-          {words.map((word) => (
-            <span class="hero__word">
-              {word.map((l) => (
-                <span class="hero__ch" style={`--i:${l.i}`}>{l.ch}</span>
-              ))}
-            </span>
-          ))}<span class="hero__caret" aria-hidden="true"></span>
-        </span>
+        <span aria-hidden="true" class="hero__q-letters"><Fragment set:html={qHtml} /><span class="hero__caret" aria-hidden="true"></span></span>
       </h1>
     </div>
 
@@ -112,7 +113,9 @@ const total = i;
   }
 
   .hero__q {
-    font-size: clamp(1.9rem, 0.7rem + 5vw, 4.6rem);
+    font-size: clamp(1.9rem, 0.6rem + 4.6vw, 4.3rem);
+    max-width: min(100%, 19ch);
+    margin-inline: auto;
     text-align: center;
     text-wrap: balance;
   }
@@ -120,9 +123,7 @@ const total = i;
   .hero__word {
     display: inline-block;
     white-space: nowrap;
-    margin-inline-end: 0.3em;
   }
-  .hero__word:last-of-type { margin-inline-end: 0; }
 
   .hero__ch {
     position: relative;

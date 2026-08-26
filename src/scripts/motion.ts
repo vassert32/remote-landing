@@ -18,13 +18,25 @@ const COAL = '#0c0c0a';
 const PAPER = '#f2f1ed';
 
 /* ==========================================================================
-   Хедер: гармошка + хамелеон
+   Хедер: гармошка + появление после фазы вопроса
    ========================================================================== */
 
+let navEl: HTMLElement | null = null;
+let veilEl: HTMLElement | null = null;
+let lenisRef: Lenis | null = null;
+
+/** Хедер отсутствует на фазе вопроса и выезжает вместе с перетеканием. */
+function setNavAway(away: boolean): void {
+  navEl?.toggleAttribute('data-away', away);
+  veilEl?.toggleAttribute('data-away', away);
+}
+
 /** Сжатие: --nav-t идёт 0→1 на первых 220px скролла. */
-function initNavShrink(nav: HTMLElement): void {
+function initNavShrink(): void {
+  const targets = [navEl, veilEl].filter(Boolean) as HTMLElement[];
+  if (!targets.length) return;
   gsap.fromTo(
-    nav,
+    targets,
     { '--nav-t': 0 },
     {
       '--nav-t': 1,
@@ -32,34 +44,6 @@ function initNavShrink(nav: HTMLElement): void {
       scrollTrigger: { start: 0, end: 220, scrub: 0.3 },
     },
   );
-}
-
-/**
- * Тема хедера. Считаем, сколько тёмных зон сейчас лежит под линией хедера.
- * Статичные тёмные секции дают вклад через собственные триггеры, hero — через
- * колбэк сцены (его фон меняется по прогрессу, а не по границам секции).
- */
-const darkZones = new Set<string>();
-let navEl: HTMLElement | null = null;
-
-function setDarkZone(id: string, active: boolean): void {
-  if (active) darkZones.add(id);
-  else darkZones.delete(id);
-  navEl?.toggleAttribute('data-on-dark', darkZones.size > 0);
-}
-
-function initNavTheme(): void {
-  document
-    .querySelectorAll<HTMLElement>('[data-band="dark"]:not([data-hero])')
-    .forEach((section, n) => {
-      ScrollTrigger.create({
-        trigger: section,
-        // Линия хедера: ~56px от верха вьюпорта.
-        start: 'top 56px',
-        end: 'bottom 56px',
-        onToggle: (self) => setDarkZone(`band-${n}`, self.isActive),
-      });
-    });
 }
 
 /* ==========================================================================
@@ -82,6 +66,7 @@ function initLenis(): Lenis {
     (window as unknown as { lenis: Lenis }).lenis = lenis;
   }
 
+  lenisRef = lenis;
   return lenis;
 }
 
@@ -102,8 +87,9 @@ function initHeroScene(): void {
   const doc = scene.querySelector<HTMLElement>('[data-hero-doc]');
   const stamp = scene.querySelector<HTMLElement>('[data-hero-stamp]');
 
-  // Пока страница не скроллилась, hero тёмный: вклад в тему хедера сразу.
-  setDarkZone('hero', true);
+  // На фазе вопроса хедера нет (страховку от не доехавшего мотора
+  // снимает инлайн-скрипт в SiteNav).
+  setNavAway(true);
 
   // Стартовые состояния фазы ответа задаёт мотор, а не CSS: транзформы из
   // стилей и yPercent GSAP не складываются, строки застревали бы за маской.
@@ -112,7 +98,6 @@ function initHeroScene(): void {
   if (doc) gsap.set(doc, { opacity: 0, y: 30 });
 
   const setSceneDark = (dark: boolean) => {
-    setDarkZone('hero', dark);
     if (dark) scene.setAttribute('data-band', 'dark');
     else scene.removeAttribute('data-band');
   };
@@ -132,13 +117,15 @@ function initHeroScene(): void {
       start: 'top top',
       // Длина сцены в явных пикселях: проценты считались бы от высоты
       // двухэкранного стейджа и раздували путь до 2.5 вьюпортов.
+      // ВАЖНО: без invalidateOnRefresh — инвалидция при refresh стирает
+      // записанные старты дочерних твинов, и вся фаза ответа замирает.
       end: () => '+=' + Math.round(window.innerHeight * 1.7),
-      invalidateOnRefresh: true,
       pin: true,
       scrub: 0.5,
       // Порог = середина перетекания фона: тема секции и хедера щёлкает там.
       onUpdate: (self) => {
         setSceneDark(self.progress < 0.33);
+        setNavAway(self.progress < 0.24);
         gsap.set(scene, { backgroundColor: mixBg(self.progress) });
       },
     },
@@ -161,6 +148,27 @@ function initHeroScene(): void {
       0.88,
     );
   }
+
+  // Автопрокрутка: когда вопрос допечатан, сцена сама везёт к ответу.
+  // Любое действие пользователя (колесо, тач, клавиши) отменяет автопилот.
+  const chars = scene.querySelectorAll('.hero__ch').length;
+  const printDoneMs = 260 + chars * 42;
+  let userTook = false;
+  const takeOver = () => {
+    userTook = true;
+  };
+  window.addEventListener('wheel', takeOver, { once: true, passive: true });
+  window.addEventListener('touchstart', takeOver, { once: true, passive: true });
+  window.addEventListener('keydown', takeOver, { once: true });
+
+  window.setTimeout(() => {
+    const y = lenisRef?.actualScroll ?? window.scrollY;
+    if (userTook || y > 40) return;
+    lenisRef?.scrollTo(Math.round(window.innerHeight * 1.7), {
+      duration: 2.6,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+    });
+  }, printDoneMs + 900);
 }
 
 /* ==========================================================================
@@ -283,14 +291,77 @@ function initReveals(): void {
     });
   }
 
-  const stems = document.querySelectorAll<HTMLElement>('[data-reveal="stem"]');
-  if (stems.length) {
-    gsap.to(stems, {
-      scaleY: 1,
-      duration: 1.0,
-      ease: 'power3.out',
-      stagger: 0.09,
-      scrollTrigger: { trigger: stems[0]!, start: 'top 85%' },
+  // Колонны Пути растут от земли каскадом.
+  const bars = document.querySelectorAll<HTMLElement>('[data-reveal="bar"]');
+  if (bars.length) {
+    gsap.fromTo(
+      bars,
+      { scaleY: 0 },
+      {
+        scaleY: 1,
+        duration: 1.1,
+        ease: 'power3.out',
+        stagger: 0.1,
+        scrollTrigger: { trigger: bars[0]!, start: 'top 85%' },
+      },
+    );
+  }
+
+  // Появление текста по словам с блюром: порт BlurText (React Bits) на GSAP.
+  for (const el of document.querySelectorAll<HTMLElement>('[data-reveal="blur"]')) {
+    const text = el.textContent ?? '';
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    if (!words.length) continue;
+    el.setAttribute('aria-label', words.join(' '));
+    el.innerHTML = words
+      .map((w) => `<span class="bw" aria-hidden="true">${w}</span>`)
+      .join(' ');
+
+    gsap.fromTo(
+      el.querySelectorAll('.bw'),
+      { opacity: 0, y: 14, filter: 'blur(10px)' },
+      {
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        duration: 0.65,
+        ease: 'power2.out',
+        stagger: 0.04,
+        scrollTrigger: { trigger: el, start: 'top 88%' },
+      },
+    );
+  }
+}
+
+/**
+ * Тикающие цифры: порт CountUp (React Bits) на GSAP.
+ * В разметке лежит полное число (SEO и no-JS), мотор сбрасывает его в ноль
+ * и пружиной докручивает при входе в кадр.
+ */
+function initCounters(): void {
+  const fmt = new Intl.NumberFormat('ru-RU');
+  for (const el of document.querySelectorAll<HTMLElement>('[data-count-to]')) {
+    const to = Number(el.dataset.countTo ?? '0');
+    const prefix = el.dataset.countPrefix ?? '';
+    const suffix = el.dataset.countSuffix ?? '';
+    const state = { v: 0 };
+    const render = () => {
+      el.textContent = prefix + fmt.format(Math.round(state.v)) + suffix;
+    };
+    render();
+
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 87%',
+      once: true,
+      onEnter: () => {
+        gsap.to(state, {
+          v: to,
+          duration: 1.5,
+          ease: 'expo.out',
+          onUpdate: render,
+        });
+      },
     });
   }
 }
@@ -363,34 +434,23 @@ function initMagnetic(): void {
 
 function boot(): void {
   navEl = document.querySelector<HTMLElement>('[data-nav]');
+  veilEl = document.querySelector<HTMLElement>('[data-nav-veil]');
   gsap.registerPlugin(ScrollTrigger);
 
   if (reduce.matches) {
-    // Без движения: тема хедера всё равно должна следовать за фоном.
-    initNavTheme();
-    setDarkZone('hero', true);
-    const hero = document.querySelector<HTMLElement>('[data-hero]');
-    if (hero) {
-      ScrollTrigger.create({
-        trigger: hero,
-        start: 'top 56px',
-        end: 'bottom 56px',
-        onToggle: (self) => setDarkZone('hero', self.isActive),
-      });
-    }
+    // Без движения хедер виден всегда; страховочный data-away снимаем.
+    setNavAway(false);
     return;
   }
 
   document.documentElement.classList.add('motion');
 
   initLenis();
-  if (navEl) initNavShrink(navEl);
+  initNavShrink();
   initHeroScene();
   initProgram();
   initReveals();
-  // Тема хедера считается по границам секций: создаём эти триггеры после
-  // пинов, чтобы границы сразу учитывали пин-спейсеры.
-  initNavTheme();
+  initCounters();
   ScrollTrigger.refresh();
   if (finePointer.matches) {
     initCursor();

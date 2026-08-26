@@ -10,7 +10,7 @@ const year = new Date().getFullYear();
 
     <h2 class="closer__title h2" data-split>Следующий оффер может быть вашим</h2>
 
-    <p class="closer__note body" data-reveal="up">
+    <p class="closer__note body" data-reveal="blur">
       Созваниваемся, смотрим ваш опыт, английский и цель. После этого я честно
       говорю, есть ли смысл работать вместе.
     </p>
@@ -27,7 +27,7 @@ const year = new Date().getFullYear();
     </div>
 
     <div class="closer__meta">
-      <span>{site.name}</span>
+      <span>{site.legal}</span>
       <ul class="closer__socials">
         {
           socials.filter((s) => s.href).map((s) => (

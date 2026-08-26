@@ -13,8 +13,8 @@
     "og": "node tools/make-og.mjs"
   },
   "dependencies": {
-    "@fontsource-variable/jetbrains-mono": "^5.2.5",
     "@fontsource-variable/onest": "^5.2.5",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
     "@iconify-json/ph": "^1.2.2",
     "@iconify-json/simple-icons": "^1.2.93",
     "astro": "^5.13.0",

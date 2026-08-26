@@ -1,8 +1,13 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { nav, cta, site, socials } from '../data/content';
+import { nav, cta, socials } from '../data/content';
 ---
 
+<!-- Слой 1: вуаль. Прогрессивный блюр: сильный у кромки, сходит на нет книзу. -->
+<div class="veil" data-nav-veil aria-hidden="true"></div>
+
+<!-- Слой 2: контент. mix-blend-difference инвертируется на любом фоне сам,
+     поэтому хедер бесшовный: никаких переключений светлый/тёмный. -->
 <header class="nav" data-nav>
   <div class="shell nav__inner">
     <div class="nav__left">
@@ -36,7 +41,7 @@ import { nav, cta, site, socials } from '../data/content';
           )
         }
       </ul>
-      <a class="btn btn--ink nav__cta" href={cta.href} target="_blank" rel="noopener" data-magnetic>
+      <a class="btn nav__cta" href={cta.href} target="_blank" rel="noopener" data-magnetic>
         <span>{cta.label}</span>
         <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
       </a>
@@ -46,46 +51,48 @@ import { nav, cta, site, socials } from '../data/content';
 
 <style>
   /* --------------------------------------------------------------------
-     Хедер-гармошка. Наверху страницы разложен широко: высокая строка,
-     крупные буквы, блоки прижаты к краям. По мере скролла --nav-t идёт
-     0 → 1 (мотор пишет её через ScrollTrigger), и все размеры плавно
-     интерполируются к компактной полоске. Без мотора хедер сразу компактный
-     (фоллбек в конце файла). Тема (чернила/бумага) следует за секцией
-     под хедером: атрибут data-on-dark вешает мотор.
+     Хедер-гармошка. Наверху разложен широко, по скроллу --nav-t (мотор)
+     сжимает его в компактную полоску. На фазе вопроса hero хедера нет:
+     мотор вешает [data-away], хедер выезжает вместе с перетеканием фона.
      -------------------------------------------------------------------- */
+
+  .veil {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: calc(var(--z-nav) - 1);
+    height: calc(140px - 48px * var(--nav-t, 0));
+    pointer-events: none;
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+    /* Градиентная маска: у кромки блюр в полную силу, книзу постепенно
+       исчезает — контент под хедером размывается плавно, без ступеньки. */
+    mask-image: linear-gradient(to bottom, #000 0%, #000 30%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 30%, transparent 100%);
+    opacity: var(--nav-t, 0);
+    transition: opacity var(--dur-mid) var(--ease-out);
+  }
+
   .nav {
     --nav-t: 0;
     position: fixed;
     inset: 0 0 auto 0;
     z-index: var(--z-nav);
-    /* 112px наверху → 64px в поездке */
     height: calc(112px - 48px * var(--nav-t));
     display: flex;
     align-items: center;
-    color: var(--fg);
-    transition: color var(--dur-mid) var(--ease-out);
+    /* Всё содержимое белое; difference инвертирует его против фона. */
+    color: #fff;
+    mix-blend-mode: difference;
+    transition: opacity var(--dur-mid) var(--ease-out),
+                translate var(--dur-mid) var(--ease-out);
   }
 
-  /* Подложка проявляется вместе со сжатием. */
-  .nav::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
-    backdrop-filter: blur(12px);
-    border-bottom: var(--hair) solid var(--line-strong);
-    opacity: var(--nav-t);
+  .nav[data-away],
+  .veil[data-away] {
+    opacity: 0;
+    pointer-events: none;
   }
-
-  /* Хедер-хамелеон: над тёмной секцией живёт в тёмной семантике. */
-  .nav[data-on-dark] {
-    --bg: var(--coal);
-    --fg: var(--paper);
-    --fg-soft: color-mix(in srgb, var(--paper) 80%, var(--coal));
-    --line-strong: color-mix(in srgb, var(--paper) 32%, transparent);
-    --stamp: #5061ff;
-  }
+  .nav[data-away] { translate: 0 -14px; }
 
   .nav__inner {
     display: flex;
@@ -98,7 +105,6 @@ import { nav, cta, site, socials } from '../data/content';
   .nav__right {
     display: flex;
     align-items: center;
-    /* Широкие зазоры наверху съезжаются вместе с хедером. */
     gap: calc(2.75rem - 1.5rem * var(--nav-t));
   }
 
@@ -107,16 +113,16 @@ import { nav, cta, site, socials } from '../data/content';
     align-items: center;
     gap: 0.6rem;
     font-weight: 650;
-    /* Крупные буквы наверху: 1.25rem → 0.9rem */
     font-size: calc(1.25rem - 0.35rem * var(--nav-t));
     letter-spacing: -0.01em;
     white-space: nowrap;
   }
+  /* Глиф в difference обязан быть белым: цветной здесь исказился бы. */
   .nav__glyph {
     width: 0.55em;
     height: 0.55em;
     flex: none;
-    background: var(--stamp);
+    background: #fff;
   }
 
   .nav__links {
@@ -129,9 +135,9 @@ import { nav, cta, site, socials } from '../data/content';
     position: relative;
     font-size: calc(1.05rem - 0.2rem * var(--nav-t));
     font-weight: 500;
-    color: var(--fg-soft);
+    opacity: 0.72;
     padding-block: 0.35rem;
-    transition: color var(--dur-fast) var(--ease-out);
+    transition: opacity var(--dur-fast) var(--ease-out);
   }
   .nav__link::after {
     content: "";
@@ -140,13 +146,13 @@ import { nav, cta, site, socials } from '../data/content';
     bottom: 0;
     width: 100%;
     height: var(--hair);
-    background: var(--stamp);
+    background: #fff;
     transform: scaleX(0);
     transform-origin: left center;
     transition: transform var(--dur-mid) var(--ease-out);
   }
   .nav__link:hover,
-  .nav__link:focus-visible { color: var(--fg); }
+  .nav__link:focus-visible { opacity: 1; }
   .nav__link:hover::after,
   .nav__link:focus-visible::after { transform: scaleX(1); }
 
@@ -159,21 +165,34 @@ import { nav, cta, site, socials } from '../data/content';
   .nav__social {
     width: calc(2.75rem - 0.45rem * var(--nav-t));
     height: calc(2.75rem - 0.45rem * var(--nav-t));
+    border-color: rgb(255 255 255 / 0.34);
+    color: #fff;
+  }
+  .nav__social:hover,
+  .nav__social:focus-visible {
+    /* Внутри difference цветных заливок нет: ховер — плотность рамки. */
+    background: transparent;
+    border-color: #fff;
+    color: #fff;
   }
 
-  .nav__social--soon {
-    opacity: 0.38;
-    cursor: default;
-  }
-  .nav__social--soon:hover { background: transparent; border-color: var(--line-strong); color: var(--fg); }
+  .nav__social--soon { opacity: 0.35; cursor: default; }
+  .nav__social--soon:hover { border-color: rgb(255 255 255 / 0.34); }
 
   .nav__cta {
     padding: calc(0.85rem - 0.23rem * var(--nav-t)) calc(1.4rem - 0.3rem * var(--nav-t));
     font-size: var(--fs-micro);
+    background: #fff;
+    color: #000;
+    border-color: #fff;
   }
+  /* Оранжевая заливка из .btn исказилась бы difference-режимом. */
+  .nav__cta::before { display: none; }
+  .nav__cta:hover, .nav__cta:focus-visible { color: #000; }
 
-  /* Без мотора сжатие не работает: держим хедер сразу компактным с подложкой. */
-  :global(html:not(.motion)) .nav { --nav-t: 1; }
+  /* Без мотора: хедер виден и сразу компактный, подложка активна. */
+  :global(html:not(.motion)) .nav,
+  :global(html:not(.motion)) .veil { --nav-t: 1; }
 
   @media (max-width: 1180px) {
     .nav__links { display: none; }
@@ -181,8 +200,8 @@ import { nav, cta, site, socials } from '../data/content';
 
   @media (max-width: 780px) {
     .nav { height: calc(84px - 20px * var(--nav-t)); }
+    .veil { height: calc(110px - 20px * var(--nav-t, 0)); }
     .nav__socials { display: none; }
-    .nav__name { white-space: nowrap; }
     .nav__mark { font-size: calc(1.05rem - 0.15rem * var(--nav-t)); }
   }
 
@@ -193,3 +212,22 @@ import { nav, cta, site, socials } from '../data/content';
     .nav__given { display: none; }
   }
 </style>
+
+<script is:inline>
+  // До старта мотора хедер на фазе вопроса скрыт, но только когда движение
+  // разрешено. Если мотор не доехал за 4 секунды, возвращаем хедер: страница
+  // обязана оставаться полноценной без JS-модуля.
+  (() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const nav = document.querySelector('[data-nav]');
+    const veil = document.querySelector('[data-nav-veil]');
+    nav?.setAttribute('data-away', '');
+    veil?.setAttribute('data-away', '');
+    setTimeout(() => {
+      if (!document.documentElement.classList.contains('motion')) {
+        nav?.removeAttribute('data-away');
+        veil?.removeAttribute('data-away');
+      }
+    }, 4000);
+  })();
+</script>
