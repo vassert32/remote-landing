@@ -52,8 +52,9 @@ export const en = {
     answer: ['Same experience.', 'Different currency.'],
     /** Lead is built from parts: mark is a highlighter, accent is colour. */
     leadParts: [
-      { t: 'One-on-one mentorship', mark: true },
-      { t: ' for experienced engineers: from rebuilding your CV to a signed ' },
+      { t: 'Personal ' },
+      { t: 'one-on-one mentorship', mark: true },
+      { t: ' for experienced engineers: from rebuilding your CV to a signed ' },
       { t: 'offer', mark: true },
       { t: ' in dollars, euros or pounds.' },
     ],
