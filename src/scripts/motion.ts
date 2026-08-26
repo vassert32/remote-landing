@@ -293,7 +293,7 @@ function initSnapScroll(): void {
     const raw: number[] = [0, Math.round(vh * 1.7)]; // верх и конец hero-сцены
 
     for (const el of document.querySelectorAll<HTMLElement>(
-      'main section:not([data-program]), footer',
+      'main > section:not([data-program]), footer',
     )) {
       raw.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
     }
@@ -344,7 +344,7 @@ function initSnapScroll(): void {
     for (const point of stops) {
       const d = Math.abs(point - y);
       const ahead = dir > 0 ? point >= y - 8 : point <= y + 8;
-      const reach = ahead ? vh * 0.3 : vh * 0.15;
+      const reach = ahead ? vh * 0.45 : vh * 0.28;
       if (d <= reach && d < bestDist) {
         bestDist = d;
         best = point;
@@ -368,13 +368,17 @@ function initSnapScroll(): void {
 }
 
 /* ==========================================================================
-   Общие появления
+   Появление секций
+   Каждый блок собирается ОДНИМ заходом: как только секция подходит к кадру,
+   заголовок выезжает словами, тексты собираются из блюра, панели и колонны
+   поднимаются — всё за ~секунду, а не размазанно по нескольким прокруткам.
+   Пинов здесь нет намеренно: пин-спейсеры сдвигают документ и ломают
+   позиции соседних сцен (наложение Программы на соседей). Остановку на
+   блоке обеспечивает доводка скролла.
    ========================================================================== */
 
-/** Разрезает заголовки на слова-маски и blur-абзацы на слова. Без анимаций. */
+/** Разрезает заголовки на слова-маски, а blur-абзацы на слова. */
 function splitTexts(): void {
-  // Заголовки: слова не зависят от строк, разметка не пересобирается
-  // на ресайзе и SplitText не нужен.
   for (const el of document.querySelectorAll<HTMLElement>('[data-split]')) {
     const text = el.innerHTML.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '');
     const words = text.trim().split(/\s+/).filter(Boolean);
@@ -390,214 +394,47 @@ function splitTexts(): void {
     const words = text.trim().split(/\s+/).filter(Boolean);
     if (!words.length) continue;
     el.setAttribute('aria-label', words.join(' '));
-    el.innerHTML = words
-      .map((w) => `<span class="bw" aria-hidden="true">${w}</span>`)
-      .join(' ');
+    el.innerHTML = words.map((w) => `<span class="bw" aria-hidden="true">${w}</span>`).join(' ');
   }
 }
 
-/* ==========================================================================
-   Сцены секций (десктоп)
-   То самое ощущение hero на каждом блоке: секция пинится, и пока страница
-   стоит, её контент въезжает по скраблу — заголовок словами из-под маски,
-   тексты собираются из блюра, панели и колонны поднимаются. Последние ~30%
-   пина контент стоит целиком (холд на прочитать), затем секция отпускает.
-   Никакого перехвата колеса: это просто участок пути.
-   ========================================================================== */
+function initSectionEntrances(): void {
+  const blocks = document.querySelectorAll<HTMLElement>('main section, footer.closer');
 
-const SCENE_SECTIONS = 'main section:not([data-hero]):not([data-program])';
+  for (const section of blocks) {
+    const words = section.querySelectorAll<HTMLElement>('.split-word');
+    const blurWords = section.querySelectorAll<HTMLElement>('.bw');
+    const rises = section.querySelectorAll<HTMLElement>('[data-reveal="up"], [data-reveal="doc"]');
+    const bars = section.querySelectorAll<HTMLElement>('[data-reveal="bar"]');
+    const rules = section.querySelectorAll<HTMLElement>('[data-reveal="rule"]');
 
-function buildScene(section: HTMLElement, opts: { pin: boolean }): void {
-  section.setAttribute('data-scene', '');
+    if (!words.length && !blurWords.length && !rises.length && !bars.length && !rules.length) continue;
 
-  const words = section.querySelectorAll<HTMLElement>('.split-word');
-  const blurWords = section.querySelectorAll<HTMLElement>('.bw');
-  const rises = section.querySelectorAll<HTMLElement>('[data-reveal="up"], [data-reveal="doc"]');
-  const bars = section.querySelectorAll<HTMLElement>('[data-reveal="bar"]');
-  const rules = section.querySelectorAll<HTMLElement>('[data-reveal="rule"]');
-
-  // Остановка: короткий пин держит блок, пока читается.
-  if (opts.pin) {
-    ScrollTrigger.create({
-      trigger: section,
-      start: 'top top',
-      end: '+=55%',
-      pin: true,
+    const tl = gsap.timeline({
+      defaults: { ease: 'power3.out' },
+      scrollTrigger: { trigger: section, start: 'top 72%' },
     });
-  }
 
-  // Вход: контент влетает одним быстрым заходом, когда секция подъезжает,
-  // а не размазанно по скраблу.
-  const tl = gsap.timeline({
-    paused: true,
-    defaults: { ease: 'power3.out' },
-    scrollTrigger: {
-      trigger: section,
-      start: opts.pin ? 'top 62%' : 'top 78%',
-    },
-  });
-
-  if (words.length) {
-    tl.fromTo(words, { yPercent: 110 }, { yPercent: 0, duration: 0.7, ease: 'power4.out', stagger: 0.045 }, 0);
-  }
-  if (blurWords.length) {
-    tl.fromTo(
-      blurWords,
-      { opacity: 0, y: 12, filter: 'blur(9px)' },
-      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.55, ease: 'power2.out', stagger: 0.02 },
-      0.18,
-    );
-  }
-  if (rises.length) {
-    tl.fromTo(rises, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.07 }, 0.26);
-  }
-  if (bars.length) {
-    tl.fromTo(bars, { scaleY: 0 }, { scaleY: 1, duration: 0.75, stagger: 0.08 }, 0.34);
-  }
-  if (rules.length) {
-    tl.fromTo(rules, { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: 'power3.inOut' }, 0.3);
-  }
-}
-
-/**
- * Возвращает true, когда сцены построены: обычные появления тогда не нужны.
- * На таче и узких экранах сцен нет — там прежние лёгкие появления.
- */
-function initSectionScenes(): boolean {
-  if (!window.matchMedia('(min-width: 901px)').matches) return false;
-
-  for (const section of document.querySelectorAll<HTMLElement>(SCENE_SECTIONS)) {
-    buildScene(section, { pin: true });
-  }
-  const closer = document.querySelector<HTMLElement>('footer.closer');
-  if (closer) buildScene(closer, { pin: false });
-  return true;
-}
-
-function initReveals(): void {
-  const skip = (el: HTMLElement) => el.closest('[data-scene]') !== null;
-
-  for (const el of document.querySelectorAll<HTMLElement>('[data-split]')) {
-    if (skip(el)) continue;
-    gsap.fromTo(
-      el.querySelectorAll('.split-word'),
-      { yPercent: 110 },
-      {
-        yPercent: 0,
-        duration: 0.9,
-        ease: 'power4.out',
-        stagger: 0.055,
-        scrollTrigger: { trigger: el, start: 'top 86%' },
-      },
-    );
-  }
-
-  for (const el of document.querySelectorAll<HTMLElement>('[data-reveal="up"], [data-reveal="doc"]')) {
-    if (skip(el)) continue;
-    gsap.to(el, {
-      opacity: 1,
-      y: 0,
-      duration: 0.85,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 88%' },
-    });
-  }
-
-  for (const el of document.querySelectorAll<HTMLElement>('[data-reveal="rule"]')) {
-    if (skip(el)) continue;
-    gsap.to(el, {
-      scaleX: 1,
-      duration: 1.1,
-      ease: 'power3.inOut',
-      scrollTrigger: { trigger: el, start: 'top 92%' },
-    });
-  }
-
-  // Портрет чуть плывёт в своей рамке при проезде: глубина без шума.
-  const portrait = document.querySelector<HTMLElement>('.mentor__figure img');
-  if (portrait) {
-    gsap.set(portrait, { scale: 1.12 });
-    gsap.fromTo(
-      portrait,
-      { yPercent: -5 },
-      {
-        yPercent: 5,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: portrait.closest('figure'),
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true,
-        },
-      },
-    );
-  }
-
-  // Колонны Пути (вне сцен — мобайл): растут от земли каскадом.
-  const bars = [...document.querySelectorAll<HTMLElement>('[data-reveal="bar"]')].filter((el) => !skip(el));
-  if (bars.length) {
-    gsap.fromTo(
-      bars,
-      { scaleY: 0 },
-      {
-        scaleY: 1,
-        duration: 1.1,
-        ease: 'power3.out',
-        stagger: 0.1,
-        scrollTrigger: { trigger: bars[0]!, start: 'top 85%' },
-      },
-    );
-  }
-
-  // Появление текста по словам с блюром: порт BlurText (React Bits) на GSAP.
-  for (const el of document.querySelectorAll<HTMLElement>('[data-reveal="blur"]')) {
-    if (skip(el)) continue;
-    gsap.fromTo(
-      el.querySelectorAll('.bw'),
-      { opacity: 0, y: 14, filter: 'blur(10px)' },
-      {
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: 0.65,
-        ease: 'power2.out',
-        stagger: 0.04,
-        scrollTrigger: { trigger: el, start: 'top 88%' },
-      },
-    );
-  }
-}
-
-/**
- * Тикающие цифры: порт CountUp (React Bits) на GSAP.
- * В разметке лежит полное число (SEO и no-JS), мотор сбрасывает его в ноль
- * и пружиной докручивает при входе в кадр.
- */
-function initCounters(): void {
-  const fmt = new Intl.NumberFormat('ru-RU');
-  for (const el of document.querySelectorAll<HTMLElement>('[data-count-to]')) {
-    const to = Number(el.dataset.countTo ?? '0');
-    const prefix = el.dataset.countPrefix ?? '';
-    const suffix = el.dataset.countSuffix ?? '';
-    const state = { v: 0 };
-    const render = () => {
-      el.textContent = prefix + fmt.format(Math.round(state.v)) + suffix;
-    };
-    render();
-
-    ScrollTrigger.create({
-      trigger: el,
-      start: 'top 87%',
-      once: true,
-      onEnter: () => {
-        gsap.to(state, {
-          v: to,
-          duration: 1.5,
-          ease: 'expo.out',
-          onUpdate: render,
-        });
-      },
-    });
+    if (words.length) {
+      tl.fromTo(words, { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power4.out', stagger: 0.045 }, 0);
+    }
+    if (blurWords.length) {
+      tl.fromTo(
+        blurWords,
+        { opacity: 0, y: 12, filter: 'blur(9px)' },
+        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power2.out', stagger: 0.018 },
+        0.16,
+      );
+    }
+    if (rises.length) {
+      tl.fromTo(rises, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.06 }, 0.22);
+    }
+    if (bars.length) {
+      tl.fromTo(bars, { scaleY: 0 }, { scaleY: 1, duration: 0.8, stagger: 0.075 }, 0.3);
+    }
+    if (rules.length) {
+      tl.fromTo(rules, { scaleX: 0 }, { scaleX: 1, duration: 0.75, ease: 'power3.inOut' }, 0.26);
+    }
   }
 }
 
@@ -685,8 +522,7 @@ function boot(): void {
   splitTexts();
   initHeroScene();
   initProgram();
-  initSectionScenes();
-  initReveals();
+  initSectionEntrances();
   initCounters();
   initSnapScroll();
   ScrollTrigger.refresh();
