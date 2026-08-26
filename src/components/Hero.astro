@@ -42,7 +42,19 @@ const total = i;
             ))}
           </h2>
 
-          <p class="lead hero__lead" data-hero-rise>{c.hero.lead}</p>
+          <p class="lead hero__lead" data-hero-rise>
+            {
+              c.hero.leadParts.map((part) =>
+                part.mark ? (
+                  <mark class="mark">{part.t}</mark>
+                ) : part.accent ? (
+                  <strong class="accent hero__accent">{part.t}</strong>
+                ) : (
+                  <Fragment>{part.t}</Fragment>
+                ),
+              )
+            }
+          </p>
 
           <div class="hero__actions" data-hero-rise>
             <a class="btn btn--ink" href={links.telegram} target="_blank" rel="noopener" data-magnetic>
@@ -58,22 +70,31 @@ const total = i;
 
         <figure class="hero__aside" data-hero-doc>
           <div class="doc offer">
-            <figcaption class="doc__head">
-              <span>{c.offer.docTitle}</span>
-              <span class="offer__owner">{c.offer.owner}</span>
+            <figcaption class="doc__head offer__head">
+              <span class="offer__title">{c.offer.docTitle}</span>
+              <span class="offer__status">{c.offer.status}</span>
             </figcaption>
-            <div class="doc__body">
+
+            <div class="offer__body">
               {
                 c.offer.rows.map((row) => (
-                  <div class="doc__row">
-                    <span class="doc__key">{row.key}</span>
-                    <span class="doc__val">{row.value}</span>
+                  <div class="offer__row">
+                    <span class="offer__key">{row.key}</span>
+                    <span class="offer__val">{row.value}</span>
                   </div>
                 ))
               }
             </div>
-            <div class="offer__seal">
-              <span class="stamp" data-hero-stamp>{c.offer.stamp}</span>
+
+            <!-- Подпись работодателя стоит, читателя — ждёт: приглашение,
+                 а не запись о состоявшемся факте. -->
+            <div class="offer__sign">
+              <div class="offer__sign-field">
+                <span class="offer__sign-line" aria-hidden="true"></span>
+                <span class="offer__sign-label">{c.offer.signLabel}</span>
+                <span class="offer__sign-hint">{c.offer.signHint}</span>
+              </div>
+              <span class="stamp offer__stamp" data-hero-stamp>{c.offer.stamp}</span>
             </div>
           </div>
         </figure>
@@ -180,7 +201,7 @@ const total = i;
   }
 
   .hero__main {
-    grid-column: 1 / 8;
+    grid-column: 1 / 7;
     display: flex;
     flex-direction: column;
     gap: clamp(1.5rem, 0.8rem + 2vw, 2.5rem);
@@ -209,15 +230,106 @@ const total = i;
   }
 
   .hero__aside {
-    grid-column: 8 / 13;
+    grid-column: 7 / 13;
     margin: 0;
   }
 
-  .offer__owner { color: var(--fg-mute); font-weight: 500; }
-  .offer__seal {
+  /* Документ намеренно строгий: жирная рамка, крупная шапка, широкие поля.
+     Читается как бланк, а не как карточка интерфейса. */
+  .offer {
+    border-width: 2px;
+    box-shadow: 0 24px 60px -30px rgb(18 18 15 / 0.45);
+  }
+
+  .offer__head {
+    padding: 0.9rem 1.4rem;
+    border-bottom-width: 2px;
+  }
+  .offer__title {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+  }
+  .offer__status {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    color: var(--fg-mute);
+  }
+
+  .offer__body { padding: 0.4rem 1.4rem; }
+
+  .offer__row {
+    display: grid;
+    grid-template-columns: minmax(7rem, 0.34fr) 1fr;
+    gap: var(--space-4);
+    align-items: baseline;
+    padding-block: 0.78rem;
+  }
+  .offer__row + .offer__row { border-top: var(--hair) solid var(--line); }
+
+  .offer__key {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: var(--tr-mono);
+    color: var(--fg-mute);
+  }
+  .offer__val {
+    font-size: var(--fs-body);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  /* Блок подписи: линия пустая и ждёт, печать уже стоит. */
+  .offer__sign {
     display: flex;
-    justify-content: flex-end;
-    padding: 0 1.1rem 1.3rem;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: 1.4rem 1.4rem 1.5rem;
+    border-top: 2px solid var(--fg);
+  }
+
+  .offer__sign-field {
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+    flex: 1;
+  }
+  .offer__sign-line {
+    display: block;
+    height: 2.1rem;
+    border-bottom: var(--hair) solid var(--fg);
+    /* Мигающая каретка на пустой линии: подпись ещё ждут. */
+    background-image: linear-gradient(var(--stamp), var(--stamp));
+    background-size: 2px 1.1rem;
+    background-position: 2px calc(100% - 0.28rem);
+    background-repeat: no-repeat;
+    animation: offer-caret 1.05s steps(1) infinite;
+  }
+  .offer__sign-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: var(--tr-mono);
+    color: var(--fg-mute);
+  }
+  .offer__sign-hint {
+    font-size: var(--fs-micro);
+    color: var(--fg-faint);
+  }
+
+  .offer__stamp {
+    flex: none;
+    align-self: center;
+    padding: 0.5rem 0.95rem;
+    font-size: var(--fs-small);
+    letter-spacing: 0.14em;
+  }
+
+  @keyframes offer-caret { 50% { background-image: none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .offer__sign-line { animation: none; }
   }
 
   /* --- Наложение фаз в режиме мотора ------------------------------------ */
@@ -230,7 +342,13 @@ const total = i;
 
   @media (max-width: 1100px) {
     .hero__main { grid-column: 1 / -1; }
-    .hero__aside { grid-column: 1 / -1; max-width: 26rem; }
+    .hero__aside { grid-column: 1 / -1; max-width: 30rem; }
+  }
+
+  @media (max-width: 560px) {
+    .offer__row { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
+    .offer__sign { flex-direction: column; align-items: flex-start; gap: var(--space-4); }
+    .offer__stamp { align-self: flex-end; }
   }
 
   @media (max-width: 560px) {

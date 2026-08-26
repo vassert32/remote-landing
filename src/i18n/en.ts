@@ -50,22 +50,35 @@ export const en = {
   hero: {
     question: 'What is your experience worth?',
     answer: ['Same experience.', 'Different currency.'],
-    lead:
-      'One-on-one mentorship for experienced engineers: from rebuilding your CV ' +
-      'to a signed offer in pounds or euros.',
+    /** Lead is built from parts: mark is a highlighter, accent is colour. */
+    leadParts: [
+      { t: 'One-on-one mentorship', mark: true },
+      { t: ' for experienced engineers: from rebuilding your CV to a signed ' },
+      { t: 'offer', accent: true },
+      { t: ' in ' },
+      { t: 'dollars, euros or pounds', mark: true },
+      { t: '.' },
+    ],
   },
 
+  /**
+   * The first-screen document: a blank offer made out TO THE READER.
+   * It is an invitation, not a record of something that happened: the
+   * employer side is approved, the reader's signature is still missing.
+   */
   offer: {
-    docTitle: 'Offer',
-    owner: 'Mine, actually',
+    docTitle: 'JOB OFFER',
+    status: 'awaiting signature',
     rows: [
-      { key: 'To', value: 'Evgeny Gerkulesov' },
-      { key: 'Role', value: 'Senior Backend Engineer' },
-      { key: 'Format', value: 'Remote, United Kingdom' },
-      { key: 'Rate', value: 'USD 8,500 per month' },
-      { key: 'Search took', value: '4 months' },
+      { key: 'To', value: 'YOU' },
+      { key: 'Format', value: 'Remote, no relocation' },
+      { key: 'Rate', value: 'from USD 5,000 per month' },
+      { key: 'Currency', value: 'USD, EUR or GBP' },
+      { key: 'Search time', value: '3-4 months' },
     ],
-    stamp: 'Signed',
+    signLabel: 'Signature',
+    signHint: 'your signature',
+    stamp: 'Approved',
   },
 
   mentor: {

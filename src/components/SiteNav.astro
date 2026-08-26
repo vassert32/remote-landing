@@ -109,11 +109,12 @@ const alt = otherLang(Astro.currentLocale);
      Прижатые к краям экрана края снимают ощущение строгой коробки. */
   .nav__inner {
     width: 100%;
-    max-width: 1840px;
+    max-width: 1560px;
     margin-inline: auto;
-    /* Поля вдвое меньше контентных (--page-pad): элементы уходят к краям
-       экрана, коробка перестаёт читаться строгой. */
-    padding-inline: clamp(1rem, 0.25rem + 1.1vw, 2rem);
+    /* Ровно на шаг шире контентной сетки: поля меньше --page-pad на 1rem.
+       Достаточно, чтобы коробка не читалась строгой, и не настолько,
+       чтобы хедер уезжал к самому краю экрана. */
+    padding-inline: max(1rem, calc(var(--page-pad) - 1rem));
     display: flex;
     align-items: center;
     justify-content: space-between;

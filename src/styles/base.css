@@ -169,6 +169,18 @@ main > .section[data-program] { padding-block: 0; }
 
 .accent { color: var(--stamp); }
 
+/* Маркер: выделение ключевого слова заливкой акцента.
+   box-decoration-break обязателен — иначе на переносе строки заливка
+   обрывается прямоугольником без боковых полей. */
+.mark {
+  background: var(--stamp);
+  color: var(--paper);
+  padding: 0.06em 0.2em;
+  margin-inline: -0.05em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 /* Шрифт цифр: отдельный токен, чтобы менять одним движением. */
 .num-font {
   font-family: var(--font-num);

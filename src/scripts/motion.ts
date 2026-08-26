@@ -95,7 +95,9 @@ function initHeroScene(): void {
   // стилей и yPercent GSAP не складываются, строки застревали бы за маской.
   gsap.set(lines, { yPercent: 110 });
   gsap.set(rises, { opacity: 0, y: 22 });
-  if (doc) gsap.set(doc, { opacity: 0, y: 30 });
+  // Лист приходит из-за нижней кромки экрана: это подача документа,
+  // а не появление карточки интерфейса.
+  if (doc) gsap.set(doc, { opacity: 0, y: () => window.innerHeight * 0.62, rotate: 1.5 });
 
   const setSceneDark = (dark: boolean) => {
     if (dark) scene.setAttribute('data-band', 'dark');
@@ -137,7 +139,7 @@ function initHeroScene(): void {
   // Фаза 2: ответ. Строки из-под маски, текст и кнопки поднимаются, документ въезжает.
   tl.to(lines, { yPercent: 0, duration: 0.2, ease: 'power2.out', stagger: 0.045 }, 0.5);
   tl.to(rises, { opacity: 1, y: 0, duration: 0.16, ease: 'power2.out', stagger: 0.04 }, 0.58);
-  if (doc) tl.to(doc, { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out' }, 0.6);
+  if (doc) tl.to(doc, { opacity: 1, y: 0, rotate: 0, duration: 0.3, ease: 'power2.out' }, 0.52);
 
   // Печать прикладывается в конце: быстрый удар, а не проявление.
   if (stamp) {
