@@ -149,6 +149,64 @@ function initHeroScene(): void {
     );
   }
 
+  // Снап сцены: у неё два валидных состояния — вопрос (верх) и ответ (конец
+  // сцены). Застрять в полусвете перетекания нельзя. Работает ТОЛЬКО здесь:
+  // на остальной странице скролл свободный, глобальную доводку мы снесли.
+  // Снап ScrollTrigger не годится — он двигает нативный скролл, которым
+  // владеет Lenis, поэтому доводим сами.
+  const sceneEnd = () => Math.round(window.innerHeight * 1.7);
+  let heroSnapping = false;
+  let lastInput = 0;
+  const markInput = () => {
+    lastInput = performance.now();
+  };
+  for (const evt of ['wheel', 'touchstart', 'touchmove', 'keydown'] as const) {
+    window.addEventListener(evt, markInput, { passive: true });
+  }
+
+  // Остановку ловим по НЕПОДВИЖНОСТИ позиции, а не по событиям: Lenis шлёт
+  // 'scroll' каждый кадр даже на стоящей странице, поэтому дебаунс на
+  // событиях не срабатывает никогда, а порог скорости не ловит момент.
+  const TICK = 120;
+  let lastPos = -1;
+  let stillFor = 0;
+
+  window.setInterval(() => {
+    if (heroSnapping || !lenisRef) return;
+
+    const end = sceneEnd();
+    const y = lenisRef.actualScroll;
+
+    // За пределами сцены и на её краях снап молчит.
+    if (y <= 6 || y >= end - 6) {
+      lastPos = y;
+      stillFor = 0;
+      return;
+    }
+
+    stillFor = Math.abs(y - lastPos) < 1.5 ? stillFor + TICK : 0;
+    lastPos = y;
+
+    // Стоим уже пару тиков и пользователь не крутит — доводим до состояния.
+    if (stillFor < 240) return;
+    if (performance.now() - lastInput < 200) return;
+
+    // Куда ближе, туда и садимся: без рывков против направления чтения.
+    const target = y > end * 0.42 ? end : 0;
+    stillFor = 0;
+    heroSnapping = true;
+    lenisRef.scrollTo(target, {
+      duration: 0.7,
+      easing: (t: number) => 1 - Math.pow(1 - t, 4),
+      onComplete: () => {
+        heroSnapping = false;
+      },
+    });
+    window.setTimeout(() => {
+      heroSnapping = false;
+    }, 1100);
+  }, TICK);
+
   // Автопрокрутка: когда вопрос допечатан, сцена сама везёт к ответу.
   // Любое действие пользователя (колесо, тач, клавиши) отменяет автопилот.
   const chars = scene.querySelectorAll('.hero__ch').length;
@@ -163,7 +221,8 @@ function initHeroScene(): void {
 
   window.setTimeout(() => {
     const y = lenisRef?.actualScroll ?? window.scrollY;
-    if (userTook || y > 40) return;
+    // Порог щедрый: важно лишь, что пользователь ещё не уехал сам.
+    if (userTook || y > window.innerHeight * 0.25) return;
     lenisRef?.scrollTo(Math.round(window.innerHeight * 1.7), {
       duration: 2.6,
       easing: (t: number) => 1 - Math.pow(1 - t, 3),
@@ -431,6 +490,10 @@ function initMagnetic(): void {
    ========================================================================== */
 
 function boot(): void {
+  // Сцена hero рассчитана на старт с нуля: восстановление позиции браузером
+  // высаживало пользователя в середину перетекания и глушило автопилот.
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
   navEl = document.querySelector<HTMLElement>('[data-nav]');
   veilEl = document.querySelector<HTMLElement>('[data-nav-veil]');
   gsap.registerPlugin(ScrollTrigger);
