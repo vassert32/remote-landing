@@ -293,7 +293,7 @@ function initSnapScroll(): void {
     const raw: number[] = [0, Math.round(vh * 1.7)]; // верх и конец hero-сцены
 
     for (const el of document.querySelectorAll<HTMLElement>(
-      'main > section:not([data-program]), footer',
+      'main section:not([data-program]), footer',
     )) {
       raw.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
     }
@@ -405,7 +405,7 @@ function splitTexts(): void {
    Никакого перехвата колеса: это просто участок пути.
    ========================================================================== */
 
-const SCENE_SECTIONS = 'main > section:not([data-hero]):not([data-program])';
+const SCENE_SECTIONS = 'main section:not([data-hero]):not([data-program])';
 
 function buildScene(section: HTMLElement, opts: { pin: boolean }): void {
   section.setAttribute('data-scene', '');
@@ -416,47 +416,47 @@ function buildScene(section: HTMLElement, opts: { pin: boolean }): void {
   const bars = section.querySelectorAll<HTMLElement>('[data-reveal="bar"]');
   const rules = section.querySelectorAll<HTMLElement>('[data-reveal="rule"]');
 
+  // Остановка: короткий пин держит блок, пока читается.
+  if (opts.pin) {
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top top',
+      end: '+=55%',
+      pin: true,
+    });
+  }
+
+  // Вход: контент влетает одним быстрым заходом, когда секция подъезжает,
+  // а не размазанно по скраблу.
   const tl = gsap.timeline({
-    defaults: { ease: 'power2.out' },
-    scrollTrigger: opts.pin
-      ? {
-          trigger: section,
-          start: 'top top',
-          end: '+=72%',
-          pin: true,
-          scrub: 0.4,
-        }
-      : {
-          // Финал не пинится: контент собирается по мере доезда.
-          trigger: section,
-          start: 'top 88%',
-          end: 'top 4%',
-          scrub: 0.4,
-        },
+    paused: true,
+    defaults: { ease: 'power3.out' },
+    scrollTrigger: {
+      trigger: section,
+      start: opts.pin ? 'top 62%' : 'top 78%',
+    },
   });
 
   if (words.length) {
-    tl.fromTo(words, { yPercent: 110 }, { yPercent: 0, duration: 0.3, stagger: 0.03 }, 0);
+    tl.fromTo(words, { yPercent: 110 }, { yPercent: 0, duration: 0.7, ease: 'power4.out', stagger: 0.045 }, 0);
   }
   if (blurWords.length) {
     tl.fromTo(
       blurWords,
       { opacity: 0, y: 12, filter: 'blur(9px)' },
-      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.28, stagger: 0.012 },
-      0.12,
+      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.55, ease: 'power2.out', stagger: 0.02 },
+      0.18,
     );
   }
   if (rises.length) {
-    tl.fromTo(rises, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.05 }, 0.2);
+    tl.fromTo(rises, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.07 }, 0.26);
   }
   if (bars.length) {
-    tl.fromTo(bars, { scaleY: 0 }, { scaleY: 1, duration: 0.34, ease: 'power3.out', stagger: 0.045 }, 0.28);
+    tl.fromTo(bars, { scaleY: 0 }, { scaleY: 1, duration: 0.75, stagger: 0.08 }, 0.34);
   }
   if (rules.length) {
-    tl.fromTo(rules, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: 'power3.inOut' }, 0.25);
+    tl.fromTo(rules, { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: 'power3.inOut' }, 0.3);
   }
-  // Холд: пустой хвост таймлайна, чтобы собранный блок постоял в пине.
-  tl.to({}, { duration: 0.32 });
 }
 
 /**

@@ -97,13 +97,16 @@ a { color: inherit; text-decoration: none; }
 /* Каждый смысловой этап занимает свой экран: контент по центру.
    ВАЖНО: у секции с пином (Программа) flex-родитель ломает пин-спейсер
    ScrollTrigger — она остаётся обычным блоком, центрует её сам пин. */
-main > .section:not([data-program]) {
+/* Потомковый селектор, не дочерний: пин-спейсер ScrollTrigger оборачивает
+   секцию в div, и «main > section» переставал матчить — секции разом
+   теряли высоту и центрирование. */
+main .section:not([data-program]) {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-main > .section[data-program] { padding-block: 0; }
+main .section[data-program] { padding-block: 0; }
 
 /* ==========================================================================
    Типографика
