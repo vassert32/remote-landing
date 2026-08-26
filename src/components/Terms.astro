@@ -24,7 +24,10 @@ const c = t(Astro.currentLocale);
       }
       <div class="bill__row bill__row--final" data-reveal="up">
         <dt class="bill__key bill__key--final">{c.terms.final.key}</dt>
-        <dd class="bill__val bill__val--final num-font">{c.terms.final.value}</dd>
+        <dd class="bill__final">
+          <span class="bill__val bill__val--final num-font">{c.terms.final.value}</span>
+          <span class="bill__note">{c.terms.final.note}</span>
+        </dd>
       </div>
     </dl>
     </div>
@@ -74,6 +77,24 @@ const c = t(Astro.currentLocale);
     line-height: 1;
     color: var(--fg-soft);
     margin: 0;
+  }
+
+  /* Итог с пояснением: без него «50%» читается как доля от всего дохода. */
+  .bill__final {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    margin: 0;
+  }
+  .bill__note {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: var(--tr-mono);
+    color: var(--fg-mute);
+    text-align: right;
+    max-width: 22ch;
+    text-wrap: pretty;
   }
 
   /* Итоговая строка: единственная сумма, которая реально появится. */

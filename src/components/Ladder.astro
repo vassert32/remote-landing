@@ -20,23 +20,23 @@ const fmt = new Intl.NumberFormat(c.locale);
         c.ladder.points.map((point, i) => (
           <li
             class:list={['col', { 'col--peak': i === c.ladder.points.length - 1 }]}
-            style={`--w:${point.weight}`}
+            style={`--w:${Math.sqrt(point.weight).toFixed(3)}`}
             tabindex="0"
           >
             <div class="col__story" role="note">
               <p>{point.story}</p>
             </div>
 
-            <span class="col__bar" data-reveal="bar" aria-hidden="true"></span>
-
-            <span class="col__num readout num-font">
-              <span
-                class="num"
-                data-count-to={point.value}
-                data-count-prefix={point.prefix}
-                data-count-suffix={point.suffix}
-              >{point.prefix}{fmt.format(point.value)}{point.suffix}</span>
+            <span class="col__bar" data-reveal="bar">
+              <span class="col__num num num-font">
+                <span
+                  data-count-to={point.value}
+                  data-count-prefix={point.prefix}
+                  data-count-suffix={point.suffix}
+                >{point.prefix}{fmt.format(point.value)}{point.suffix}</span>
+              </span>
             </span>
+
             <span class="col__stage">
               <Icon name={point.icon} class="col__stage-icon" aria-hidden="true" />
               {point.stage}
@@ -60,8 +60,9 @@ const fmt = new Intl.NumberFormat(c.locale);
     grid-template-columns: repeat(5, minmax(0, 1fr));
     align-items: end;
     column-gap: var(--col-gap);
-    /* Поле колонн: высота пиковой. */
-    --field: clamp(8rem, 3.5rem + 11vw, 12.5rem);
+    /* Поле высокое: столбец должен быть выше своей ширины, иначе
+       читается прямоугольником, а не столбцом. */
+    --field: clamp(11rem, 5rem + 15vw, 21rem);
   }
 
   .col {
@@ -81,12 +82,15 @@ const fmt = new Intl.NumberFormat(c.locale);
     transition: color var(--dur-fast) var(--ease-out);
   }
 
-  /* Колонна: заметная плоть с оранжевой кромкой сверху. */
+  /* Столбец: узкий и высокий, сумма напечатана внутри у основания. */
   .col__bar {
-    display: block;
-    width: 100%;
-    height: max(calc(var(--field) * var(--w)), 8px);
-    background: color-mix(in srgb, var(--paper) 10%, var(--bg));
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    width: clamp(4.5rem, 2.5rem + 4.5vw, 8.5rem);
+    height: max(calc(var(--field) * var(--w)), 3.4rem);
+    padding: 0.55rem 0.7rem;
+    background: color-mix(in srgb, var(--paper) 9%, var(--bg));
     box-shadow: inset 0 2px 0 var(--stamp);
     transform-origin: bottom center;
   }
@@ -94,24 +98,22 @@ const fmt = new Intl.NumberFormat(c.locale);
   .ladder__panel { padding-top: clamp(1.8rem, 1.4rem + 1.6vw, 2.6rem); }
 
   .col__num {
-    display: inline-block;
-    align-self: flex-start;
-    margin-top: var(--space-4);
-    font-weight: 550;
-    font-size: clamp(0.82rem, 0.3rem + 1.45vw, 1.35rem);
-    line-height: 1.15;
+    font-weight: 600;
+    font-size: clamp(0.7rem, 0.45rem + 0.8vw, 0.95rem);
+    line-height: 1.1;
+    white-space: nowrap;
   }
 
 
+  /* Подпись этапа под столбцом: крупнее прежнего, это несущий текст. */
   .col__stage {
     display: flex;
     align-items: center;
-    gap: 0.45em;
-    margin-top: 0.45rem;
-    font-family: var(--font-mono);
-    font-size: var(--fs-micro);
-    line-height: 1.4;
-    color: var(--fg-mute);
+    gap: 0.5em;
+    margin-top: 0.9rem;
+    font-size: var(--fs-small);
+    line-height: 1.35;
+    color: var(--fg-soft);
   }
 
   /* История: всплывает над колонной при наведении или фокусе. */
@@ -150,13 +152,15 @@ const fmt = new Intl.NumberFormat(c.locale);
     box-shadow: inset 0 2px 0 var(--stamp);
   }
   .col--peak .col__num { color: var(--stamp); }
-  .col--peak .col__stage { color: var(--fg); }
+  .col--peak .col__stage { color: var(--fg); font-weight: 600; }
   .col--peak .col__stage-icon { color: var(--stamp); }
 
   @media (max-width: 900px) {
     .ladder__title, .ladder__body { grid-column: 1 / -1; }
-    .cols { --field: clamp(7rem, 3rem + 14vw, 11rem); column-gap: 0.7rem; }
-    .col__num { font-size: clamp(0.72rem, 0.28rem + 1.6vw, 1rem); }
+    .cols { --field: clamp(8rem, 3rem + 15vw, 12rem); column-gap: 0.7rem; }
+    .col__bar { width: 100%; padding-inline: 0.45rem; }
+    .col__num { font-size: clamp(0.62rem, 0.4rem + 0.7vw, 0.8rem); }
+    .col__stage { font-size: var(--fs-micro); }
   }
 
   /* Ниже 560px пять колонн нечитаемы: разворачиваем в вертикальный список,

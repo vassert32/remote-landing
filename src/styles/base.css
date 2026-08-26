@@ -163,7 +163,9 @@ main > .section[data-program] { padding-block: 0; }
 .num {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1, "zero" 1;
+  /* Только табличные цифры. Фича "zero" рисует ноль с точкой внутри —
+     на суммах это читается как брак печати. */
+  font-feature-settings: "tnum" 1;
   letter-spacing: -0.02em;
 }
 

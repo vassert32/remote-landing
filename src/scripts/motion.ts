@@ -438,9 +438,13 @@ function initSectionEntrances(): void {
       continue;
     }
 
+    // Тёмная секция сначала закрывает экран целиком чёрным полотном и
+    // только потом наполняется: старт входа отложен почти до её верха.
+    const isDark = section.matches('[data-band="dark"]');
+
     const tl = gsap.timeline({
       defaults: { ease: 'power3.out' },
-      scrollTrigger: { trigger: section, start: 'top 72%' },
+      scrollTrigger: { trigger: section, start: isDark ? 'top 22%' : 'top 72%' },
     });
 
     if (words.length) {

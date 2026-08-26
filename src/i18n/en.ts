@@ -165,7 +165,7 @@ export const en = {
       { key: 'First review call', value: '₽0' },
       { key: 'Preparation and guidance up to the offer', value: '₽0' },
     ],
-    final: { key: 'After your first paycheck', value: '50%' },
+    final: { key: 'After your first paycheck', value: '50%', note: 'once, from your first paycheck, nothing after that' },
   },
 
   fit: {
