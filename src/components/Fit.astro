@@ -1,32 +1,36 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { fit } from '../data/content';
+
+/**
+ * Пары «подойдёт/не подойдёт» лежат в одной грид-строке: их линии совпадают
+ * по горизонтали. Визуально это те же две колонки, что и раньше.
+ */
+const rows = fit.yes.map((yes, i) => ({ yes, no: fit.no[i] ?? '' }));
 ---
 
 <section class="section fitcheck">
   <div class="shell">
     <h2 class="h2 fitcheck__title" data-split>Это не курс входа в IT</h2>
 
-    <div class="grid fitcheck__cols">
-      <div class="fitcheck__col" data-reveal="up">
-        <h3 class="fitcheck__colhead">
-          <Icon name="ph:check-bold" class="fitcheck__mark fitcheck__mark--yes" aria-hidden="true" />
-          <span>Подойдёт</span>
-        </h3>
-        <ul class="fitcheck__list">
-          {fit.yes.map((item) => <li class="fitcheck__item">{item}</li>)}
-        </ul>
-      </div>
+    <div class="fitcheck__table">
+      <h3 class="fitcheck__colhead">
+        <Icon name="ph:check-bold" class="fitcheck__mark fitcheck__mark--yes" aria-hidden="true" />
+        <span>Подойдёт</span>
+      </h3>
+      <h3 class="fitcheck__colhead fitcheck__colhead--no">
+        <Icon name="ph:x-bold" class="fitcheck__mark" aria-hidden="true" />
+        <span>Не подойдёт</span>
+      </h3>
 
-      <div class="fitcheck__col fitcheck__col--no" data-reveal="up">
-        <h3 class="fitcheck__colhead">
-          <Icon name="ph:x-bold" class="fitcheck__mark" aria-hidden="true" />
-          <span>Не подойдёт</span>
-        </h3>
-        <ul class="fitcheck__list">
-          {fit.no.map((item) => <li class="fitcheck__item">{item}</li>)}
-        </ul>
-      </div>
+      {
+        rows.map((row) => (
+          <>
+            <p class="fitcheck__item" data-reveal="up">{row.yes}</p>
+            <p class="fitcheck__item fitcheck__item--no" data-reveal="up">{row.no}</p>
+          </>
+        ))
+      }
     </div>
   </div>
 </section>
@@ -34,37 +38,49 @@ import { fit } from '../data/content';
 <style>
   .fitcheck__title { margin-bottom: clamp(2.5rem, 1rem + 5vw, 5rem); max-width: 16ch; }
 
-  .fitcheck__cols { row-gap: var(--space-12); }
-
-  .fitcheck__col { grid-column: span 6; }
-  .fitcheck__col--no { color: var(--fg-mute); }
+  .fitcheck__table {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2rem, 1rem + 4vw, 5rem);
+    align-items: stretch;
+  }
 
   .fitcheck__colhead {
     display: flex;
     align-items: center;
     gap: 0.6rem;
+    margin: 0;
     padding-bottom: var(--space-4);
     border-bottom: 2px solid var(--fg);
     font-size: var(--fs-h3);
     font-weight: 600;
     letter-spacing: -0.014em;
   }
-  .fitcheck__col--no .fitcheck__colhead { border-bottom-color: var(--line-strong); }
+  .fitcheck__colhead--no { color: var(--fg-mute); border-bottom-color: var(--line-strong); }
 
   .fitcheck__mark { width: 0.8em; height: 0.8em; flex: none; }
   .fitcheck__mark--yes { color: var(--stamp); }
 
   .fitcheck__item {
+    margin: 0;
     padding-block: var(--space-4);
     border-bottom: var(--hair) solid var(--line);
     max-width: 44ch;
-    /* Пары строк левой и правой колонок держат общий ритм. */
-    min-height: 4.1em;
     text-wrap: pretty;
   }
-  .fitcheck__col--no .fitcheck__item { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: var(--fg-faint); }
+  .fitcheck__item--no {
+    color: var(--fg-mute);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--fg-faint);
+  }
 
-  @media (max-width: 900px) {
-    .fitcheck__col { grid-column: 1 / -1; }
+  /* Мобайл: сетка складывается в две группы — сперва все «да», затем «нет». */
+  @media (max-width: 780px) {
+    .fitcheck__table { grid-template-columns: minmax(0, 1fr); }
+    .fitcheck__colhead { order: 1; }
+    .fitcheck__item { order: 2; }
+    .fitcheck__colhead--no { order: 3; margin-top: var(--space-8); }
+    .fitcheck__item--no { order: 4; }
   }
 </style>

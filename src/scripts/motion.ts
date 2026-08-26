@@ -371,9 +371,10 @@ function initSnapScroll(): void {
    Общие появления
    ========================================================================== */
 
-function initReveals(): void {
-  // Заголовки выезжают по словам из-под маски: слова не зависят от строк,
-  // поэтому разметка не пересобирается на ресайзе и SplitText не нужен.
+/** Разрезает заголовки на слова-маски и blur-абзацы на слова. Без анимаций. */
+function splitTexts(): void {
+  // Заголовки: слова не зависят от строк, разметка не пересобирается
+  // на ресайзе и SplitText не нужен.
   for (const el of document.querySelectorAll<HTMLElement>('[data-split]')) {
     const text = el.innerHTML.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '');
     const words = text.trim().split(/\s+/).filter(Boolean);
@@ -382,7 +383,102 @@ function initReveals(): void {
     el.innerHTML = words
       .map((w) => `<span class="split-mask" aria-hidden="true"><span class="split-word">${w}</span></span>`)
       .join(' ');
+  }
 
+  for (const el of document.querySelectorAll<HTMLElement>('[data-reveal="blur"]')) {
+    const text = el.textContent ?? '';
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    if (!words.length) continue;
+    el.setAttribute('aria-label', words.join(' '));
+    el.innerHTML = words
+      .map((w) => `<span class="bw" aria-hidden="true">${w}</span>`)
+      .join(' ');
+  }
+}
+
+/* ==========================================================================
+   Сцены секций (десктоп)
+   То самое ощущение hero на каждом блоке: секция пинится, и пока страница
+   стоит, её контент въезжает по скраблу — заголовок словами из-под маски,
+   тексты собираются из блюра, панели и колонны поднимаются. Последние ~30%
+   пина контент стоит целиком (холд на прочитать), затем секция отпускает.
+   Никакого перехвата колеса: это просто участок пути.
+   ========================================================================== */
+
+const SCENE_SECTIONS = 'main > section:not([data-hero]):not([data-program])';
+
+function buildScene(section: HTMLElement, opts: { pin: boolean }): void {
+  section.setAttribute('data-scene', '');
+
+  const words = section.querySelectorAll<HTMLElement>('.split-word');
+  const blurWords = section.querySelectorAll<HTMLElement>('.bw');
+  const rises = section.querySelectorAll<HTMLElement>('[data-reveal="up"], [data-reveal="doc"]');
+  const bars = section.querySelectorAll<HTMLElement>('[data-reveal="bar"]');
+  const rules = section.querySelectorAll<HTMLElement>('[data-reveal="rule"]');
+
+  const tl = gsap.timeline({
+    defaults: { ease: 'power2.out' },
+    scrollTrigger: opts.pin
+      ? {
+          trigger: section,
+          start: 'top top',
+          end: '+=72%',
+          pin: true,
+          scrub: 0.4,
+        }
+      : {
+          // Финал не пинится: контент собирается по мере доезда.
+          trigger: section,
+          start: 'top 88%',
+          end: 'top 4%',
+          scrub: 0.4,
+        },
+  });
+
+  if (words.length) {
+    tl.fromTo(words, { yPercent: 110 }, { yPercent: 0, duration: 0.3, stagger: 0.03 }, 0);
+  }
+  if (blurWords.length) {
+    tl.fromTo(
+      blurWords,
+      { opacity: 0, y: 12, filter: 'blur(9px)' },
+      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.28, stagger: 0.012 },
+      0.12,
+    );
+  }
+  if (rises.length) {
+    tl.fromTo(rises, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.05 }, 0.2);
+  }
+  if (bars.length) {
+    tl.fromTo(bars, { scaleY: 0 }, { scaleY: 1, duration: 0.34, ease: 'power3.out', stagger: 0.045 }, 0.28);
+  }
+  if (rules.length) {
+    tl.fromTo(rules, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: 'power3.inOut' }, 0.25);
+  }
+  // Холд: пустой хвост таймлайна, чтобы собранный блок постоял в пине.
+  tl.to({}, { duration: 0.32 });
+}
+
+/**
+ * Возвращает true, когда сцены построены: обычные появления тогда не нужны.
+ * На таче и узких экранах сцен нет — там прежние лёгкие появления.
+ */
+function initSectionScenes(): boolean {
+  if (!window.matchMedia('(min-width: 901px)').matches) return false;
+
+  for (const section of document.querySelectorAll<HTMLElement>(SCENE_SECTIONS)) {
+    buildScene(section, { pin: true });
+  }
+  const closer = document.querySelector<HTMLElement>('footer.closer');
+  if (closer) buildScene(closer, { pin: false });
+  return true;
+}
+
+function initReveals(): void {
+  const skip = (el: HTMLElement) => el.closest('[data-scene]') !== null;
+
+  for (const el of document.querySelectorAll<HTMLElement>('[data-split]')) {
+    if (skip(el)) continue;
     gsap.fromTo(
       el.querySelectorAll('.split-word'),
       { yPercent: 110 },
@@ -397,6 +493,7 @@ function initReveals(): void {
   }
 
   for (const el of document.querySelectorAll<HTMLElement>('[data-reveal="up"], [data-reveal="doc"]')) {
+    if (skip(el)) continue;
     gsap.to(el, {
       opacity: 1,
       y: 0,
@@ -407,6 +504,7 @@ function initReveals(): void {
   }
 
   for (const el of document.querySelectorAll<HTMLElement>('[data-reveal="rule"]')) {
+    if (skip(el)) continue;
     gsap.to(el, {
       scaleX: 1,
       duration: 1.1,
@@ -435,8 +533,8 @@ function initReveals(): void {
     );
   }
 
-  // Колонны Пути растут от земли каскадом.
-  const bars = document.querySelectorAll<HTMLElement>('[data-reveal="bar"]');
+  // Колонны Пути (вне сцен — мобайл): растут от земли каскадом.
+  const bars = [...document.querySelectorAll<HTMLElement>('[data-reveal="bar"]')].filter((el) => !skip(el));
   if (bars.length) {
     gsap.fromTo(
       bars,
@@ -453,14 +551,7 @@ function initReveals(): void {
 
   // Появление текста по словам с блюром: порт BlurText (React Bits) на GSAP.
   for (const el of document.querySelectorAll<HTMLElement>('[data-reveal="blur"]')) {
-    const text = el.textContent ?? '';
-    const words = text.trim().split(/\s+/).filter(Boolean);
-    if (!words.length) continue;
-    el.setAttribute('aria-label', words.join(' '));
-    el.innerHTML = words
-      .map((w) => `<span class="bw" aria-hidden="true">${w}</span>`)
-      .join(' ');
-
+    if (skip(el)) continue;
     gsap.fromTo(
       el.querySelectorAll('.bw'),
       { opacity: 0, y: 14, filter: 'blur(10px)' },
@@ -591,8 +682,10 @@ function boot(): void {
 
   initLenis();
   initNavShrink();
+  splitTexts();
   initHeroScene();
   initProgram();
+  initSectionScenes();
   initReveals();
   initCounters();
   initSnapScroll();
