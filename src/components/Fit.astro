@@ -1,26 +1,28 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { fit } from '../data/content';
+import { t } from '../i18n';
+
+const c = t(Astro.currentLocale);
 
 /**
  * Пары «подойдёт/не подойдёт» лежат в одной грид-строке: их линии совпадают
  * по горизонтали. Визуально это те же две колонки, что и раньше.
  */
-const rows = fit.yes.map((yes, i) => ({ yes, no: fit.no[i] ?? '' }));
+const rows = c.fit.yes.map((yes, i) => ({ yes, no: c.fit.no[i] ?? '' }));
 ---
 
 <section class="section fitcheck">
   <div class="shell">
-    <h2 class="h2 fitcheck__title" data-split>Это не курс входа в IT</h2>
+    <h2 class="h2 fitcheck__title" data-split>{c.fit.title}</h2>
 
     <div class="fitcheck__table">
       <h3 class="fitcheck__colhead">
         <Icon name="ph:check-bold" class="fitcheck__mark fitcheck__mark--yes" aria-hidden="true" />
-        <span>Подойдёт</span>
+        <span>{c.fit.yesTitle}</span>
       </h3>
       <h3 class="fitcheck__colhead fitcheck__colhead--no">
         <Icon name="ph:x-bold" class="fitcheck__mark" aria-hidden="true" />
-        <span>Не подойдёт</span>
+        <span>{c.fit.noTitle}</span>
       </h3>
 
       {

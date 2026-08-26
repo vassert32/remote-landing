@@ -1,24 +1,22 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { cta, offer, hero } from '../data/content';
+import { t, links } from '../i18n';
+
+const c = t(Astro.currentLocale);
 
 /**
  * Вопрос разрезается на буквы на этапе СБОРКИ, а не в браузере: печать
- * стартует мгновенно вместе с первой отрисовкой и работает без JS —
- * это и есть «бесшовный типографский прелоадер» из брифа.
+ * стартует мгновенно вместе с первой отрисовкой и работает без JS.
+ * Пробелы между словами обязаны быть настоящими текстовыми узлами: без них
+ * между inline-block-словами нет точки переноса, и строка уезжает за край.
  */
-const wordsSrc = hero.question.split(' ');
 let i = 0;
-/* Пробелы между словами обязаны быть настоящими текстовыми узлами: без них
-   между inline-block-словами нет точки переноса, и длинная строка вместо
-   переноса уезжает за край экрана. Поэтому разметка собирается строкой. */
-const qHtml = wordsSrc
+const qHtml = c.hero.question
+  .split(' ')
   .map(
     (word) =>
       '<span class="hero__word">' +
-      [...word]
-        .map((ch) => `<span class="hero__ch" style="--i:${i++}">${ch}</span>`)
-        .join('') +
+      [...word].map((ch) => `<span class="hero__ch" style="--i:${i++}">${ch}</span>`).join('') +
       '</span>',
   )
   .join(' ');
@@ -29,7 +27,7 @@ const total = i;
   <div class="hero__stage">
     <!-- Фаза 1: вопрос на чёрном -->
     <div class="hero__phase hero__question" data-hero-question>
-      <h1 class="hero__q display" style={`--n:${total}`} aria-label={hero.question}>
+      <h1 class="hero__q display" style={`--n:${total}`} aria-label={c.hero.question}>
         <span aria-hidden="true" class="hero__q-letters"><Fragment set:html={qHtml} /><span class="hero__caret" aria-hidden="true"></span></span>
       </h1>
     </div>
@@ -39,20 +37,20 @@ const total = i;
       <div class="shell grid hero__grid">
         <div class="hero__main">
           <h2 class="display hero__title">
-            {hero.answer.map((line) => (
+            {c.hero.answer.map((line) => (
               <span class="hero__mask"><span class="hero__line" data-hero-line>{line}</span></span>
             ))}
           </h2>
 
-          <p class="lead hero__lead" data-hero-rise>{hero.lead}</p>
+          <p class="lead hero__lead" data-hero-rise>{c.hero.lead}</p>
 
           <div class="hero__actions" data-hero-rise>
-            <a class="btn btn--ink" href={cta.href} target="_blank" rel="noopener" data-magnetic>
-              <span>{cta.label}</span>
+            <a class="btn btn--ink" href={links.telegram} target="_blank" rel="noopener" data-magnetic>
+              <span>{c.cta.label}</span>
               <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
             </a>
             <a class="btn btn--ghost" href="#programma">
-              <span>Как это устроено</span>
+              <span>{c.ui.howItWorks}</span>
               <Icon class="btn__arrow" name="ph:arrow-down-bold" />
             </a>
           </div>
@@ -61,12 +59,12 @@ const total = i;
         <figure class="hero__aside" data-hero-doc>
           <div class="doc offer">
             <figcaption class="doc__head">
-              <span>{offer.docTitle}</span>
-              <span class="offer__owner">Мой собственный</span>
+              <span>{c.offer.docTitle}</span>
+              <span class="offer__owner">{c.offer.owner}</span>
             </figcaption>
             <div class="doc__body">
               {
-                offer.rows.map((row) => (
+                c.offer.rows.map((row) => (
                   <div class="doc__row">
                     <span class="doc__key">{row.key}</span>
                     <span class="doc__val">{row.value}</span>
@@ -75,7 +73,7 @@ const total = i;
               }
             </div>
             <div class="offer__seal">
-              <span class="stamp" data-hero-stamp>{offer.stamp}</span>
+              <span class="stamp" data-hero-stamp>{c.offer.stamp}</span>
             </div>
           </div>
         </figure>
@@ -88,15 +86,10 @@ const total = i;
   /* --------------------------------------------------------------------
      Сцена. Без мотора: два обычных экрана подряд (вопрос, затем ответ) —
      всё читаемо. С мотором: .hero__stage пинится, фазы накладываются,
-     фон ведётся скрабом от угля к бумаге, атрибут data-band="dark"
-     снимается на светлой половине пути (хедер и токены перещёлкиваются).
+     фон ведётся скрабом от угля к бумаге.
      -------------------------------------------------------------------- */
 
-  .hero {
-    /* Стартовое значение фона; дальше его ведёт мотор. */
-    background: var(--coal);
-  }
-
+  .hero { background: var(--coal); }
   .hero__stage { position: relative; }
 
   .hero__phase {
@@ -195,9 +188,7 @@ const total = i;
   }
 
   .hero__title {
-    /* Кегль от ширины колонки: строки заданы вручную и не переносятся.
-       Unbounded заметно шире Onest, коэффициент подобран под
-       «Другая валюта.» на 500-м весе с запасом. */
+    /* Кегль от ширины колонки: строки заданы вручную и не переносятся. */
     font-size: clamp(1.75rem, 8.6cqi, 4.3rem);
     white-space: nowrap;
   }

@@ -1,60 +1,69 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { cta, site } from '../data/content';
+import { t, links, docHref, path } from '../i18n';
+
+const c = t(Astro.currentLocale);
+const lang = Astro.currentLocale;
 const year = new Date().getFullYear();
 ---
 
 <footer class="closer" data-band="dark">
   <div class="shell closer__inner">
-    <p class="closer__kicker" data-reveal="up">Первый разбор бесплатный</p>
+    <p class="closer__kicker" data-reveal="up">{c.closer.kicker}</p>
 
-    <h2 class="closer__title h2" data-split>Следующий оффер может быть вашим</h2>
+    <h2 class="closer__title h2" data-split>{c.closer.title}</h2>
 
-    <p class="closer__note body" data-reveal="blur">
-      Созваниваемся, смотрим ваш опыт, английский и цель. После этого я честно
-      говорю, есть ли смысл работать вместе.
-    </p>
+    <p class="closer__note body" data-reveal="blur">{c.closer.note}</p>
 
     <div class="closer__actions" data-reveal="up">
-      <a class="btn btn--ink" href={cta.href} target="_blank" rel="noopener" data-magnetic>
-        <span>{cta.label}</span>
+      <a class="btn btn--ink" href={links.telegram} target="_blank" rel="noopener" data-magnetic>
+        <span>{c.cta.label}</span>
         <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
       </a>
-      <a class="closer__tg" href={cta.href} target="_blank" rel="noopener">
+      <a class="closer__tg" href={links.telegram} target="_blank" rel="noopener">
         <Icon name="ph:telegram-logo" class="closer__tg-icon" aria-hidden="true" />
-        <span>{site.telegramHandle}</span>
+        <span>{c.site.telegramHandle}</span>
       </a>
     </div>
 
     <!-- Информативный низ: разделы, контакты текстом, документы, реквизиты.
          Иконки живут в хедере — здесь не дублируются. -->
     <div class="closer__foot">
-      <nav class="closer__col" aria-label="Разделы страницы">
-        <span class="closer__col-title">Разделы</span>
-        <a class="closer__flink" href="#put">Путь</a>
-        <a class="closer__flink" href="#programma">Программа</a>
-        <a class="closer__flink" href="#usloviya">Условия</a>
-        <a class="closer__flink" href="#voprosy">Вопросы</a>
+      <nav class="closer__col" aria-label={c.ui.navLabel}>
+        <span class="closer__col-title">{c.closer.foot.sections}</span>
+        {c.nav.map((item) => <a class="closer__flink" href={item.href}>{item.label}</a>)}
       </nav>
 
       <div class="closer__col">
-        <span class="closer__col-title">Связь</span>
-        <a class="closer__flink" href={cta.href} target="_blank" rel="noopener">{site.telegramHandle}</a>
-        <!-- TODO(заказчик): реальные почта и GitHub — слоты оживут со ссылками -->
-        <span class="closer__flink closer__flink--soon" title="Скоро">Почта</span>
-        <span class="closer__flink closer__flink--soon" title="Скоро">GitHub</span>
+        <span class="closer__col-title">{c.closer.foot.contact}</span>
+        <a class="closer__flink" href={links.telegram} target="_blank" rel="noopener">{c.site.telegramHandle}</a>
+        {
+          links.email ? (
+            <a class="closer__flink" href={`mailto:${links.email}`}>{c.closer.foot.email}</a>
+          ) : (
+            /* TODO(заказчик): реальная почта — слот оживёт со ссылкой */
+            <span class="closer__flink closer__flink--soon" title={c.ui.soon}>{c.closer.foot.email}</span>
+          )
+        }
+        {
+          links.github ? (
+            <a class="closer__flink" href={links.github} target="_blank" rel="noopener">{c.closer.foot.github}</a>
+          ) : (
+            <span class="closer__flink closer__flink--soon" title={c.ui.soon}>{c.closer.foot.github}</span>
+          )
+        }
       </div>
 
       <div class="closer__col">
-        <span class="closer__col-title">Документы</span>
-        <a class="closer__flink" href="/oferta">Публичная оферта</a>
-        <a class="closer__flink" href="/dogovor">Договор менторства</a>
-        <a class="closer__flink" href="/privacy">Политика конфиденциальности</a>
+        <span class="closer__col-title">{c.closer.foot.docs}</span>
+        <a class="closer__flink" href={docHref(lang, 'oferta')}>{c.docs.oferta.title}</a>
+        <a class="closer__flink" href={docHref(lang, 'dogovor')}>{c.docs.dogovor.title}</a>
+        <a class="closer__flink" href={docHref(lang, 'privacy')}>{c.docs.privacy.title}</a>
       </div>
 
       <div class="closer__col closer__col--legal">
-        <span class="closer__col-title">Реквизиты</span>
-        <span>{site.legal}</span>
+        <span class="closer__col-title">{c.closer.foot.legalTitle}</span>
+        <span>{c.site.legal}</span>
         <span class="num closer__year">{year}</span>
       </div>
     </div>

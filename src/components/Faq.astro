@@ -1,11 +1,14 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { faq } from '../data/content';
+import { t } from '../i18n';
+
+const c = t(Astro.currentLocale);
+const faq = c.faq.items;
 ---
 
 <section class="section section--band faq" id="voprosy">
   <div class="shell grid faq__grid">
-    <h2 class="h2 faq__title" data-split>Вопросы, которые задают до созвона</h2>
+    <h2 class="h2 faq__title" data-split>{c.faq.title}</h2>
 
     <div class="faq__list">
       {

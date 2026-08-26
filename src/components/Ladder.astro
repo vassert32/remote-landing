@@ -1,28 +1,25 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { ladder } from '../data/content';
+import { t } from '../i18n';
 
-const fmt = new Intl.NumberFormat('ru-RU');
+const c = t(Astro.currentLocale);
+const fmt = new Intl.NumberFormat(c.locale);
 ---
 
 <section class="section ladder" id="put" data-band="dark">
   <div class="shell">
     <header class="ladder__head grid">
-      <h2 class="h2 ladder__title" data-split>Путь, который можно повторить</h2>
-      <p class="body ladder__body" data-reveal="blur">
-        Школу Яндекса, стажировку и штат я прошёл сам, без связей и релокации.
-        Поэтому помню, где на этом пути теряются месяцы и что на самом деле
-        спрашивают на собеседованиях.
-      </p>
+      <h2 class="h2 ladder__title" data-split>{c.ladder.title}</h2>
+      <p class="body ladder__body" data-reveal="blur">{c.ladder.body}</p>
     </header>
 
     <div class="panel ladder__panel">
-      <span class="panel__tag">доход по этапам</span>
-    <ol class="cols" aria-label="Рост дохода по этапам карьеры">
+      <span class="panel__tag">{c.ladder.panelTag}</span>
+    <ol class="cols" aria-label={c.ladder.chartLabel}>
       {
-        ladder.map((point, i) => (
+        c.ladder.points.map((point, i) => (
           <li
-            class:list={['col', { 'col--peak': i === ladder.length - 1 }]}
+            class:list={['col', { 'col--peak': i === c.ladder.points.length - 1 }]}
             style={`--w:${point.weight}`}
             tabindex="0"
           >

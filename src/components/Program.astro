@@ -1,5 +1,8 @@
 ---
-import { roadmap } from '../data/content';
+import { t } from '../i18n';
+
+const c = t(Astro.currentLocale);
+const roadmap = c.program.steps;
 ---
 
 <section class="section program" id="programma" data-band="dark" data-program>
@@ -7,11 +10,8 @@ import { roadmap } from '../data/content';
   <div class="program__pin" data-program-pin>
     <div class="shell program__rail">
       <div class="program__head">
-        <h2 class="h2" data-split>Сопровождение всего маршрута</h2>
-        <p class="body" data-reveal="blur">
-          Не набор созвонов, а шесть последовательных этапов: от пересборки
-          резюме до первых недель на новом месте.
-        </p>
+        <h2 class="h2" data-split>{c.program.title}</h2>
+        <p class="body" data-reveal="blur">{c.program.body}</p>
       </div>
 
       <div class="program__counter num-font" aria-hidden="true">

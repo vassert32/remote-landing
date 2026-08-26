@@ -1,42 +1,40 @@
 ---
 import { Icon } from 'astro-icon/components';
 import Base from '../layouts/Base.astro';
-import { site, cta } from '../data/content';
+import { t, links, path } from '../i18n';
 
 interface Props {
-  title: string;
-  /** Что это за документ, одним предложением. */
-  about: string;
+  /** Ключ документа в словаре: oferta | dogovor | privacy. */
+  doc: 'oferta' | 'dogovor' | 'privacy';
 }
 
-const { title, about } = Astro.props;
+const { doc } = Astro.props;
+const c = t(Astro.currentLocale);
+const page = c.docs[doc];
 ---
 
-<Base title={`${title}. ${site.name}`} description={about}>
+<Base title={`${page.title}. ${c.site.name}`} description={page.about}>
   <div class="doc-page">
     <div class="shell doc-page__inner">
-      <a class="doc-page__back" href="/">
+      <a class="doc-page__back" href={path(Astro.currentLocale, '/')}>
         <Icon name="ph:arrow-left-bold" class="doc-page__back-icon" aria-hidden="true" />
-        <span>На главную</span>
+        <span>{c.ui.back}</span>
       </a>
 
-      <h1 class="h2 doc-page__title">{title}</h1>
-      <p class="body doc-page__about">{about}</p>
+      <h1 class="h2 doc-page__title">{page.title}</h1>
+      <p class="body doc-page__about">{page.about}</p>
 
       <!-- TODO(заказчик): заменить заглушку финальным текстом документа. -->
       <div class="panel doc-page__note">
-        <span class="panel__tag">статус</span>
-        <p class="body">
-          Документ готовится. Актуальную редакцию вышлю по запросу в
-          Telegram до начала работы — подписываем до первого платного шага.
-        </p>
-        <a class="btn btn--ink doc-page__cta" href={cta.href} target="_blank" rel="noopener">
-          <span>Запросить в Telegram</span>
+        <span class="panel__tag">{c.docs.statusTag}</span>
+        <p class="body">{c.docs.statusText}</p>
+        <a class="btn btn--ink doc-page__cta" href={links.telegram} target="_blank" rel="noopener">
+          <span>{c.docs.statusCta}</span>
           <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
         </a>
       </div>
 
-      <p class="doc-page__legal">{site.legal} · {new Date().getFullYear()}</p>
+      <p class="doc-page__legal">{c.site.legal} · {new Date().getFullYear()}</p>
     </div>
   </div>
 </Base>

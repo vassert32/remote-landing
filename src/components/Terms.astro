@@ -1,23 +1,21 @@
 ---
-import { terms } from '../data/content';
+import { t } from '../i18n';
+
+const c = t(Astro.currentLocale);
 ---
 
 <section class="section section--band terms" id="usloviya">
   <div class="shell grid terms__grid">
     <header class="terms__head">
-      <h2 class="h2 terms__title" data-split>Ноль на старте. Считаю с результата</h2>
-      <p class="body terms__body" data-reveal="blur">
-        Вся подготовка и сопровождение до оффера бесплатны. Мой счёт появляется
-        один раз, и это половина вашей первой зарплаты после выхода на работу.
-        Нет оффера, нет и счёта.
-      </p>
+      <h2 class="h2 terms__title" data-split>{c.terms.title}</h2>
+      <p class="body terms__body" data-reveal="blur">{c.terms.body}</p>
     </header>
 
     <div class="panel bill-panel" data-reveal="up">
-      <span class="panel__tag">расчёт</span>
+      <span class="panel__tag">{c.terms.panelTag}</span>
     <dl class="bill">
       {
-        terms.rows.map((row) => (
+        c.terms.rows.map((row) => (
           <div class="bill__row" data-reveal="up">
             <dt class="bill__key">{row.key}</dt>
             <dd class="bill__val num-font">{row.value}</dd>
@@ -25,8 +23,8 @@ import { terms } from '../data/content';
         ))
       }
       <div class="bill__row bill__row--final" data-reveal="up">
-        <dt class="bill__key bill__key--final">{terms.final.key}</dt>
-        <dd class="bill__val bill__val--final num-font">{terms.final.value}</dd>
+        <dt class="bill__key bill__key--final">{c.terms.final.key}</dt>
+        <dd class="bill__val bill__val--final num-font">{c.terms.final.value}</dd>
       </div>
     </dl>
     </div>

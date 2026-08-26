@@ -1,6 +1,9 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { nav, cta, socials } from '../data/content';
+import { t, socialHref, otherLang, path, links } from '../i18n';
+
+const c = t(Astro.currentLocale);
+const alt = otherLang(Astro.currentLocale);
 ---
 
 <!-- Слой 1: вуаль. Прогрессивный блюр: сильный у кромки, сходит на нет книзу. -->
@@ -9,39 +12,48 @@ import { nav, cta, socials } from '../data/content';
 <!-- Слой 2: контент. mix-blend-difference инвертируется на любом фоне сам,
      поэтому хедер бесшовный: никаких переключений светлый/тёмный. -->
 <header class="nav" data-nav>
-  <div class="shell nav__inner">
+  <div class="nav__inner">
     <div class="nav__left">
       <a class="nav__mark" href="#top">
-        <span class="nav__name"><span class="nav__given">Евгений </span>Геркулесов</span>
+        <span class="nav__name"><span class="nav__given">{c.site.given}</span>{c.site.family}</span>
       </a>
-      <nav class="nav__links" aria-label="Разделы страницы">
-        {nav.map((item) => <a class="nav__link" href={item.href}>{item.label}</a>)}
+
+      <nav class="nav__links" aria-label={c.ui.navLabel}>
+        {c.nav.map((item) => <a class="nav__link" href={item.href}>{item.label}</a>)}
       </nav>
+
+      <!-- Переключатель языка: намеренно тихий, живёт сразу за навигацией. -->
+      <a class="nav__lang" href={path(alt, '/')} hreflang={alt} lang={alt} title={c.switchLabel}>
+        <Icon name="ph:globe-simple" class="nav__lang-icon" aria-hidden="true" />
+        <span>{c.switchTo}</span>
+      </a>
     </div>
 
     <div class="nav__right">
       <ul class="nav__socials">
         {
-          socials.map((s) =>
-            s.href ? (
+          c.socials.map((s) => {
+            const href = socialHref(s.key);
+            return href ? (
               <li>
-                <a class="iconbtn nav__social" href={s.href} target="_blank" rel="noopener" aria-label={s.name} data-magnetic>
+                <a class="iconbtn nav__social" href={href} target="_blank" rel="noopener" aria-label={s.name} data-magnetic>
                   <Icon name={s.icon} />
                 </a>
               </li>
             ) : (
               /* TODO(заказчик): адрес не выдан — иконка стоит, но не кликается */
               <li>
-                <span class="iconbtn nav__social nav__social--soon" aria-label={`${s.name}: ссылка скоро появится`} title="Скоро">
+                <span class="iconbtn nav__social nav__social--soon" aria-label={c.ui.soonAria(s.name)} title={c.ui.soon}>
                   <Icon name={s.icon} />
                 </span>
               </li>
-            ),
-          )
+            );
+          })
         }
       </ul>
-      <a class="btn nav__cta" href={cta.href} target="_blank" rel="noopener" data-magnetic>
-        <span>{cta.label}</span>
+
+      <a class="btn nav__cta" href={links.telegram} target="_blank" rel="noopener" data-magnetic>
+        <span>{c.cta.label}</span>
         <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
       </a>
     </div>
@@ -93,7 +105,15 @@ import { nav, cta, socials } from '../data/content';
   }
   .nav[data-away] { translate: 0 -14px; }
 
+  /* Хедер намеренно ШИРЕ контентной сетки: свой контейнер и меньшие поля.
+     Прижатые к краям экрана края снимают ощущение строгой коробки. */
   .nav__inner {
+    width: 100%;
+    max-width: 1840px;
+    margin-inline: auto;
+    /* Поля вдвое меньше контентных (--page-pad): элементы уходят к краям
+       экрана, коробка перестаёт читаться строгой. */
+    padding-inline: clamp(1rem, 0.25rem + 1.1vw, 2rem);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -147,6 +167,22 @@ import { nav, cta, socials } from '../data/content';
   .nav__link:hover::after,
   .nav__link:focus-visible::after { transform: scaleX(1); }
 
+  /* Переключатель языка: тихий и мелкий, не спорит с навигацией. */
+  .nav__lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-inline-start: calc(-1.4rem + 0.6rem * var(--nav-t));
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: var(--tr-mono);
+    opacity: 0.45;
+    transition: opacity var(--dur-fast) var(--ease-out);
+  }
+  .nav__lang:hover,
+  .nav__lang:focus-visible { opacity: 0.85; }
+  .nav__lang-icon { width: 1em; height: 1em; flex: none; }
+
   .nav__socials {
     display: flex;
     align-items: center;
@@ -187,6 +223,7 @@ import { nav, cta, socials } from '../data/content';
 
   @media (max-width: 1180px) {
     .nav__links { display: none; }
+    .nav__lang { margin-inline-start: 0; }
   }
 
   @media (max-width: 780px) {
@@ -194,6 +231,7 @@ import { nav, cta, socials } from '../data/content';
     .veil { height: calc(118px - 20px * var(--nav-t, 0)); }
     .nav__socials { display: none; }
     .nav__mark { font-size: calc(1.2rem - 0.15rem * var(--nav-t)); }
+    .nav__left { gap: var(--space-6); }
   }
 
   @media (max-width: 480px) {

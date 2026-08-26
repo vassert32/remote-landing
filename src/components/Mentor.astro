@@ -1,6 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import mentor from '../assets/mentor.jpg';
+import { t } from '../i18n';
+
+const c = t(Astro.currentLocale);
 ---
 
 <section class="section mentor">
@@ -8,7 +11,7 @@ import mentor from '../assets/mentor.jpg';
     <figure class="mentor__figure" data-reveal="up">
       <Image
         src={mentor}
-        alt="Евгений Геркулесов выступает с докладом перед схемой архитектуры сервиса"
+        alt={c.mentor.photoAlt}
         widths={[420, 620, 900]}
         sizes="(max-width: 900px) 84vw, 38vw"
         loading="lazy"
@@ -16,39 +19,20 @@ import mentor from '../assets/mentor.jpg';
       />
       <!-- Идентификация врезана прямо в кадр, как табличка на приборе. -->
       <figcaption class="mentor__plate">
-        <div class="doc__row">
-          <span class="doc__key">Имя</span>
-          <span class="doc__val">Евгений Геркулесов</span>
-        </div>
-        <div class="doc__row">
-          <span class="doc__key">Роль</span>
-          <span class="doc__val">Senior Backend Engineer</span>
-        </div>
-        <div class="doc__row">
-          <span class="doc__key">Формат</span>
-          <span class="doc__val">Один на один</span>
-        </div>
+        {
+          c.mentor.plate.map((row) => (
+            <div class="doc__row">
+              <span class="doc__key">{row.key}</span>
+              <span class="doc__val">{row.value}</span>
+            </div>
+          ))
+        }
       </figcaption>
     </figure>
 
     <div class="mentor__text">
-      <h2 class="h2" data-split>Кто вас будет вести</h2>
-
-      <p class="body" data-reveal="blur">
-        Я Евгений, backend-разработчик. Начинал со школы Яндекса, дорос до
-        штата, а потом подписал удалённый контракт с зарубежной компанией
-        и остался жить дома.
-      </p>
-      <p class="body" data-reveal="blur">
-        Со мной, а не с командой кураторов: резюме, отклики, разборы
-        собеседований и переговоры по офферу идут через меня лично. Без
-        общих чатов и записанных уроков.
-      </p>
-      <p class="body" data-reveal="blur">
-        Почему мне можно верить: я не продаю доступ к материалам, мой доход
-        привязан к вашему офферу. Пока вы не вышли на работу, я зарабатываю
-        ровно ноль.
-      </p>
+      <h2 class="h2" data-split>{c.mentor.title}</h2>
+      {c.mentor.paragraphs.map((p) => <p class="body" data-reveal="blur">{p}</p>)}
     </div>
   </div>
 </section>

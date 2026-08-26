@@ -1,0 +1,51 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteNav from '../../components/SiteNav.astro';
+import Hero from '../../components/Hero.astro';
+import Ladder from '../../components/Ladder.astro';
+import Mentor from '../../components/Mentor.astro';
+import Terms from '../../components/Terms.astro';
+import Fit from '../../components/Fit.astro';
+import Program from '../../components/Program.astro';
+import Faq from '../../components/Faq.astro';
+import Closer from '../../components/Closer.astro';
+import Cursor from '../../components/Cursor.astro';
+---
+
+<Base>
+  <SiteNav />
+  <!-- Ритм: чёрный старт → свет (кто я) → тьма (путь) → свет → тьма (программа) → свет → чёрный финал -->
+  <main id="main">
+    <Hero />
+    <Mentor />
+    <Ladder />
+    <Terms />
+    <Fit />
+    <Program />
+    <Faq />
+  </main>
+  <Closer />
+  <Cursor />
+</Base>
+
+<style is:global>
+  /* Маска для построчного появления заголовков. Разметку создаёт motion.ts,
+     поэтому стили живут глобально, а не в компоненте. */
+  .split-mask {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    /* Запас под нижние выносные кириллицы: «у», «р», «д». */
+    padding-bottom: 0.1em;
+  }
+  .split-word { display: inline-block; }
+
+  /* Слово в blur-появлении (порт BlurText): фильтр требует своего бокса. */
+  .bw { display: inline-block; will-change: transform, filter, opacity; }
+</style>
+
+<script>
+  // Мотор грузится отложенно: печать вопроса в hero работает на чистом CSS,
+  // поэтому задержка модуля не видна пользователю.
+  import('../../scripts/motion');
+</script>

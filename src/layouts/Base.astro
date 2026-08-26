@@ -2,42 +2,52 @@
 import '../styles/tokens.css';
 import '../styles/fonts.css';
 import '../styles/base.css';
-import { site } from '../data/content';
+import { t, links, LANGS, path } from '../i18n';
 
 interface Props {
   title?: string;
   description?: string;
 }
 
-const { title = site.title, description = site.description } = Astro.props;
+const c = t(Astro.currentLocale);
+const lang = Astro.currentLocale ?? 'ru';
+const { title = c.site.title, description = c.site.description } = Astro.props;
+
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL('/og.jpg', Astro.site).href;
+
+/** Тот же документ на другом языке: для hreflang и переключателя. */
+const pathWithoutLang = Astro.url.pathname.replace(/^\/en(?=\/|$)/, '') || '/';
+const alternates = LANGS.map((l) => ({
+  lang: l,
+  href: new URL(path(l, pathWithoutLang), Astro.site).href,
+}));
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
-  name: site.name,
+  name: c.site.name,
   description,
   url: canonical,
+  inLanguage: lang,
   areaServed: 'Worldwide',
-  serviceType: 'Карьерное менторство для IT-специалистов',
   provider: {
     '@type': 'Person',
-    name: site.name,
+    name: c.site.name,
     jobTitle: 'Senior Backend Engineer',
-    sameAs: [site.telegram],
+    sameAs: [links.telegram],
   },
   offers: {
     '@type': 'Offer',
     price: '0',
     priceCurrency: 'RUB',
-    description: 'Первый разбор бесплатно. Основная оплата составляет 50% от первой зарплаты после выхода на работу.',
+    description: c.terms.body,
   },
 };
 ---
 
 <!doctype html>
-<html lang="ru">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -45,13 +55,14 @@ const jsonLd = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
+    {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(pathWithoutLang, Astro.site).href} />
+
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    {/* Единственный захардкоженный цвет на проекте: meta не понимает
-        переменные CSS. Должен совпадать с --paper в tokens.css. */}
     <meta name="theme-color" content="#f2f1ed" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:locale" content={c.locale.replace('-', '_')} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -62,20 +73,8 @@ const jsonLd = {
 
     <!-- Шрифты первого экрана. Моноширинный подтягивается обычным путём:
          он занят мелким текстом и на LCP не влияет. -->
-    <link
-      rel="preload"
-      href="/fonts/onest-cyrillic-wght-normal.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/onest-latin-wght-normal.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    <link rel="preload" href="/fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
 
     <script is:inline>
       // Ставим метку до первой отрисовки: только под ней CSS прячет элементы
@@ -83,11 +82,43 @@ const jsonLd = {
       document.documentElement.classList.add('js');
     </script>
 
+    <script is:inline define:vars={{ lang }}>
+      // Автоопределение языка — ровно один раз и только с главной в корне.
+      // Явный выбор пользователя (клик по переключателю) запоминается и
+      // побеждает: никаких повторных редиректов против его воли.
+      (() => {
+        try {
+          const KEY = 'lang-choice';
+          const stored = localStorage.getItem(KEY);
+          const p = location.pathname;
+          const isRoot = p === '/' || p === '';
+
+          // Клик по переключателю фиксирует выбор.
+          document.addEventListener('click', (e) => {
+            const a = e.target.closest?.('a[hreflang]');
+            if (a) localStorage.setItem(KEY, a.getAttribute('hreflang'));
+          });
+
+          if (stored) {
+            if (stored === 'en' && isRoot) location.replace('/en/');
+            return;
+          }
+          if (!isRoot || lang !== 'ru') return;
+
+          const prefers = (navigator.languages || [navigator.language || ''])
+            .some((l) => l.toLowerCase().startsWith('ru'));
+          if (!prefers) location.replace('/en/');
+        } catch {
+          /* приватный режим без localStorage: остаёмся на языке страницы */
+        }
+      })();
+    </script>
+
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </head>
 
   <body>
-    <a class="skip-link" href="#main">К основному содержанию</a>
+    <a class="skip-link" href="#main">{c.ui.skipLink}</a>
     <slot />
     <div class="grain" aria-hidden="true"></div>
   </body>
