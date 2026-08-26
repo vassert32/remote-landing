@@ -1,0 +1,374 @@
+---
+/**
+ * Пробник визуализаций. Служебная страница: /viz
+ * Здесь лежит то, что НЕ внедрено в страницу и ждёт решения заказчика.
+ * Каждый блок помечен: куда просится, что даёт, чего не хватает.
+ * После выбора страница удаляется, выбранное переезжает в компоненты.
+ */
+import '../styles/tokens.css';
+import '../styles/fonts.css';
+import '../styles/base.css';
+import { Icon } from 'astro-icon/components';
+
+const funnel = [
+  { label: 'Отклики', w: 1 },
+  { label: 'Ответы', w: 0.42 },
+  { label: 'Собеседования', w: 0.2 },
+  { label: 'Финалы', w: 0.1 },
+  { label: 'Оффер', w: 0.045 },
+];
+
+const weeks = [
+  { n: '1-3', title: 'Упаковка' },
+  { n: '3-6', title: 'Поиск' },
+  { n: '5-10', title: 'Собесы' },
+  { n: '10-13', title: 'Оффер' },
+  { n: '13-14', title: 'Документы' },
+  { n: '14-16', title: 'Старт' },
+];
+
+const cvBefore = [
+  'Разработчик, 5 лет опыта',
+  'Работал с Java, Spring, PostgreSQL',
+  'Участвовал в разработке сервисов',
+  'Занимался оптимизацией',
+];
+const cvAfter = [
+  'Senior Backend Engineer · 5 yrs',
+  'Java 17, Spring Boot, PostgreSQL, Kafka',
+  'Owned 3 services in production, 40M requests/day',
+  'Cut p99 latency 320ms → 80ms',
+];
+
+const markets = [
+  { code: 'GBP', place: 'Великобритания', rate: '5 000 – 9 000' },
+  { code: 'EUR', place: 'Европа', rate: '4 500 – 8 000' },
+  { code: 'USD', place: 'США и глобально', rate: '5 000 – 12 000' },
+];
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Пробник визуализаций</title>
+    <meta name="robots" content="noindex" />
+  </head>
+  <body class="viz">
+    <header class="viz__head">
+      <h1 class="h2">Пробник визуализаций</h1>
+      <p class="body">
+        Это НЕ на сайте. Здесь варианты, которые ждут твоего «да». Три штуки
+        уже внедрены в страницу: анкета в «Для кого», маршрутная полоса в
+        «Программе», цена входа в финале. Ниже то, что крупнее и спорнее.
+        У каждого блока честно написано, каких данных не хватает.
+      </p>
+    </header>
+
+    <!-- ============ 1. Воронка ============ -->
+    <section class="viz__item" data-band="dark">
+      <div class="viz__label">
+        <span class="viz__num num">01</span>
+        <div>
+          <h2 class="h3">Воронка поиска</h2>
+          <p class="viz__where">Куда: в «Программу», к этапу «Поиск и воронка»</p>
+        </div>
+      </div>
+
+      <div class="panel viz__stage">
+        <span class="panel__tag">путь до оффера</span>
+        <ol class="funnel">
+          {
+            funnel.map((f, i) => (
+              <li class="funnel__row" style={`--w:${f.w}`}>
+                <span class="funnel__label">{f.label}</span>
+                <span class:list={['funnel__bar', { 'funnel__bar--last': i === funnel.length - 1 }]}></span>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="viz__gap">
+          Нужны твои реальные пропорции: сколько откликов на один оффер выходит
+          у учеников. Сейчас стоят условные — публиковать их нельзя.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 2. Календарь ============ -->
+    <section class="viz__item">
+      <div class="viz__label">
+        <span class="viz__num num">02</span>
+        <div>
+          <h2 class="h3">Календарь 16 недель</h2>
+          <p class="viz__where">Куда: в «Программу», вместо или над маршрутной полосой</p>
+        </div>
+      </div>
+
+      <div class="panel viz__stage">
+        <span class="panel__tag">3-4 месяца по неделям</span>
+        <div class="weeks">
+          {
+            weeks.map((w, i) => (
+              <div class="weeks__col" style={`--i:${i}`}>
+                <span class="weeks__bar"></span>
+                <span class="weeks__n num">{w.n}</span>
+                <span class="weeks__t">{w.title}</span>
+              </div>
+            ))
+          }
+        </div>
+        <p class="viz__gap">
+          Недели проставлены по логике «3-4 месяца на шесть этапов». Скажи
+          реальные сроки этапов — поправлю.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 3. Резюме до/после ============ -->
+    <section class="viz__item" data-band="dark">
+      <div class="viz__label">
+        <span class="viz__num num">03</span>
+        <div>
+          <h2 class="h3">Резюме до и после</h2>
+          <p class="viz__where">Куда: в «Программу», к этапу «Упаковка опыта», или отдельной секцией</p>
+        </div>
+      </div>
+
+      <div class="diff">
+        <div class="panel diff__side">
+          <span class="panel__tag">было</span>
+          {cvBefore.map((l) => <p class="diff__line diff__line--minus"><span>−</span>{l}</p>)}
+        </div>
+        <div class="panel diff__side diff__side--after">
+          <span class="panel__tag">стало</span>
+          {cvAfter.map((l) => <p class="diff__line diff__line--plus"><span>+</span>{l}</p>)}
+        </div>
+      </div>
+      <p class="viz__gap">
+        Самый сильный визуал из всех: показывает работу руками, а не обещание.
+        Нужен реальный обезличенный пример до и после от тебя.
+      </p>
+    </section>
+
+    <!-- ============ 4. Рынки и валюты ============ -->
+    <section class="viz__item">
+      <div class="viz__label">
+        <span class="viz__num num">04</span>
+        <div>
+          <h2 class="h3">Рынки и вилки</h2>
+          <p class="viz__where">Куда: новой секцией после «Пути» или в первый экран</p>
+        </div>
+      </div>
+
+      <div class="markets">
+        {
+          markets.map((m) => (
+            <div class="panel markets__card">
+              <span class="markets__code num-font">{m.code}</span>
+              <span class="markets__place">{m.place}</span>
+              <span class="markets__rate num">{m.rate}</span>
+              <span class="markets__unit">в месяц</span>
+            </div>
+          ))
+        }
+      </div>
+      <p class="viz__gap">
+        Вилки условные. Нужны реальные, на которые ты ориентируешь учеников,
+        иначе публиковать нельзя.
+      </p>
+    </section>
+
+    <!-- ============ 5. Крупная цитата ============ -->
+    <section class="viz__item" data-band="dark">
+      <div class="viz__label">
+        <span class="viz__num num">05</span>
+        <div>
+          <h2 class="h3">Разворот с цитатой</h2>
+          <p class="viz__where">Куда: между «Условиями» и «Для кого», как воздух между плотными блоками</p>
+        </div>
+      </div>
+
+      <blockquote class="pull">
+        <p class="pull__text">
+          Я не продаю доступ к материалам.<br />
+          Пока вы не вышли на работу, я зарабатываю <span class="accent">ноль</span>.
+        </p>
+        <footer class="pull__by">
+          <Icon name="ph:quotes" class="pull__icon" aria-hidden="true" />
+          <span>Евгений Геркулесов</span>
+        </footer>
+      </blockquote>
+      <p class="viz__gap">
+        Данных не требует: это уже сказано на странице, просто вынесено
+        в полноэкранный разворот. Готово к внедрению хоть сейчас.
+      </p>
+    </section>
+
+    <!-- ============ 6. Счётчик мест ============ -->
+    <section class="viz__item">
+      <div class="viz__label">
+        <span class="viz__num num">06</span>
+        <div>
+          <h2 class="h3">Занятость потока</h2>
+          <p class="viz__where">Куда: в финал, рядом с кнопкой</p>
+        </div>
+      </div>
+
+      <div class="panel viz__stage slots">
+        <span class="panel__tag">мест на поток</span>
+        <div class="slots__row">
+          {
+            Array.from({ length: 6 }, (_, i) => (
+              <span class:list={['slots__cell', { 'slots__cell--taken': i < 4 }]}>
+                {i < 4 ? <Icon name="ph:user-fill" /> : <Icon name="ph:user" />}
+              </span>
+            ))
+          }
+        </div>
+        <p class="slots__note num">4 из 6 заняты</p>
+        <p class="viz__gap">
+          Работает только если цифра настоящая и ты готов её обновлять.
+          Фальшивый счётчик мест — самый заметный признак инфоцыганства,
+          поэтому без реальных данных внедрять не буду.
+        </p>
+      </div>
+    </section>
+
+    <footer class="viz__foot">
+      <p class="body">
+        Скажи номера, которые берём. Всё, кроме 05, требует от тебя реальных
+        цифр или примера. 05 можно внедрить сразу.
+      </p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .viz { padding: clamp(1.5rem, 1rem + 3vw, 4rem); }
+
+  .viz__head, .viz__foot {
+    max-width: 60ch;
+    margin: 0 auto clamp(2rem, 1rem + 4vw, 5rem);
+    display: grid;
+    gap: var(--space-4);
+  }
+  .viz__foot { margin-block: clamp(2rem, 1rem + 4vw, 5rem) 0; }
+
+  .viz__item {
+    max-width: 1100px;
+    margin: 0 auto clamp(2rem, 1rem + 3vw, 4rem);
+    padding: clamp(1.5rem, 1rem + 2vw, 3rem);
+    border: var(--hair) solid var(--line-strong);
+  }
+
+  .viz__label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+  .viz__num { font-size: var(--fs-h3); color: var(--stamp); font-weight: 700; }
+  .viz__where {
+    margin-top: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    color: var(--fg-mute);
+  }
+  .viz__gap {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: var(--hair) solid var(--line);
+    font-size: var(--fs-small);
+    color: var(--fg-mute);
+    max-width: 62ch;
+  }
+  .viz__stage { padding-top: 2.2rem; }
+
+  /* --- 01 Воронка --- */
+  .funnel { display: grid; gap: var(--space-4); }
+  .funnel__row { display: grid; grid-template-columns: 9rem 1fr; align-items: center; gap: var(--space-4); }
+  .funnel__label { font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--fg-mute); }
+  .funnel__bar {
+    height: 2.2rem;
+    width: calc(100% * var(--w));
+    min-width: 3rem;
+    background: color-mix(in srgb, var(--paper) 12%, var(--bg));
+    box-shadow: inset 0 2px 0 var(--stamp);
+  }
+  .funnel__bar--last { background: color-mix(in srgb, var(--stamp) 40%, var(--bg)); }
+
+  /* --- 02 Календарь --- */
+  .weeks { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; align-items: end; }
+  .weeks__col { display: grid; gap: 0.5rem; }
+  .weeks__bar {
+    height: calc(1.5rem + var(--i) * 0.9rem);
+    background: color-mix(in srgb, var(--stamp) calc(20% + var(--i) * 12%), var(--bg-band));
+  }
+  .weeks__n { font-size: var(--fs-micro); color: var(--fg-mute); }
+  .weeks__t { font-size: var(--fs-small); font-weight: 600; }
+
+  /* --- 03 Диф --- */
+  .diff { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
+  .diff__side { padding-top: 2.2rem; }
+  .diff__line {
+    display: grid;
+    grid-template-columns: 1.2rem 1fr;
+    gap: 0.4rem;
+    padding-block: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    line-height: 1.45;
+  }
+  .diff__line--minus { color: var(--fg-mute); }
+  .diff__line--minus span { color: var(--fg-faint); }
+  .diff__line--plus span { color: var(--stamp); }
+
+  /* --- 04 Рынки --- */
+  .markets { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+  .markets__card { display: grid; gap: 0.35rem; padding: var(--space-6); }
+  .markets__code { font-size: clamp(1.8rem, 1rem + 2.5vw, 3rem); font-weight: var(--fw-display); color: var(--stamp); line-height: 1; }
+  .markets__place { font-size: var(--fs-small); color: var(--fg-soft); }
+  .markets__rate { font-size: var(--fs-h3); font-weight: 600; margin-top: 0.4rem; }
+  .markets__unit { font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--fg-mute); }
+
+  /* --- 05 Цитата --- */
+  .pull { margin: 0; }
+  .pull__text {
+    font-family: var(--font-display);
+    font-weight: var(--fw-display);
+    font-size: clamp(1.4rem, 0.9rem + 2.4vw, 2.6rem);
+    line-height: 1.25;
+    letter-spacing: var(--tr-tight);
+  }
+  .pull__by {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: var(--space-6);
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--fg-mute);
+  }
+  .pull__icon { width: 1rem; height: 1rem; color: var(--stamp); }
+
+  /* --- 06 Места --- */
+  .slots__row { display: flex; gap: 0.6rem; }
+  .slots__cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border: var(--hair) solid var(--line-strong);
+    color: var(--fg-faint);
+  }
+  .slots__cell--taken { border-color: var(--stamp); color: var(--stamp); }
+  .slots__cell :global(svg) { width: 1.2rem; height: 1.2rem; }
+  .slots__note { margin-top: var(--space-4); font-size: var(--fs-small); color: var(--fg-soft); }
+
+  @media (max-width: 780px) {
+    .diff, .markets, .weeks { grid-template-columns: 1fr; }
+    .funnel__row { grid-template-columns: 1fr; gap: 0.3rem; }
+  }
+</style>
