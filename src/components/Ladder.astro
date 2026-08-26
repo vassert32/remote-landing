@@ -30,10 +30,6 @@ const fmt = new Intl.NumberFormat('ru-RU');
               <p>{point.story}</p>
             </div>
 
-            <span class="col__icon" aria-hidden="true">
-              <Icon name={point.icon} />
-            </span>
-
             <span class="col__bar" data-reveal="bar" aria-hidden="true"></span>
 
             <span class="col__num readout num-font">
@@ -44,7 +40,10 @@ const fmt = new Intl.NumberFormat('ru-RU');
                 data-count-suffix={point.suffix}
               >{point.prefix}{fmt.format(point.value)}{point.suffix}</span>
             </span>
-            <span class="col__stage">{point.stage}</span>
+            <span class="col__stage">
+              <Icon name={point.icon} class="col__stage-icon" aria-hidden="true" />
+              {point.stage}
+            </span>
           </li>
         ))
       }
@@ -54,7 +53,8 @@ const fmt = new Intl.NumberFormat('ru-RU');
 </section>
 
 <style>
-  .ladder__head { row-gap: var(--space-6); margin-bottom: clamp(2rem, 1rem + 3vw, 3.5rem); }
+  .ladder { padding-block: clamp(3rem, 2rem + 3vw, 5rem); }
+  .ladder__head { row-gap: var(--space-4); margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
   .ladder__title { grid-column: 1 / 9; }
   .ladder__body { grid-column: 1 / 8; }
 
@@ -64,7 +64,7 @@ const fmt = new Intl.NumberFormat('ru-RU');
     align-items: end;
     column-gap: var(--col-gap);
     /* Поле колонн: высота пиковой. */
-    --field: clamp(9rem, 4rem + 13vw, 15rem);
+    --field: clamp(8rem, 3.5rem + 11vw, 12.5rem);
   }
 
   .col {
@@ -76,31 +76,25 @@ const fmt = new Intl.NumberFormat('ru-RU');
     outline-offset: 4px;
   }
 
-  .col__icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.4rem;
-    height: 2.4rem;
-    margin-bottom: var(--space-4);
-    border: var(--hair) solid var(--line-strong);
+  .col__stage-icon {
+    width: 0.95em;
+    height: 0.95em;
+    flex: none;
     color: var(--fg-mute);
-    transition: color var(--dur-fast) var(--ease-out),
-                border-color var(--dur-fast) var(--ease-out);
+    transition: color var(--dur-fast) var(--ease-out);
   }
-  .col__icon :global(svg) { width: 1.15rem; height: 1.15rem; }
 
-  /* Колонна: плоский графит с оранжевой кромкой сверху. */
+  /* Колонна: заметная плоть с оранжевой кромкой сверху. */
   .col__bar {
     display: block;
     width: 100%;
-    height: max(calc(var(--field) * var(--w)), 6px);
-    background: var(--bg-deep);
+    height: max(calc(var(--field) * var(--w)), 8px);
+    background: color-mix(in srgb, var(--paper) 10%, var(--bg));
     box-shadow: inset 0 2px 0 var(--stamp);
     transform-origin: bottom center;
   }
 
-  .ladder__panel { padding-top: clamp(2.2rem, 2rem + 2vw, 3.4rem); }
+  .ladder__panel { padding-top: clamp(1.8rem, 1.4rem + 1.6vw, 2.6rem); }
 
   .col__num {
     display: inline-block;
@@ -113,8 +107,10 @@ const fmt = new Intl.NumberFormat('ru-RU');
 
 
   .col__stage {
-    display: block;
-    margin-top: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+    margin-top: 0.45rem;
     font-family: var(--font-mono);
     font-size: var(--fs-micro);
     line-height: 1.4;
@@ -149,19 +145,16 @@ const fmt = new Intl.NumberFormat('ru-RU');
     opacity: 1;
     translate: 0 0;
   }
-  .col:hover .col__icon,
-  .col:focus-visible .col__icon {
-    color: var(--stamp);
-    border-color: var(--stamp);
-  }
+  .col:hover .col__stage-icon,
+  .col:focus-visible .col__stage-icon { color: var(--stamp); }
 
   .col--peak .col__bar {
-    background: color-mix(in srgb, var(--stamp) 26%, var(--bg-deep));
+    background: color-mix(in srgb, var(--stamp) 34%, var(--bg));
     box-shadow: inset 0 2px 0 var(--stamp);
   }
   .col--peak .col__num { color: var(--stamp); }
   .col--peak .col__stage { color: var(--fg); }
-  .col--peak .col__icon { color: var(--stamp); border-color: var(--stamp); }
+  .col--peak .col__stage-icon { color: var(--stamp); }
 
   @media (max-width: 900px) {
     .ladder__title, .ladder__body { grid-column: 1 / -1; }
@@ -178,16 +171,15 @@ const fmt = new Intl.NumberFormat('ru-RU');
     }
     .col {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: 1fr auto;
       align-items: center;
       column-gap: var(--space-4);
       padding-block: var(--space-4);
       border-top: var(--hair) solid var(--line);
     }
     .col__bar { display: none; }
-    .col__icon { margin-bottom: 0; }
-    .col__num { grid-column: 3; margin-top: 0; }
-    .col__stage { grid-column: 2; grid-row: 1; margin-top: 0; font-size: var(--fs-small); }
+    .col__num { grid-column: 2; margin-top: 0; justify-self: end; }
+    .col__stage { grid-column: 1; grid-row: 1; margin-top: 0; font-size: var(--fs-small); }
     .col__story {
       position: static;
       grid-column: 1 / -1;

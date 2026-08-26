@@ -54,7 +54,6 @@ function initLenis(): Lenis {
   const lenis = new Lenis({
     duration: 1.05,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    anchors: { offset: -80 },
   });
 
   lenis.on('scroll', ScrollTrigger.update);
@@ -165,6 +164,7 @@ function initHeroScene(): void {
     const y = lenisRef?.actualScroll ?? window.scrollY;
     if (userTook || y > 40) return;
     lenisRef?.scrollTo(Math.round(window.innerHeight * 1.7), {
+      force: true,
       duration: 2.6,
       easing: (t: number) => 1 - Math.pow(1 - t, 3),
     });
@@ -244,71 +244,153 @@ function initProgram(): void {
 }
 
 /* ==========================================================================
-   Скролл-магнит секций
-   Каждый смысловой этап — экран; когда прокрутка остановилась рядом с
-   началом секции, страницу мягко подклеивает к нему. Внутри пин-сцен
-   (hero, программа) магнит молчит: там своя механика.
+   Пошаговый скролл (десктоп)
+   Жест колеса или клавиша — один переход: к следующей секции либо к
+   следующей внутренней остановке сцены (фазы hero, этапы Программы).
+   Свободного «проматывания» между экранами нет: страница листается.
+   На таче остаётся обычный инерционный скролл.
    ========================================================================== */
 
-function initSectionSnap(): void {
-  let points: number[] = [];
-  let zones: Array<[number, number]> = [];
+function initStepScroll(): void {
+  if (!lenisRef || !finePointer.matches) return;
+  const lenis = lenisRef;
+
+  let stops: number[] = [];
 
   const collect = () => {
     const vh = window.innerHeight;
-    points = [...document.querySelectorAll<HTMLElement>('main > section, footer')].map(
-      (el) => Math.round(el.getBoundingClientRect().top + window.scrollY),
-    );
-    points.unshift(0);
-    // Пин-спейсеры: глушим магнит внутри сцен, кроме их кромок.
-    zones = [...document.querySelectorAll<HTMLElement>('.pin-spacer')].map((sp) => {
-      const r = sp.getBoundingClientRect();
-      const top = r.top + window.scrollY;
-      return [top + vh * 0.25, top + r.height - vh * 1.25];
-    });
+    const raw: number[] = [0];
+
+    // Конец hero-сцены: полный ответ.
+    raw.push(Math.round(vh * 1.7));
+
+    for (const el of document.querySelectorAll<HTMLElement>(
+      'main > section:not([data-program]), footer',
+    )) {
+      raw.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
+    }
+
+    // Программа: остановка на каждом этапе горизонтального проезда.
+    const spacer = document.querySelector<HTMLElement>('[data-program] .pin-spacer, .pin-spacer:has([data-program-pin])');
+    const pin = document.querySelector<HTMLElement>('[data-program-pin]');
+    const host = spacer ?? pin?.parentElement ?? null;
+    if (host && pin) {
+      const top = Math.round(host.getBoundingClientRect().top + window.scrollY);
+      const travel = Math.max(0, host.getBoundingClientRect().height - vh);
+      const steps = document.querySelectorAll('[data-program-step]').length;
+      for (let i = 0; i <= Math.max(1, steps - 1); i++) {
+        raw.push(Math.round(top + (travel * i) / Math.max(1, steps - 1)));
+      }
+    }
+
+    // Сортировка и склейка почти совпадающих точек.
+    raw.sort((a, b) => a - b);
+    stops = raw.filter((v, i) => i === 0 || v - raw[i - 1]! > 60);
   };
 
   collect();
   ScrollTrigger.addEventListener('refresh', collect);
 
-  let timer = 0;
-  let snapping = false;
+  // Аккордеон FAQ меняет высоту страницы без refresh — пересчитываем сами.
+  let resizeT = 0;
+  new ResizeObserver(() => {
+    window.clearTimeout(resizeT);
+    resizeT = window.setTimeout(collect, 220);
+  }).observe(document.body);
 
-  const trySnap = () => {
-    if (snapping || !lenisRef) return;
-    const y = lenisRef.actualScroll;
-    if (zones.some(([a, b]) => y > a && y < b)) return;
+  let busy = false;
 
+  const indexAt = (y: number): number => {
     let best = 0;
-    let dist = Infinity;
-    for (const point of points) {
-      const d = Math.abs(point - y);
-      if (d < dist) {
-        dist = d;
-        best = point;
-      }
+    for (let i = 0; i < stops.length; i++) {
+      if (Math.abs(stops[i]! - y) < Math.abs(stops[best]! - y)) best = i;
     }
-    // «Клеим на немного»: тянем только с близкого расстояния.
-    if (dist < 6 || dist > window.innerHeight * 0.28) return;
-
-    snapping = true;
-    lenisRef.scrollTo(best, {
-      duration: 0.75,
-      easing: (t: number) => 1 - Math.pow(1 - t, 3),
-      onComplete: () => {
-        snapping = false;
-      },
-    });
-    // Страховка, если onComplete потеряется из-за перехвата скролла.
-    window.setTimeout(() => {
-      snapping = false;
-    }, 1000);
+    return best;
   };
 
-  lenisRef?.on('scroll', () => {
-    if (snapping) return;
-    window.clearTimeout(timer);
-    timer = window.setTimeout(trySnap, 160);
+  const goTo = (index: number) => {
+    const target = stops[Math.max(0, Math.min(stops.length - 1, index))]!;
+    const y = lenis.actualScroll;
+    if (Math.abs(target - y) < 4) return;
+    busy = true;
+    lenis.scrollTo(target, {
+      force: true,
+      duration: 0.95,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+      onComplete: () => {
+        busy = false;
+      },
+    });
+    window.setTimeout(() => {
+      busy = false;
+    }, 1200);
+  };
+
+  const step = (dir: number) => {
+    if (busy) return;
+    const y = lenis.actualScroll;
+    const current = indexAt(y);
+    // Стоим не на точке: первый жест докатывает до неё по направлению.
+    const offPoint = Math.abs(stops[current]! - y) > 6;
+    let next = current + dir;
+    if (offPoint) {
+      next = dir > 0 ? stops.findIndex((v) => v > y + 6) : stops.length - 1 - [...stops].reverse().findIndex((v) => v < y - 6);
+      if (next < 0 || next >= stops.length) next = current + dir;
+    }
+    goTo(next);
+  };
+
+  // Колесо ведём сами: Lenis остановлен, страницу листает только step().
+  lenis.stop();
+
+  window.addEventListener(
+    'wheel',
+    (e: WheelEvent) => {
+      if (e.ctrlKey) return; // масштабирование не трогаем
+      e.preventDefault();
+      if (Math.abs(e.deltaY) < 16) return;
+      step(Math.sign(e.deltaY));
+    },
+    { passive: false },
+  );
+
+  window.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.target instanceof HTMLElement && /^(input|textarea|select)$/i.test(e.target.tagName)) return;
+    if (['ArrowDown', 'PageDown', ' '].includes(e.key)) {
+      e.preventDefault();
+      step(1);
+    } else if (['ArrowUp', 'PageUp'].includes(e.key)) {
+      e.preventDefault();
+      step(-1);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      goTo(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      goTo(stops.length - 1);
+    }
+  });
+
+  // Якоря хедера: со stop()-нутым Lenis нужен force.
+  document.addEventListener('click', (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
+    if (!a) return;
+    const el = document.querySelector<HTMLElement>(a.getAttribute('href')!);
+    if (!el) return;
+    e.preventDefault();
+    busy = true;
+    lenis.scrollTo(el, {
+      force: true,
+      offset: -70,
+      duration: 1.1,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+      onComplete: () => {
+        busy = false;
+      },
+    });
+    window.setTimeout(() => {
+      busy = false;
+    }, 1400);
   });
 }
 
@@ -520,7 +602,7 @@ function boot(): void {
   initProgram();
   initReveals();
   initCounters();
-  initSectionSnap();
+  initStepScroll();
   ScrollTrigger.refresh();
   if (finePointer.matches) {
     initCursor();
