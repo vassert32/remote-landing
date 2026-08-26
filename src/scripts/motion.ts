@@ -8,6 +8,7 @@
  *  - при prefers-reduced-motion не запускается ничего, кроме темы хедера.
  */
 import Lenis from 'lenis';
+import Snap from 'lenis/snap';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -61,9 +62,11 @@ function initLenis(): Lenis {
   gsap.ticker.add((time) => lenis.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
 
-  // Lenis перехватывает нативный scrollTo: наружу для отладки из консоли.
+  // Отладочный хэндл под своим именем: window.lenis занят служебным
+  // реестром самого Lenis ({version, horizontal, snap, touch}), и запись
+  // инстанса туда ломает его собственную бухгалтерию и аддоны.
   if (import.meta.env.DEV) {
-    (window as unknown as { lenis: Lenis }).lenis = lenis;
+    (window as unknown as { __lenis: Lenis }).__lenis = lenis;
   }
 
   lenisRef = lenis;
@@ -153,24 +156,25 @@ function initHeroScene(): void {
     );
   }
 
-  // Снап сцены: у неё два валидных состояния — вопрос (верх) и ответ (конец
-  // сцены). Застрять в полусвете перетекания нельзя. Работает ТОЛЬКО здесь:
-  // на остальной странице скролл свободный, глобальную доводку мы снесли.
-  // Снап ScrollTrigger не годится — он двигает нативный скролл, которым
-  // владеет Lenis, поэтому доводим сами.
+  /*
+   * Сторож сцены. Общий снап Lenis работает по близости и внутри длинной
+   * сцены молчит — можно застрять в полусвете перетекания. Здесь состояний
+   * ровно два: вопрос и ответ. Зоны не пересекаются с общим снапом: тот
+   * отвечает за секции от Ментора и ниже.
+   *
+   * Остановку ловим по НЕПОДВИЖНОСТИ позиции: Lenis шлёт события скролла
+   * каждый кадр даже на стоящей странице, поэтому дебаунс на событиях не
+   * срабатывает никогда, а порог скорости не ловит момент.
+   */
   const sceneEnd = () => Math.round(window.innerHeight * 1.7);
   let heroSnapping = false;
   let lastInput = 0;
-  const markInput = () => {
-    lastInput = performance.now();
-  };
   for (const evt of ['wheel', 'touchstart', 'touchmove', 'keydown'] as const) {
-    window.addEventListener(evt, markInput, { passive: true });
+    window.addEventListener(evt, () => {
+      lastInput = performance.now();
+    }, { passive: true });
   }
 
-  // Остановку ловим по НЕПОДВИЖНОСТИ позиции, а не по событиям: Lenis шлёт
-  // 'scroll' каждый кадр даже на стоящей странице, поэтому дебаунс на
-  // событиях не срабатывает никогда, а порог скорости не ловит момент.
   const TICK = 120;
   let lastPos = -1;
   let stillFor = 0;
@@ -180,8 +184,7 @@ function initHeroScene(): void {
 
     const end = sceneEnd();
     const y = lenisRef.actualScroll;
-
-    // За пределами сцены и на её краях снап молчит.
+    // Только строго внутри сцены: на краях и ниже сторож молчит.
     if (y <= 6 || y >= end - 6) {
       lastPos = y;
       stillFor = 0;
@@ -190,8 +193,6 @@ function initHeroScene(): void {
 
     stillFor = Math.abs(y - lastPos) < 1.5 ? stillFor + TICK : 0;
     lastPos = y;
-
-    // Стоим уже пару тиков и пользователь не крутит — доводим до состояния.
     if (stillFor < 240) return;
     if (performance.now() - lastInput < 200) return;
 
@@ -200,7 +201,7 @@ function initHeroScene(): void {
     stillFor = 0;
     heroSnapping = true;
     lenisRef.scrollTo(target, {
-      duration: 0.7,
+      duration: 0.75,
       easing: (t: number) => 1 - Math.pow(1 - t, 4),
       onComplete: () => {
         heroSnapping = false;
@@ -208,7 +209,7 @@ function initHeroScene(): void {
     });
     window.setTimeout(() => {
       heroSnapping = false;
-    }, 1100);
+    }, 1200);
   }, TICK);
 
   // Автопрокрутка: когда вопрос допечатан, сцена сама везёт к ответу.
@@ -334,6 +335,59 @@ function initProgram(): void {
     );
     return () => triggers.forEach((t) => t.kill());
   });
+}
+
+/* ==========================================================================
+   Снап позиций
+   Каждая секция ростом с экран, поэтому остановка «между» показывает
+   полоску соседней и читается поломкой. Лечим родным аддоном Lenis:
+   он живёт ВНУТРИ его физики скролла, а не догоняет страницу отдельной
+   анимацией после остановки — именно это раздражало в самодельных
+   версиях. Тип proximity: тянет только когда граница уже рядом, при
+   быстром пролистывании молчит.
+   ========================================================================== */
+
+function initSnap(lenis: Lenis): void {
+  const snap = new Snap(lenis, {
+    type: 'proximity',
+    // Тянет, когда граница в пределах 40% экрана. Дальше — не трогает:
+    // быстрый пролёт через несколько секций остаётся свободным.
+    distanceThreshold: '40%',
+    duration: 0.9,
+    easing: (t: number) => 1 - Math.pow(1 - t, 3),
+    debounce: 260,
+  });
+
+  // Точек hero здесь нет: за сцену отвечает отдельный сторож ниже.
+  // Общий снап работает от Ментора и дальше.
+
+  // Обычные секции: начало секции = её контент по центру экрана,
+  // потому что внутри он отцентрован вёрсткой.
+  for (const el of document.querySelectorAll<HTMLElement>(
+    'main section:not([data-hero]):not([data-program]), footer.closer',
+  )) {
+    snap.addElement(el, { align: ['start'] });
+  }
+
+  /*
+   * Программа — исключение. Её пин длиной в несколько экранов везёт
+   * горизонтальную сцену со своим ритмом, и притягивать к началу секции
+   * изнутри проезда нельзя. Поэтому у неё только две точки: вход в пин
+   * и выход из него, между ними снап молчит.
+   */
+  const addProgramEdges = () => {
+    const pin = document.querySelector<HTMLElement>('[data-program-pin]');
+    const host = pin?.closest<HTMLElement>('.pin-spacer') ?? pin;
+    if (!host) return;
+    const top = Math.round(host.getBoundingClientRect().top + window.scrollY);
+    const exit = Math.round(top + host.offsetHeight - window.innerHeight);
+    snap.add(top);
+    if (exit > top) snap.add(exit);
+  };
+  addProgramEdges();
+
+  // Пины меняют геометрию документа: после пересчёта обновляем точки.
+  ScrollTrigger.addEventListener('refresh', () => snap.resize());
 }
 
 /* ==========================================================================
@@ -510,13 +564,16 @@ function boot(): void {
 
   document.documentElement.classList.add('motion');
 
-  initLenis();
+  const lenis = initLenis();
   initNavShrink();
   splitTexts();
   initHeroScene();
   initProgram();
   initSectionEntrances();
+  // Пины меняют высоту документа: сначала даём ScrollTrigger посчитать
+  // геометрию, только потом снимаем с неё точки снапа.
   ScrollTrigger.refresh();
+  initSnap(lenis);
   if (finePointer.matches) {
     initCursor();
     initMagnetic();

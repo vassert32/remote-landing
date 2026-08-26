@@ -57,7 +57,7 @@ export const en = {
       { t: ' for experienced engineers: from rebuilding your CV to a signed ' },
       { t: 'offer', mark: true },
       { t: ' in dollars, euros or pounds.' },
-    ],
+    ] as ReadonlyArray<{ t: string; mark?: boolean }>,
   },
 
   /**

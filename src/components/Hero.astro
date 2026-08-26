@@ -45,13 +45,7 @@ const total = i;
           <p class="lead hero__lead" data-hero-rise>
             {
               c.hero.leadParts.map((part) =>
-                part.mark ? (
-                  <mark class="mark">{part.t}</mark>
-                ) : part.accent ? (
-                  <strong class="accent hero__accent">{part.t}</strong>
-                ) : (
-                  <Fragment>{part.t}</Fragment>
-                ),
+                part.mark ? <mark class="mark">{part.t}</mark> : <Fragment>{part.t}</Fragment>,
               )
             }
           </p>
