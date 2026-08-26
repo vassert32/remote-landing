@@ -35,7 +35,7 @@ import { ladder } from '../data/content';
 <style>
   .ladder__head { row-gap: var(--space-6); margin-bottom: clamp(3rem, 1rem + 6vw, 6rem); }
   .ladder__title { grid-column: 1 / 9; }
-  .ladder__body { grid-column: 1 / 8; color: var(--ink-soft); }
+  .ladder__body { grid-column: 1 / 8; color: var(--fg-soft); }
 
   .chart {
     display: grid;
@@ -58,7 +58,7 @@ import { ladder } from '../data/content';
     display: block;
     width: var(--hair);
     height: calc(var(--field) * var(--weight));
-    background: var(--rule-strong);
+    background: var(--line-strong);
     transform-origin: bottom center;
   }
   .chart__tick {
@@ -66,7 +66,7 @@ import { ladder } from '../data/content';
     width: 9px;
     height: var(--hair);
     margin-bottom: 0.85rem;
-    background: var(--ink);
+    background: var(--fg);
   }
 
   .chart__value {
@@ -82,13 +82,13 @@ import { ladder } from '../data/content';
     margin-top: 0.35rem;
     font-size: var(--fs-micro);
     line-height: 1.35;
-    color: var(--ink-soft);
+    color: var(--fg-soft);
   }
 
   .chart__point--peak .chart__stem { width: 2px; background: var(--stamp); }
   .chart__point--peak .chart__tick { width: 14px; height: 2px; background: var(--stamp); }
   .chart__point--peak .chart__value { color: var(--stamp); }
-  .chart__point--peak .chart__stage { color: var(--ink); font-weight: 600; }
+  .chart__point--peak .chart__stage { color: var(--fg); font-weight: 600; }
 
   .chart__base { margin-top: var(--space-4); }
 
@@ -112,7 +112,7 @@ import { ladder } from '../data/content';
       align-items: baseline;
       column-gap: var(--space-4);
       padding-block: 0.85rem;
-      border-top: var(--hair) solid var(--rule);
+      border-top: var(--hair) solid var(--line);
     }
     .chart__stem, .chart__tick { display: none; }
     .chart__value { grid-column: 2; text-align: right; }

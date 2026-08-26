@@ -1,15 +1,14 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { cta, site } from '../data/content';
+import { cta, site, socials } from '../data/content';
 const year = new Date().getFullYear();
 ---
 
-<!-- Единственная инверсия на странице: тёмная концовка как последний лист досье. -->
-<footer class="closer">
+<footer class="closer" data-band="dark">
   <div class="shell closer__inner">
     <p class="closer__kicker" data-reveal="up">Первый разбор бесплатный</p>
 
-    <h2 class="closer__title" data-split>Следующий оффер может быть вашим</h2>
+    <h2 class="closer__title h2" data-split>Следующий оффер может быть вашим</h2>
 
     <p class="closer__note body" data-reveal="up">
       Созваниваемся, смотрим ваш опыт, английский и цель. После этого я честно
@@ -17,7 +16,7 @@ const year = new Date().getFullYear();
     </p>
 
     <div class="closer__actions" data-reveal="up">
-      <a class="btn closer__btn" href={cta.href} target="_blank" rel="noopener">
+      <a class="btn btn--ink" href={cta.href} target="_blank" rel="noopener" data-magnetic>
         <span>{cta.label}</span>
         <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
       </a>
@@ -29,6 +28,17 @@ const year = new Date().getFullYear();
 
     <div class="closer__meta">
       <span>{site.name}</span>
+      <ul class="closer__socials">
+        {
+          socials.filter((s) => s.href).map((s) => (
+            <li>
+              <a class="iconbtn" href={s.href} target="_blank" rel="noopener" aria-label={s.name} data-magnetic>
+                <Icon name={s.icon} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
       <span class="num">{year}</span>
     </div>
   </div>
@@ -36,8 +46,6 @@ const year = new Date().getFullYear();
 
 <style>
   .closer {
-    background: var(--ink);
-    color: var(--paper);
     padding-block: clamp(5rem, 3rem + 8vw, 10rem) 0;
   }
 
@@ -54,22 +62,12 @@ const year = new Date().getFullYear();
     font-weight: 600;
     letter-spacing: var(--tr-mono);
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--paper) 55%, transparent);
+    color: var(--fg-mute);
   }
 
-  .closer__title {
-    font-size: clamp(2.25rem, 1.1rem + 4.8vw, 5.5rem);
-    line-height: var(--lh-tight);
-    letter-spacing: var(--tr-tight);
-    font-weight: 700;
-    max-width: 15ch;
-    text-wrap: balance;
-  }
+  .closer__title { max-width: 16ch; }
 
-  .closer__note {
-    color: color-mix(in srgb, var(--paper) 72%, transparent);
-    max-width: 44ch;
-  }
+  .closer__note { color: var(--fg-soft); max-width: 44ch; }
 
   .closer__actions {
     display: flex;
@@ -79,39 +77,37 @@ const year = new Date().getFullYear();
     margin-top: var(--space-4);
   }
 
-  .closer__btn {
-    background: var(--paper);
-    color: var(--ink);
-    border-color: var(--paper);
-  }
-  .closer__btn:hover,
-  .closer__btn:focus-visible { color: var(--paper); border-color: var(--stamp); }
-
   .closer__tg {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     font-family: var(--font-mono);
     font-size: var(--fs-small);
-    color: color-mix(in srgb, var(--paper) 72%, transparent);
+    color: var(--fg-soft);
     transition: color var(--dur-fast) var(--ease-out);
   }
-  .closer__tg:hover, .closer__tg:focus-visible { color: var(--paper); }
+  .closer__tg:hover, .closer__tg:focus-visible { color: var(--fg); }
   .closer__tg-icon { width: 1.1rem; height: 1.1rem; }
 
   .closer__meta {
     width: 100%;
     display: flex;
+    align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
     margin-top: clamp(3rem, 2rem + 5vw, 6rem);
     padding-block: var(--space-6);
-    border-top: var(--hair) solid color-mix(in srgb, var(--paper) 22%, transparent);
+    border-top: var(--hair) solid var(--line);
     font-size: var(--fs-small);
-    color: color-mix(in srgb, var(--paper) 55%, transparent);
+    color: var(--fg-mute);
+  }
+
+  .closer__socials {
+    display: flex;
+    gap: var(--space-3);
   }
 
   @media (max-width: 560px) {
-    .closer__btn { width: 100%; justify-content: space-between; }
+    .closer__actions :global(.btn) { width: 100%; justify-content: space-between; }
   }
 </style>

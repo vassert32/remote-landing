@@ -1,73 +1,192 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { cta, offer } from '../data/content';
+import { cta, offer, hero } from '../data/content';
+
+/**
+ * Вопрос разрезается на буквы на этапе СБОРКИ, а не в браузере: печать
+ * стартует мгновенно вместе с первой отрисовкой и работает без JS —
+ * это и есть «бесшовный типографский прелоадер» из брифа.
+ */
+type Letter = { ch: string; i: number };
+const words: Letter[][] = [];
+let i = 0;
+for (const word of hero.question.split(' ')) {
+  words.push([...word].map((ch) => ({ ch, i: i++ })));
+}
+const total = i;
 ---
 
-<section class="hero" id="top">
-  <div class="shell hero__inner grid">
-    <div class="hero__main">
-      <h1 class="display hero__title">
-        <span class="hero__mask"><span class="hero__line" data-hero="line">Тот же опыт.</span></span>
-        <span class="hero__mask"><span class="hero__line" data-hero="line">Другая валюта.</span></span>
+<section class="hero" id="top" data-hero data-band="dark">
+  <div class="hero__stage">
+    <!-- Фаза 1: вопрос на чёрном -->
+    <div class="hero__phase hero__question" data-hero-question>
+      <h1 class="hero__q display" style={`--n:${total}`} aria-label={hero.question}>
+        <span aria-hidden="true" class="hero__q-letters">
+          {words.map((word) => (
+            <span class="hero__word">
+              {word.map((l) => (
+                <span class="hero__ch" style={`--i:${l.i}`}>{l.ch}</span>
+              ))}
+            </span>
+          ))}<span class="hero__caret" aria-hidden="true"></span>
+        </span>
       </h1>
-
-      <p class="lead hero__lead" data-hero="fade">
-        Личное менторство для IT-специалистов с опытом. Довожу до удалённого оффера
-        в Великобритании и Европе за <span class="nowrap">3-4 месяца</span>.
-      </p>
-
-      <div class="hero__actions" data-hero="fade">
-        <a class="btn btn--ink" href={cta.href} target="_blank" rel="noopener">
-          <span>{cta.label}</span>
-          <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
-        </a>
-        <a class="btn btn--ghost" href="#programma">
-          <span>Как это устроено</span>
-          <Icon class="btn__arrow" name="ph:arrow-down-bold" />
-        </a>
-      </div>
     </div>
 
-    <figure class="hero__aside" data-hero="doc">
-      <div class="doc offer">
-        <figcaption class="doc__head">
-          <span>{offer.docTitle}</span>
-          <span class="offer__owner">Мой собственный</span>
-        </figcaption>
-        <div class="doc__body">
-          {
-            offer.rows.map((row) => (
-              <div class="doc__row">
-                <span class="doc__key">{row.key}</span>
-                <span class="doc__val">{row.value}</span>
-              </div>
-            ))
-          }
-        </div>
-        <div class="offer__seal">
-          <span class="stamp" data-hero="stamp">{offer.stamp}</span>
-        </div>
-      </div>
-    </figure>
-  </div>
+    <!-- Фаза 2: ответ на бумаге -->
+    <div class="hero__phase hero__answer" data-hero-answer>
+      <div class="shell grid hero__grid">
+        <div class="hero__main">
+          <h2 class="display hero__title">
+            {hero.answer.map((line) => (
+              <span class="hero__mask"><span class="hero__line" data-hero-line>{line}</span></span>
+            ))}
+          </h2>
 
-  <div class="shell"><hr class="rule rule--strong" /></div>
+          <p class="lead hero__lead" data-hero-rise>{hero.lead}</p>
+
+          <div class="hero__actions" data-hero-rise>
+            <a class="btn btn--ink" href={cta.href} target="_blank" rel="noopener" data-magnetic>
+              <span>{cta.label}</span>
+              <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
+            </a>
+            <a class="btn btn--ghost" href="#programma">
+              <span>Как это устроено</span>
+              <Icon class="btn__arrow" name="ph:arrow-down-bold" />
+            </a>
+          </div>
+        </div>
+
+        <figure class="hero__aside" data-hero-doc>
+          <div class="doc offer">
+            <figcaption class="doc__head">
+              <span>{offer.docTitle}</span>
+              <span class="offer__owner">Мой собственный</span>
+            </figcaption>
+            <div class="doc__body">
+              {
+                offer.rows.map((row) => (
+                  <div class="doc__row">
+                    <span class="doc__key">{row.key}</span>
+                    <span class="doc__val">{row.value}</span>
+                  </div>
+                ))
+              }
+            </div>
+            <div class="offer__seal">
+              <span class="stamp" data-hero-stamp>{offer.stamp}</span>
+            </div>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </div>
 </section>
 
 <style>
+  /* --------------------------------------------------------------------
+     Сцена. Без мотора: два обычных экрана подряд (вопрос, затем ответ) —
+     всё читаемо. С мотором: .hero__stage пинится, фазы накладываются,
+     фон ведётся скрабом от угля к бумаге, атрибут data-band="dark"
+     снимается на светлой половине пути (хедер и токены перещёлкиваются).
+     -------------------------------------------------------------------- */
+
   .hero {
-    padding-top: clamp(2.5rem, 1rem + 5vw, 6rem);
-    padding-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
+    /* Стартовое значение фона; дальше его ведёт мотор. */
+    background: var(--coal);
   }
 
-  .hero__inner {
-    min-height: calc(100dvh - var(--nav-h) - clamp(4.5rem, 2rem + 8vw, 9.5rem));
-    align-content: center;
+  .hero__stage { position: relative; }
+
+  .hero__phase {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+  }
+
+  /* --- Вопрос ---------------------------------------------------------- */
+
+  .hero__question {
+    justify-content: center;
+    padding-inline: var(--page-pad);
+  }
+
+  .hero__q {
+    font-size: clamp(1.9rem, 0.7rem + 5vw, 4.6rem);
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .hero__word {
+    display: inline-block;
+    white-space: nowrap;
+    margin-inline-end: 0.3em;
+  }
+  .hero__word:last-of-type { margin-inline-end: 0; }
+
+  .hero__ch {
+    position: relative;
+    display: inline-block;
+    opacity: 0;
+    /* Печать: буквы появляются мгновенно, по одной, слева направо. */
+    animation: hero-type 1ms steps(1) forwards;
+    animation-delay: calc(260ms + var(--i) * 42ms);
+  }
+
+  /* Бегущая каретка: у каждой буквы своя, горит ровно один шаг печати
+     и гаснет, когда загорается у следующей. Ноль JS. */
+  .hero__ch::after {
+    content: "";
+    position: absolute;
+    top: 0.07em;
+    right: -0.14em;
+    width: 0.085em;
+    height: 0.9em;
+    background: var(--stamp);
+    opacity: 0;
+    animation: hero-caret-run 46ms linear;
+    animation-delay: calc(260ms + var(--i) * 42ms);
+  }
+
+  /* Финальная каретка появляется, когда печать закончена, и мигает. */
+  .hero__caret {
+    display: inline-block;
+    width: 0.085em;
+    height: 0.9em;
+    margin-inline-start: 0.12em;
+    background: var(--stamp);
+    transform: translateY(0.12em);
+    opacity: 0;
+    animation:
+      hero-type 1ms steps(1) forwards,
+      hero-caret-blink 940ms steps(1) infinite;
+    animation-delay: calc(260ms + var(--n) * 42ms);
+  }
+
+  @keyframes hero-type { to { opacity: 1; } }
+  @keyframes hero-caret-run { from, to { opacity: 1; } }
+  @keyframes hero-caret-blink { 50% { opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__ch { animation: none; opacity: 1; }
+    .hero__ch::after { animation: none; }
+    .hero__caret { animation: none; opacity: 1; }
+  }
+
+  /* --- Ответ ------------------------------------------------------------ */
+
+  .hero__answer {
+    padding-block: calc(var(--nav-h) + var(--space-8)) var(--space-8);
+  }
+
+  .hero__grid {
+    width: 100%;
+    align-items: center;
     row-gap: var(--space-12);
   }
 
   .hero__main {
-    grid-column: 1 / 9;
+    grid-column: 1 / 8;
     display: flex;
     flex-direction: column;
     gap: clamp(1.5rem, 0.8rem + 2vw, 2.5rem);
@@ -75,24 +194,21 @@ import { cta, offer } from '../data/content';
   }
 
   .hero__title {
-    /* Кегль считается от ширины колонки, а не от вьюпорта: строки заданы
-       вручную и обязаны уместиться без переносов на любой ширине.
-       12.6cqi выведено из реальной ширины «Другая валюта.» в Onest 700
-       (около 7.6em на четырнадцать знаков) с запасом на подстановку шрифта. */
-    font-size: clamp(2.25rem, 12.6cqi, 6.25rem);
-    font-weight: 700;
+    /* Кегль от ширины колонки: строки заданы вручную и не переносятся.
+       Unbounded заметно шире Onest, коэффициент подобран под
+       «Другая валюта.» на 500-м весе с запасом. */
+    font-size: clamp(1.75rem, 8.6cqi, 4.3rem);
     white-space: nowrap;
   }
 
   .hero__mask {
     display: block;
     overflow: hidden;
-    /* Запас под нижние выносные: маска не должна срезать «р» и «у». */
-    padding-bottom: 0.06em;
+    padding-bottom: 0.1em; /* нижние выносные кириллицы */
   }
   .hero__line { display: block; }
 
-  .hero__lead { max-width: 36ch; }
+  .hero__lead { max-width: 38ch; }
 
   .hero__actions {
     display: flex;
@@ -101,66 +217,26 @@ import { cta, offer } from '../data/content';
   }
 
   .hero__aside {
-    grid-column: 9 / 13;
-    align-self: center;
+    grid-column: 8 / 13;
     margin: 0;
   }
 
-  .offer { position: relative; }
-  .offer__owner { color: var(--ink-mute); font-weight: 500; }
-
+  .offer__owner { color: var(--fg-mute); font-weight: 500; }
   .offer__seal {
     display: flex;
     justify-content: flex-end;
     padding: 0 1.1rem 1.3rem;
   }
 
-  /* ---- Вход первого экрана ------------------------------------------------
-     Намеренно на CSS, а не на GSAP: первый экран не должен зависеть от того,
-     доехал ли JS-модуль, и не имеет права мигнуть при подмене состояния. */
-  @media (prefers-reduced-motion: no-preference) {
-    [data-hero] {
-      animation: hero-enter var(--dur-slow) var(--ease-out) both;
-      animation-delay: var(--delay, 0ms);
-    }
-    [data-hero="line"] {
-      animation-name: hero-line;
-      animation-duration: 900ms;
-    }
-    .hero__mask:nth-child(1) [data-hero="line"] { --delay: 60ms; }
-    .hero__mask:nth-child(2) [data-hero="line"] { --delay: 160ms; }
-    .hero__lead { --delay: 380ms; }
-    .hero__actions { --delay: 480ms; }
-    .hero__aside { --delay: 560ms; }
-    [data-hero="stamp"] {
-      animation-name: hero-stamp;
-      animation-duration: 460ms;
-      --delay: 1050ms;
-    }
-  }
+  /* --- Наложение фаз в режиме мотора ------------------------------------ */
 
-  @keyframes hero-line {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
+  :global(.motion) [data-hero-question] {
+    position: absolute;
+    inset: 0;
   }
-  @keyframes hero-enter {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  /* Печать прикладывают, а не проявляют: приходит сверху и садится с недолётом. */
-  @keyframes hero-stamp {
-    0%   { opacity: 0; transform: rotate(-14deg) scale(1.5); }
-    70%  { opacity: 1; transform: rotate(-4deg) scale(0.96); }
-    100% { opacity: 1; transform: rotate(-6deg) scale(1); }
-  }
+  :global(.motion) [data-hero-answer] { position: relative; }
 
   @media (max-width: 1100px) {
-    .hero__main { grid-column: 1 / 8; }
-    .hero__aside { grid-column: 8 / 13; }
-  }
-
-  @media (max-width: 900px) {
-    .hero__inner { min-height: 0; row-gap: var(--space-8); }
     .hero__main { grid-column: 1 / -1; }
     .hero__aside { grid-column: 1 / -1; max-width: 26rem; }
   }

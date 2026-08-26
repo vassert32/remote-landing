@@ -2,7 +2,7 @@
 import { terms } from '../data/content';
 ---
 
-<section class="section section--band terms" id="usloviya">
+<section class="section terms" id="usloviya" data-band="dark">
   <div class="shell">
     <header class="terms__head grid">
       <h2 class="h2 terms__title" data-split>Ноль на старте. Считаю с результата</h2>
@@ -44,9 +44,9 @@ import { terms } from '../data/content';
     justify-content: space-between;
     gap: var(--space-8);
     padding-block: clamp(1.1rem, 0.6rem + 1.6vw, 2rem);
-    border-top: var(--hair) solid var(--rule-strong);
+    border-top: var(--hair) solid var(--line-strong);
   }
-  .bill__row:last-child { border-bottom: 2px solid var(--ink); }
+  .bill__row:last-child { border-bottom: 2px solid var(--fg); }
 
   .bill__key {
     font-family: var(--font-mono);
@@ -54,7 +54,7 @@ import { terms } from '../data/content';
     font-weight: 600;
     letter-spacing: var(--tr-mono);
     text-transform: uppercase;
-    color: var(--ink-soft);
+    color: var(--fg-soft);
     text-wrap: balance;
   }
 
@@ -65,13 +65,13 @@ import { terms } from '../data/content';
     font-size: clamp(2rem, 1rem + 4vw, 4.5rem);
     font-weight: 700;
     line-height: 1;
-    color: var(--ink-soft);
+    color: var(--fg-soft);
     margin: 0;
   }
 
   /* Итоговая строка: единственная сумма, которая реально появится. */
-  .bill__row--final { border-top-width: 2px; border-top-color: var(--ink); }
-  .bill__key--final { color: var(--ink); font-weight: 700; }
+  .bill__row--final { border-top-width: 2px; border-top-color: var(--fg); }
+  .bill__key--final { color: var(--fg); font-weight: 700; }
   .bill__val--final {
     color: var(--stamp);
     font-size: clamp(2.75rem, 1rem + 7vw, 7rem);

@@ -10,6 +10,7 @@ const OUT = 'public/fonts';
 const SUBSETS = ['latin', 'latin-ext', 'cyrillic'];
 const FAMILIES = [
   { pkg: '@fontsource-variable/onest', file: 'onest' },
+  { pkg: '@fontsource-variable/unbounded', file: 'unbounded' },
   { pkg: '@fontsource-variable/jetbrains-mono', file: 'jetbrains-mono' },
 ];
 
