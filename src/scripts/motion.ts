@@ -139,7 +139,9 @@ function initHeroScene(): void {
   // Фаза 2: ответ. Строки из-под маски, текст и кнопки поднимаются, документ въезжает.
   tl.to(lines, { yPercent: 0, duration: 0.2, ease: 'power2.out', stagger: 0.045 }, 0.5);
   tl.to(rises, { opacity: 1, y: 0, duration: 0.16, ease: 'power2.out', stagger: 0.04 }, 0.58);
-  if (doc) tl.to(doc, { opacity: 1, y: 0, rotate: 0, duration: 0.3, ease: 'power2.out' }, 0.52);
+  // Лист подаётся ПОСЛЕ основного текста и заметно спокойнее его: сначала
+  // читаешь обещание, потом получаешь на руки бумагу.
+  if (doc) tl.to(doc, { opacity: 1, y: 0, rotate: 0, duration: 0.46, ease: 'power2.out' }, 0.72);
 
   // Печать прикладывается в конце: быстрый удар, а не проявление.
   if (stamp) {
@@ -147,7 +149,7 @@ function initHeroScene(): void {
       stamp,
       { opacity: 0, rotate: -14, scale: 1.6 },
       { opacity: 1, rotate: -6, scale: 1, duration: 0.08, ease: 'power3.in' },
-      0.88,
+      1.2,
     );
   }
 

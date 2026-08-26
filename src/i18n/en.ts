@@ -54,10 +54,8 @@ export const en = {
     leadParts: [
       { t: 'One-on-one mentorship', mark: true },
       { t: ' for experienced engineers: from rebuilding your CV to a signed ' },
-      { t: 'offer', accent: true },
-      { t: ' in ' },
-      { t: 'dollars, euros or pounds', mark: true },
-      { t: '.' },
+      { t: 'offer', mark: true },
+      { t: ' in dollars, euros or pounds.' },
     ],
   },
 
@@ -77,7 +75,7 @@ export const en = {
       { key: 'Search time', value: '3-4 months' },
     ],
     signLabel: 'Signature',
-    signHint: 'your signature',
+    signCta: 'Sign it',
     stamp: 'Approved',
   },
 
