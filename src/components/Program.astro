@@ -146,6 +146,11 @@ import { roadmap } from '../data/content';
   .program__step.is-active .program__num { color: var(--stamp); }
   .program__step.is-active { box-shadow: inset 0 2px 0 var(--stamp); }
 
+  @media (hover: hover) {
+    .program__step:hover { background: color-mix(in srgb, var(--paper) 4%, transparent); }
+    .program__step:hover .program__num { color: var(--stamp); }
+  }
+
   @media (max-width: 900px) {
     .program__rail { flex-direction: column; align-items: flex-start; }
     .program__counter { display: none; }

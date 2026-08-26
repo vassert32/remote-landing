@@ -210,6 +210,19 @@ function initProgram(): void {
     if (!pin || !track) return;
     const dist = () => track.scrollWidth - window.innerWidth;
 
+    gsap.fromTo(
+      steps,
+      { y: 42, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.7,
+        ease: 'power3.out',
+        stagger: 0.07,
+        scrollTrigger: { trigger: pin, start: 'top 72%' },
+      },
+    );
+
     const tween = gsap.to(track, {
       x: () => -dist(),
       ease: 'none',
@@ -235,6 +248,19 @@ function initProgram(): void {
 
   // Мобайл и планшет: вертикальный список, активный этап по центру экрана.
   mm.add('(max-width: 900px)', () => {
+    for (const step of steps) {
+      gsap.fromTo(
+        step,
+        { y: 26, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: step, start: 'top 90%' },
+        },
+      );
+    }
     const triggers = steps.map((step, n) =>
       ScrollTrigger.create({
         trigger: step,
@@ -387,6 +413,26 @@ function initReveals(): void {
       ease: 'power3.inOut',
       scrollTrigger: { trigger: el, start: 'top 92%' },
     });
+  }
+
+  // Портрет чуть плывёт в своей рамке при проезде: глубина без шума.
+  const portrait = document.querySelector<HTMLElement>('.mentor__figure img');
+  if (portrait) {
+    gsap.set(portrait, { scale: 1.12 });
+    gsap.fromTo(
+      portrait,
+      { yPercent: -5 },
+      {
+        yPercent: 5,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: portrait.closest('figure'),
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+        },
+      },
+    );
   }
 
   // Колонны Пути растут от земли каскадом.
