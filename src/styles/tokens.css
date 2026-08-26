@@ -37,6 +37,8 @@
   --font-display: 'Unbounded Variable', 'Onest Variable', system-ui, sans-serif;
   --font-sans: 'Onest Variable', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  /* Цифровой шрифт: выбирается по пробнику /numbers, пока дисплейный. */
+  --font-num: var(--font-display);
 
   /* Unbounded массивнее гротеска: заголовки держим на 500-м весе
      и на шаг меньшем кегле, чем было в Onest-версии. */

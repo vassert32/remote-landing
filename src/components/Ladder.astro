@@ -5,7 +5,7 @@ import { ladder } from '../data/content';
 const fmt = new Intl.NumberFormat('ru-RU');
 ---
 
-<section class="section ladder blueprint" id="put" data-band="dark">
+<section class="section ladder" id="put" data-band="dark">
   <div class="shell">
     <header class="ladder__head grid">
       <h2 class="h2 ladder__title" data-split>Путь, который можно повторить</h2>
@@ -18,7 +18,6 @@ const fmt = new Intl.NumberFormat('ru-RU');
 
     <div class="panel ladder__panel">
       <span class="panel__tag">доход по этапам</span>
-      <span class="panel__led" aria-hidden="true"></span>
     <ol class="cols" aria-label="Рост дохода по этапам карьеры">
       {
         ladder.map((point, i) => (
@@ -35,10 +34,9 @@ const fmt = new Intl.NumberFormat('ru-RU');
               <Icon name={point.icon} />
             </span>
 
-            <span class="col__ticks" aria-hidden="true"></span>
             <span class="col__bar" data-reveal="bar" aria-hidden="true"></span>
 
-            <span class="col__num readout">
+            <span class="col__num readout num-font">
               <span
                 class="num"
                 data-count-to={point.value}
@@ -51,15 +49,12 @@ const fmt = new Intl.NumberFormat('ru-RU');
         ))
       }
     </ol>
-    <div class="ladder__ruler" aria-hidden="true">
-      <span>0</span><span>100 000 ₽</span><span>250 000 ₽</span><span>500 000 ₽</span><span>$8 500</span>
-    </div>
     </div>
   </div>
 </section>
 
 <style>
-  .ladder__head { row-gap: var(--space-6); margin-bottom: clamp(3.5rem, 1.5rem + 7vw, 8rem); }
+  .ladder__head { row-gap: var(--space-6); margin-bottom: clamp(2rem, 1rem + 3vw, 3.5rem); }
   .ladder__title { grid-column: 1 / 9; }
   .ladder__body { grid-column: 1 / 8; }
 
@@ -69,7 +64,7 @@ const fmt = new Intl.NumberFormat('ru-RU');
     align-items: end;
     column-gap: var(--col-gap);
     /* Поле колонн: высота пиковой. */
-    --field: clamp(10rem, 5rem + 16vw, 19rem);
+    --field: clamp(9rem, 4rem + 13vw, 15rem);
   }
 
   .col {
@@ -111,26 +106,11 @@ const fmt = new Intl.NumberFormat('ru-RU');
     display: inline-block;
     align-self: flex-start;
     margin-top: var(--space-4);
-    font-family: var(--font-display);
     font-weight: 550;
     font-size: clamp(0.82rem, 0.3rem + 1.45vw, 1.35rem);
     line-height: 1.15;
   }
 
-  /* Деления вдоль колонны: приборная шкала ровно на высоту бара. */
-  .col { --readout-zone: 4.6rem; }
-  .col__ticks {
-    position: absolute;
-    left: -0.55rem;
-    bottom: var(--readout-zone);
-    width: 5px;
-    height: max(calc(var(--field) * var(--w)), 6px);
-    background: repeating-linear-gradient(
-      to top,
-      color-mix(in srgb, var(--fg) 40%, transparent) 0 1px,
-      transparent 1px 9px
-    );
-  }
 
   .col__stage {
     display: block;
@@ -183,23 +163,10 @@ const fmt = new Intl.NumberFormat('ru-RU');
   .col--peak .col__stage { color: var(--fg); }
   .col--peak .col__icon { color: var(--stamp); border-color: var(--stamp); }
 
-  .ladder__ruler {
-    display: flex;
-    justify-content: space-between;
-    margin-top: var(--space-6);
-    padding-top: var(--space-3);
-    border-top: var(--hair) solid var(--line-strong);
-    font-family: var(--font-mono);
-    font-size: var(--fs-micro);
-    color: var(--fg-mute);
-  }
-
   @media (max-width: 900px) {
     .ladder__title, .ladder__body { grid-column: 1 / -1; }
     .cols { --field: clamp(7rem, 3rem + 14vw, 11rem); column-gap: 0.7rem; }
     .col__num { font-size: clamp(0.72rem, 0.28rem + 1.6vw, 1rem); }
-    .col__ticks { display: none; }
-    .ladder__ruler { display: none; }
   }
 
   /* Ниже 560px пять колонн нечитаемы: разворачиваем в вертикальный список,
@@ -218,7 +185,6 @@ const fmt = new Intl.NumberFormat('ru-RU');
       border-top: var(--hair) solid var(--line);
     }
     .col__bar { display: none; }
-    .col__ticks { display: none; }
     .col__icon { margin-bottom: 0; }
     .col__num { grid-column: 3; margin-top: 0; }
     .col__stage { grid-column: 2; grid-row: 1; margin-top: 0; font-size: var(--fs-small); }

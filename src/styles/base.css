@@ -94,6 +94,15 @@ a { color: inherit; text-decoration: none; }
 .section { padding-block: var(--section-y); }
 .section--band { background: var(--bg-band); }
 
+/* Каждый смысловой этап занимает свой экран: контент по центру,
+   скролл-магнит подклеивает к началу секции. */
+main > .section {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 /* ==========================================================================
    Типографика
    ========================================================================== */
@@ -157,6 +166,12 @@ a { color: inherit; text-decoration: none; }
 }
 
 .accent { color: var(--stamp); }
+
+/* Шрифт цифр: отдельный токен, чтобы менять одним движением. */
+.num-font {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
 
 /* Держит вместе то, что нельзя рвать переносом: диапазоны, суммы, единицы. */
 .nowrap { white-space: nowrap; }
@@ -310,17 +325,6 @@ a { color: inherit; text-decoration: none; }
   color: var(--fg-mute);
 }
 
-/* Единственный светодиод на страницу: живые данные, не декор. */
-.panel__led {
-  position: absolute;
-  top: -3px;
-  right: 1.3rem;
-  width: 7px;
-  height: 7px;
-  background: var(--stamp);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--stamp) 80%, transparent);
-}
-
 /* Окошко-табло для цифр. */
 .readout {
   display: inline-block;
@@ -328,13 +332,6 @@ a { color: inherit; text-decoration: none; }
   border: var(--hair) solid var(--line-strong);
   background: var(--bg-band);
   white-space: nowrap;
-}
-
-/* Чертёжная сетка тёмных полос: едва заметная, только атмосфера. */
-.blueprint {
-  background-image:
-    repeating-linear-gradient(to right, color-mix(in srgb, var(--paper) 4%, transparent) 0 1px, transparent 1px 56px),
-    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--paper) 4%, transparent) 0 1px, transparent 1px 56px);
 }
 
 /* Печать. Ставится один раз на странице, поэтому имеет право быть заметной. */

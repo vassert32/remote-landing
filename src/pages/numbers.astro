@@ -1,0 +1,115 @@
+---
+/**
+ * Пробник шрифта ЦИФР. Служебная страница: /numbers
+ * Цифрам кириллица не нужна, поэтому выбор шире, чем у текстовых шрифтов.
+ * Каждый вариант: суммы на угле и на бумаге, табло, счётчик этапов.
+ * После выбора страница удаляется.
+ */
+import '../styles/tokens.css';
+import '../styles/fonts.css';
+import '@fontsource-variable/space-grotesk';
+import '@fontsource/chakra-petch/500.css';
+import '@fontsource/chakra-petch/600.css';
+import '@fontsource/michroma';
+import '@fontsource-variable/oxanium';
+
+const variants = [
+  { name: '01 · Unbounded', note: 'текущий: как заголовки', css: "'Unbounded Variable', sans-serif", w: 550 },
+  { name: '02 · Space Grotesk', note: 'техно-гротеск, фирменные цифры', css: "'Space Grotesk Variable', sans-serif", w: 600 },
+  { name: '03 · Chakra Petch', note: 'гранёный, приборный', css: "'Chakra Petch', sans-serif", w: 600 },
+  { name: '04 · Michroma', note: 'широкий, дорогое табло', css: "'Michroma', sans-serif", w: 400 },
+  { name: '05 · Oxanium', note: 'техно, легче и уже', css: "'Oxanium Variable', sans-serif", w: 600 },
+];
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Пробник цифр</title>
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <p class="hint">
+      Шрифт только для цифр: суммы, счётчики, номера этапов. Если знак ₽
+      в варианте выглядит инородно, он подтянулся из текстового шрифта —
+      честно видно, как будет в бою.
+    </p>
+
+    {
+      variants.map((v) => (
+        <section class="variant">
+          <header class="variant__label">
+            <span>{v.name}</span>
+            <span class="variant__note">{v.note}</span>
+          </header>
+
+          <div class="variant__dark" style={`font-family:${v.css};font-weight:${v.w}`}>
+            <span class="big">$8 500</span>
+            <span class="mid">240 000 ₽</span>
+            <span class="counter">1<span class="counter__total"> / 6</span></span>
+          </div>
+
+          <div class="variant__light" style={`font-family:${v.css};font-weight:${v.w}`}>
+            <span class="readout">0 ₽</span>
+            <span class="readout">40 000 ₽</span>
+            <span class="big big--accent">50%</span>
+            <span class="small">3–4 месяца · 10 часов в неделю</span>
+          </div>
+        </section>
+      ))
+    }
+  </body>
+</html>
+
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #4a4a44;
+    font-family: 'Onest Variable', sans-serif;
+    padding: 2rem clamp(1rem, 4vw, 4rem) 4rem;
+  }
+  .hint { color: #d8d6cf; max-width: 62ch; margin: 0 auto 2.5rem; font-size: 0.9rem; }
+
+  .variant { max-width: 1100px; margin: 0 auto 2.5rem; border: 1px solid #0c0c0a; }
+  .variant__label {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 1.2rem;
+    background: #12120f;
+    color: #f2f1ed;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+  }
+  .variant__note { color: #9a9a91; }
+
+  .variant__dark,
+  .variant__light {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: clamp(1.2rem, 4vw, 3rem);
+    padding: clamp(1.4rem, 3.5vw, 2.5rem);
+  }
+  .variant__dark { background: #0c0c0a; color: #f2f1ed; }
+  .variant__light { background: #f2f1ed; color: #12120f; }
+
+  .big { font-size: clamp(2.4rem, 6vw, 4.5rem); line-height: 1; }
+  .big--accent { color: #d9531e; }
+  .variant__dark .big { color: #ff9e5e; }
+  .mid { font-size: clamp(1.4rem, 3.4vw, 2.4rem); }
+  .small { font-size: 1rem; color: #6a6a62; }
+
+  .counter { font-size: clamp(1.6rem, 3.5vw, 2.6rem); }
+  .counter__total { font-size: 0.55em; color: #8b8b82; }
+
+  .readout {
+    border: 1px solid rgb(18 18 15 / 0.32);
+    background: #e7e5de;
+    padding: 0.25em 0.5em;
+    font-size: clamp(1.1rem, 2.4vw, 1.8rem);
+  }
+</style>

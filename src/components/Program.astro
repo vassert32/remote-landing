@@ -2,19 +2,19 @@
 import { roadmap } from '../data/content';
 ---
 
-<section class="section program blueprint" id="programma" data-band="dark" data-program>
-  <div class="shell program__head">
-    <h2 class="h2" data-split>Сопровождение всего маршрута</h2>
-    <p class="body" data-reveal="blur">
-      Не набор созвонов, а шесть последовательных этапов: от пересборки резюме
-      до первых недель на новом месте.
-    </p>
-  </div>
-
+<section class="section program" id="programma" data-band="dark" data-program>
   <!-- Пин-зона: на десктопе с мотором этапы едут горизонтально -->
   <div class="program__pin" data-program-pin>
-    <div class="shell program__rail" aria-hidden="true">
-      <div class="program__counter num">
+    <div class="shell program__rail">
+      <div class="program__head">
+        <h2 class="h2" data-split>Сопровождение всего маршрута</h2>
+        <p class="body" data-reveal="blur">
+          Не набор созвонов, а шесть последовательных этапов: от пересборки
+          резюме до первых недель на новом месте.
+        </p>
+      </div>
+
+      <div class="program__counter num-font" aria-hidden="true">
         <span class="program__digits">
           <span class="program__reel" data-program-digits>
             {roadmap.map((step) => <span class="program__digit">{step.num}</span>)}
@@ -22,19 +22,18 @@ import { roadmap } from '../data/content';
         </span>
         <span class="program__total">/ {roadmap[roadmap.length - 1]!.num}</span>
       </div>
-      <div class="program__trackline">
-        <span class="program__progress" data-program-progress></span>
-      </div>
     </div>
+
+    <div class="shell"><div class="program__trackline"><span class="program__progress" data-program-progress></span></div></div>
 
     <div class="program__viewport">
       <ol class="program__steps" data-program-track>
         {
           roadmap.map((step) => (
             <li class="program__step" data-program-step>
-              <span class="program__num num" aria-hidden="true">{step.num}</span>
+              <span class="program__num num-font" aria-hidden="true">{step.num}</span>
               <div class="program__body">
-                <h3 class="h3">{step.title}</h3>
+                <h3 class="program__t">{step.title}</h3>
                 <p class="body">{step.text}</p>
               </div>
             </li>
@@ -46,54 +45,47 @@ import { roadmap } from '../data/content';
 </section>
 
 <style>
-  .program__head {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-6);
-    margin-bottom: clamp(2.5rem, 1rem + 4vw, 4.5rem);
-  }
-
-  /* --- Рейка: счётчик + линия прогресса --------------------------------- */
-
+  /* Рейка: слева заголовок с вводкой, справа скромный счётчик. */
   .program__rail {
     display: flex;
     align-items: flex-end;
+    justify-content: space-between;
     gap: var(--space-8);
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-6);
   }
 
-  /* Обрезающий бокс и лента цифр — разные элементы: двигается лента,
-     бокс держит место и обрезает. */
+  .program__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 34rem;
+  }
+
   .program__counter {
     display: flex;
-    align-items: flex-end;
-    gap: var(--space-3);
-    font-weight: 800;
+    align-items: baseline;
+    gap: var(--space-2);
+    font-weight: 600;
     flex: none;
+    padding-bottom: 0.3rem;
   }
   .program__digits {
     display: block;
     height: 1em;
     overflow: hidden;
-    font-size: clamp(3rem, 1.5rem + 5vw, 6rem);
+    font-size: clamp(1.6rem, 1rem + 1.6vw, 2.6rem);
     line-height: 1;
-    letter-spacing: -0.04em;
   }
   .program__reel { display: block; will-change: transform; }
   .program__digit { display: block; height: 1em; line-height: 1; }
 
   .program__total {
-    font-size: var(--fs-h3);
-    font-weight: 600;
+    font-size: clamp(0.95rem, 0.7rem + 0.7vw, 1.3rem);
     color: var(--fg-mute);
-    padding-bottom: 0.18em;
   }
 
-  /* Линия прогресса теперь горизонтальная: дорога, по которой едем. */
   .program__trackline {
-    flex: 1;
     height: var(--hair);
-    margin-bottom: 0.5rem;
     background: var(--line);
   }
   .program__progress {
@@ -121,19 +113,28 @@ import { roadmap } from '../data/content';
   .program__step {
     display: grid;
     grid-template-columns: auto 1fr;
-    column-gap: clamp(1.25rem, 3vw, 2.5rem);
+    column-gap: clamp(1.25rem, 3vw, 2rem);
     align-items: start;
     padding-block: clamp(1.6rem, 1rem + 2.5vw, 2.75rem);
     border-top: var(--hair) solid var(--line-strong);
+    transition: box-shadow var(--dur-mid) var(--ease-out);
   }
   .program__step:last-child { border-bottom: var(--hair) solid var(--line-strong); }
 
+  /* Акцент живёт на этапе, а не на цифре: номер тихий, заголовок звучит. */
   .program__num {
     font-size: var(--fs-small);
-    font-weight: 700;
-    color: var(--fg-mute);
-    padding-top: 0.4rem;
+    font-weight: 600;
+    color: var(--fg-faint);
+    padding-top: 0.5rem;
     transition: color var(--dur-mid) var(--ease-out);
+  }
+
+  .program__t {
+    font-family: var(--font-display);
+    font-weight: var(--fw-display);
+    font-size: clamp(1.35rem, 1.1rem + 1vw, 2rem);
+    line-height: 1.15;
   }
 
   .program__body {
@@ -143,20 +144,17 @@ import { roadmap } from '../data/content';
   }
 
   .program__step.is-active .program__num { color: var(--stamp); }
-  /* Активная карточка получает приборную кромку сверху. */
-  .program__step { box-shadow: inset 0 0 0 transparent; transition: box-shadow var(--dur-mid) var(--ease-out); }
   .program__step.is-active { box-shadow: inset 0 2px 0 var(--stamp); }
 
   @media (max-width: 900px) {
-    .program__rail { display: none; }
+    .program__rail { flex-direction: column; align-items: flex-start; }
+    .program__counter { display: none; }
+    .program__trackline { display: none; }
   }
 
-  /* --- Горизонтальная сцена: только десктоп с мотором -------------------
-     Мотор пинит .program__pin и везёт трек по X. Ширина карточки задана,
-     линии между этапами становятся вертикальными рёбрами. */
+  /* --- Горизонтальная сцена: только десктоп с мотором ------------------- */
   @media (min-width: 901px) {
     :global(.motion) .program__pin {
-      /* Высота пина: рейка + карточки; остальной путь создаёт ScrollTrigger. */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -176,13 +174,11 @@ import { roadmap } from '../data/content';
     :global(.motion) .program__step {
       width: clamp(30rem, 38vw, 36rem);
       flex: none;
-      grid-template-rows: auto 1fr;
+      grid-template-columns: auto 1fr;
       border-top: 0;
       border-left: var(--hair) solid var(--line-strong);
-      padding: var(--space-4) clamp(1.5rem, 2.5vw, 2.5rem) var(--space-4) clamp(1.25rem, 2vw, 2rem);
+      padding: var(--space-6) clamp(1.5rem, 2.5vw, 2.5rem) var(--space-6) clamp(1.25rem, 2vw, 2rem);
     }
     :global(.motion) .program__step:last-child { border-bottom: 0; }
-
-    :global(.motion) .program__num { font-size: var(--fs-h3); padding-top: 0; }
   }
 </style>

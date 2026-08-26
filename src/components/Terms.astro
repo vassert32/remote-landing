@@ -20,13 +20,13 @@ import { terms } from '../data/content';
         terms.rows.map((row) => (
           <div class="bill__row" data-reveal="up">
             <dt class="bill__key">{row.key}</dt>
-            <dd class="bill__val">{row.value}</dd>
+            <dd class="bill__val num-font">{row.value}</dd>
           </div>
         ))
       }
       <div class="bill__row bill__row--final" data-reveal="up">
         <dt class="bill__key bill__key--final">{terms.final.key}</dt>
-        <dd class="bill__val bill__val--final">{terms.final.value}</dd>
+        <dd class="bill__val bill__val--final num-font">{terms.final.value}</dd>
       </div>
     </dl>
     </div>
@@ -63,7 +63,6 @@ import { terms } from '../data/content';
 
   .bill__val {
     flex: none;
-    font-family: var(--font-display);
     font-size: clamp(1.6rem, 0.8rem + 3.2vw, 3.4rem);
     font-weight: 550;
     line-height: 1;

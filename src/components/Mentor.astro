@@ -5,35 +5,31 @@ import mentor from '../assets/mentor.jpg';
 
 <section class="section mentor">
   <div class="shell grid mentor__grid">
-    <div class="mentor__aside">
-      <figure class="mentor__figure" data-reveal="up">
-        <Image
-          src={mentor}
-          alt="Евгений Геркулесов выступает с докладом перед схемой архитектуры сервиса"
-          widths={[420, 620, 900]}
-          sizes="(max-width: 900px) 84vw, 38vw"
-          loading="lazy"
-          decoding="async"
-        />
-      </figure>
-
-      <div class="mentor__card doc" data-reveal="doc">
-        <div class="doc__body">
-          <div class="doc__row">
-            <span class="doc__key">Имя</span>
-            <span class="doc__val">Евгений Геркулесов</span>
-          </div>
-          <div class="doc__row">
-            <span class="doc__key">Роль</span>
-            <span class="doc__val">Senior Backend Engineer</span>
-          </div>
-          <div class="doc__row">
-            <span class="doc__key">Формат</span>
-            <span class="doc__val">Один на один</span>
-          </div>
+    <figure class="mentor__figure" data-reveal="up">
+      <Image
+        src={mentor}
+        alt="Евгений Геркулесов выступает с докладом перед схемой архитектуры сервиса"
+        widths={[420, 620, 900]}
+        sizes="(max-width: 900px) 84vw, 38vw"
+        loading="lazy"
+        decoding="async"
+      />
+      <!-- Идентификация врезана прямо в кадр, как табличка на приборе. -->
+      <figcaption class="mentor__plate">
+        <div class="doc__row">
+          <span class="doc__key">Имя</span>
+          <span class="doc__val">Евгений Геркулесов</span>
         </div>
-      </div>
-    </div>
+        <div class="doc__row">
+          <span class="doc__key">Роль</span>
+          <span class="doc__val">Senior Backend Engineer</span>
+        </div>
+        <div class="doc__row">
+          <span class="doc__key">Формат</span>
+          <span class="doc__val">Один на один</span>
+        </div>
+      </figcaption>
+    </figure>
 
     <div class="mentor__text">
       <h2 class="h2" data-split>Кто вас будет вести</h2>
@@ -45,24 +41,24 @@ import mentor from '../assets/mentor.jpg';
       </p>
       <p class="body" data-reveal="blur">
         Со мной, а не с командой кураторов: резюме, отклики, разборы
-        собеседований и переговоры по офферу идут через меня лично. Без общих
-        чатов и записанных уроков.
+        собеседований и переговоры по офферу идут через меня лично. Без
+        общих чатов и записанных уроков.
+      </p>
+      <p class="body" data-reveal="blur">
+        Почему мне можно верить: я не продаю доступ к материалам, мой доход
+        привязан к вашему офферу. Пока вы не вышли на работу, я зарабатываю
+        ровно ноль.
       </p>
     </div>
   </div>
 </section>
 
 <style>
-  .mentor__grid { row-gap: var(--space-12); align-items: start; }
-
-  .mentor__aside {
-    grid-column: 1 / 6;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-6);
-  }
+  .mentor__grid { row-gap: var(--space-12); align-items: center; }
 
   .mentor__figure {
+    position: relative;
+    grid-column: 1 / 6;
     margin: 0;
     border: var(--hair) solid var(--fg);
   }
@@ -73,21 +69,29 @@ import mentor from '../assets/mentor.jpg';
     object-fit: cover;
   }
 
+  /* Табличка поверх нижней части кадра. */
+  .mentor__plate {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 0.35rem 1rem 0.55rem;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(6px);
+    border-top: var(--hair) solid var(--fg);
+  }
+
   .mentor__text {
     grid-column: 7 / 13;
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
-    /* Оптический сдвиг: верхняя линия текста садится на верх фотографии. */
-    padding-top: clamp(0rem, -1rem + 2vw, 1.25rem);
   }
 
   @media (max-width: 900px) {
-    .mentor__aside { grid-column: 1 / 4; }
-    .mentor__text { grid-column: 4 / 7; padding-top: 0; }
+    .mentor__figure { grid-column: 1 / 4; }
+    .mentor__text { grid-column: 4 / 7; }
   }
 
   @media (max-width: 560px) {
-    .mentor__aside { max-width: 22rem; }
+    .mentor__figure { max-width: 24rem; }
   }
 </style>

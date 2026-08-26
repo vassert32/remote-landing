@@ -244,6 +244,75 @@ function initProgram(): void {
 }
 
 /* ==========================================================================
+   Скролл-магнит секций
+   Каждый смысловой этап — экран; когда прокрутка остановилась рядом с
+   началом секции, страницу мягко подклеивает к нему. Внутри пин-сцен
+   (hero, программа) магнит молчит: там своя механика.
+   ========================================================================== */
+
+function initSectionSnap(): void {
+  let points: number[] = [];
+  let zones: Array<[number, number]> = [];
+
+  const collect = () => {
+    const vh = window.innerHeight;
+    points = [...document.querySelectorAll<HTMLElement>('main > section, footer')].map(
+      (el) => Math.round(el.getBoundingClientRect().top + window.scrollY),
+    );
+    points.unshift(0);
+    // Пин-спейсеры: глушим магнит внутри сцен, кроме их кромок.
+    zones = [...document.querySelectorAll<HTMLElement>('.pin-spacer')].map((sp) => {
+      const r = sp.getBoundingClientRect();
+      const top = r.top + window.scrollY;
+      return [top + vh * 0.25, top + r.height - vh * 1.25];
+    });
+  };
+
+  collect();
+  ScrollTrigger.addEventListener('refresh', collect);
+
+  let timer = 0;
+  let snapping = false;
+
+  const trySnap = () => {
+    if (snapping || !lenisRef) return;
+    const y = lenisRef.actualScroll;
+    if (zones.some(([a, b]) => y > a && y < b)) return;
+
+    let best = 0;
+    let dist = Infinity;
+    for (const point of points) {
+      const d = Math.abs(point - y);
+      if (d < dist) {
+        dist = d;
+        best = point;
+      }
+    }
+    // «Клеим на немного»: тянем только с близкого расстояния.
+    if (dist < 6 || dist > window.innerHeight * 0.28) return;
+
+    snapping = true;
+    lenisRef.scrollTo(best, {
+      duration: 0.75,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+      onComplete: () => {
+        snapping = false;
+      },
+    });
+    // Страховка, если onComplete потеряется из-за перехвата скролла.
+    window.setTimeout(() => {
+      snapping = false;
+    }, 1000);
+  };
+
+  lenisRef?.on('scroll', () => {
+    if (snapping) return;
+    window.clearTimeout(timer);
+    timer = window.setTimeout(trySnap, 160);
+  });
+}
+
+/* ==========================================================================
    Общие появления
    ========================================================================== */
 
@@ -451,6 +520,7 @@ function boot(): void {
   initProgram();
   initReveals();
   initCounters();
+  initSectionSnap();
   ScrollTrigger.refresh();
   if (finePointer.matches) {
     initCursor();
