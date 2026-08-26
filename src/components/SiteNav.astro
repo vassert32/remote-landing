@@ -59,7 +59,7 @@ import { nav, cta, socials } from '../data/content';
     position: fixed;
     inset: 0 0 auto 0;
     z-index: calc(var(--z-nav) - 1);
-    height: calc(140px - 48px * var(--nav-t, 0));
+    height: calc(150px - 48px * var(--nav-t, 0));
     pointer-events: none;
     backdrop-filter: blur(9px);
     -webkit-backdrop-filter: blur(9px);
@@ -76,7 +76,7 @@ import { nav, cta, socials } from '../data/content';
     position: fixed;
     inset: 0 0 auto 0;
     z-index: var(--z-nav);
-    height: calc(112px - 48px * var(--nav-t));
+    height: calc(124px - 48px * var(--nav-t));
     display: flex;
     align-items: center;
     /* Всё содержимое белое; difference инвертирует его против фона. */
@@ -104,7 +104,7 @@ import { nav, cta, socials } from '../data/content';
   .nav__right {
     display: flex;
     align-items: center;
-    gap: calc(2.75rem - 1.5rem * var(--nav-t));
+    gap: calc(3rem - 1.4rem * var(--nav-t));
   }
 
   .nav__mark {
@@ -190,8 +190,8 @@ import { nav, cta, socials } from '../data/content';
   }
 
   @media (max-width: 780px) {
-    .nav { height: calc(84px - 20px * var(--nav-t)); }
-    .veil { height: calc(110px - 20px * var(--nav-t, 0)); }
+    .nav { height: calc(92px - 20px * var(--nav-t)); }
+    .veil { height: calc(118px - 20px * var(--nav-t, 0)); }
     .nav__socials { display: none; }
     .nav__mark { font-size: calc(1.2rem - 0.15rem * var(--nav-t)); }
   }

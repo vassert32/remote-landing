@@ -26,20 +26,45 @@ const year = new Date().getFullYear();
       </a>
     </div>
 
-    <div class="closer__meta">
-      <span>{site.legal}</span>
-      <ul class="closer__socials">
-        {
-          socials.filter((s) => s.href).map((s) => (
-            <li>
-              <a class="iconbtn" href={s.href} target="_blank" rel="noopener" aria-label={s.name} data-magnetic>
-                <Icon name={s.icon} />
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-      <span class="num">{year}</span>
+    <!-- Информативный низ: навигация, контакт, реквизиты — без пустоты. -->
+    <div class="closer__foot">
+      <nav class="closer__col" aria-label="Разделы страницы">
+        <span class="closer__col-title">Разделы</span>
+        <a class="closer__flink" href="#put">Путь</a>
+        <a class="closer__flink" href="#programma">Программа</a>
+        <a class="closer__flink" href="#usloviya">Условия</a>
+        <a class="closer__flink" href="#voprosy">Вопросы</a>
+      </nav>
+
+      <div class="closer__col">
+        <span class="closer__col-title">Связь</span>
+        <a class="closer__flink" href={cta.href} target="_blank" rel="noopener">{site.telegramHandle}</a>
+        <ul class="closer__socials">
+          {
+            socials.map((s) =>
+              s.href ? (
+                <li>
+                  <a class="iconbtn" href={s.href} target="_blank" rel="noopener" aria-label={s.name} data-magnetic>
+                    <Icon name={s.icon} />
+                  </a>
+                </li>
+              ) : (
+                <li>
+                  <span class="iconbtn closer__soon" aria-label={`${s.name}: ссылка скоро появится`} title="Скоро">
+                    <Icon name={s.icon} />
+                  </span>
+                </li>
+              ),
+            )
+          }
+        </ul>
+      </div>
+
+      <div class="closer__col closer__col--legal">
+        <span class="closer__col-title">Реквизиты</span>
+        <span>{site.legal}</span>
+        <span class="num closer__year">{year}</span>
+      </div>
     </div>
   </div>
 </footer>
@@ -56,9 +81,10 @@ const year = new Date().getFullYear();
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: center;
     gap: var(--space-8);
   }
+  /* Контент по центру свободного места, инфо-подвал прижат к низу. */
+  .closer__kicker { margin-top: auto; }
 
   .closer__kicker {
     font-family: var(--font-mono);
@@ -92,23 +118,53 @@ const year = new Date().getFullYear();
   .closer__tg:hover, .closer__tg:focus-visible { color: var(--fg); }
   .closer__tg-icon { width: 1.1rem; height: 1.1rem; }
 
-  .closer__meta {
+  .closer__foot {
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-8);
     margin-top: auto;
-    padding-top: clamp(3rem, 2rem + 5vw, 6rem);
-    padding-block: var(--space-6);
+    padding-block: clamp(2rem, 1.5rem + 2vw, 3rem) var(--space-8);
     border-top: var(--hair) solid var(--line);
     font-size: var(--fs-small);
     color: var(--fg-mute);
   }
 
+  .closer__col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+  }
+  .closer__col--legal { align-items: flex-end; text-align: right; }
+
+  .closer__col-title {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: var(--tr-mono);
+    color: var(--fg-faint);
+    margin-bottom: 0.25rem;
+  }
+
+  .closer__flink {
+    color: var(--fg-soft);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .closer__flink:hover, .closer__flink:focus-visible { color: var(--fg); }
+
   .closer__socials {
     display: flex;
     gap: var(--space-3);
+    margin-top: 0.35rem;
+  }
+  .closer__soon { opacity: 0.35; cursor: default; }
+  .closer__soon:hover { background: transparent; border-color: var(--line-strong); color: var(--fg); }
+
+  .closer__year { color: var(--fg-faint); }
+
+  @media (max-width: 780px) {
+    .closer__foot { grid-template-columns: 1fr 1fr; }
+    .closer__col--legal { grid-column: 1 / -1; align-items: flex-start; text-align: left; flex-direction: row; justify-content: space-between; width: 100%; }
   }
 
   @media (max-width: 560px) {

@@ -3,8 +3,8 @@ import { terms } from '../data/content';
 ---
 
 <section class="section section--band terms" id="usloviya">
-  <div class="shell">
-    <header class="terms__head grid">
+  <div class="shell grid terms__grid">
+    <header class="terms__head">
       <h2 class="h2 terms__title" data-split>Ноль на старте. Считаю с результата</h2>
       <p class="body terms__body" data-reveal="blur">
         Вся подготовка и сопровождение до оффера бесплатны. Мой счёт появляется
@@ -13,7 +13,7 @@ import { terms } from '../data/content';
       </p>
     </header>
 
-    <div class="panel bill-panel">
+    <div class="panel bill-panel" data-reveal="up">
       <span class="panel__tag">расчёт</span>
     <dl class="bill">
       {
@@ -34,19 +34,27 @@ import { terms } from '../data/content';
 </section>
 
 <style>
-  .terms__head { row-gap: var(--space-6); margin-bottom: clamp(3rem, 1.5rem + 5vw, 6rem); }
-  .terms__title { grid-column: 1 / 8; }
-  .terms__body { grid-column: 1 / 7; }
+  /* Двухколонник: слева заголовок и вводка, справа компактный расчёт.
+     Плотно, по центру секции, без сквозной пустоты. */
+  .terms__grid { align-items: center; row-gap: var(--space-8); }
+  .terms__head {
+    grid-column: 1 / 6;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .terms__title { max-width: 14ch; }
+  .terms__body { max-width: 40ch; }
 
-  .bill-panel { padding-block: 0.4rem; background: var(--bg); }
+  .bill-panel { grid-column: 7 / 13; padding-block: 0.4rem; background: var(--bg); }
   .bill { margin: 0; }
 
   .bill__row {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    gap: var(--space-8);
-    padding-block: clamp(1.1rem, 0.6rem + 1.6vw, 2rem);
+    gap: var(--space-6);
+    padding-block: clamp(0.9rem, 0.5rem + 1.2vw, 1.4rem);
     border-top: var(--hair) solid var(--line-strong);
   }
   .bill__row:last-child { border-bottom: 0; }
@@ -63,7 +71,7 @@ import { terms } from '../data/content';
 
   .bill__val {
     flex: none;
-    font-size: clamp(1.6rem, 0.8rem + 3.2vw, 3.4rem);
+    font-size: clamp(1.35rem, 0.7rem + 2.2vw, 2.4rem);
     font-weight: 550;
     line-height: 1;
     color: var(--fg-soft);
@@ -75,11 +83,12 @@ import { terms } from '../data/content';
   .bill__key--final { color: var(--fg); font-weight: 700; }
   .bill__val--final {
     color: var(--stamp);
-    font-size: clamp(2.4rem, 0.9rem + 6vw, 5.6rem);
+    font-size: clamp(2rem, 0.8rem + 4vw, 4rem);
   }
 
   @media (max-width: 900px) {
-    .terms__title, .terms__body { grid-column: 1 / -1; }
+    .terms__head { grid-column: 1 / -1; }
+    .bill-panel { grid-column: 1 / -1; }
     .bill__row { gap: var(--space-4); }
   }
 </style>

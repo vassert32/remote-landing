@@ -327,14 +327,19 @@ function initSnapScroll(): void {
   let settling = false;
   let lastY = 0;
   let dir = 1;
+  let lastWheel = 0;
+  window.addEventListener('wheel', () => { lastWheel = performance.now(); }, { passive: true });
 
   lenis.on('scroll', ({ velocity }: { velocity: number }) => {
     const y = lenis.actualScroll;
     if (Math.abs(y - lastY) > 0.5) dir = y > lastY ? 1 : -1;
     lastY = y;
 
+    // Подхватываем ещё НА замедлении (а не после полной остановки), но
+    // никогда — пока пользователь активно крутит колесо.
     const speed = Math.abs(velocity);
-    if (settling || speed === 0 || speed > 0.6) return;
+    if (settling || speed === 0 || speed > 1.25) return;
+    if (performance.now() - lastWheel < 160) return;
 
     // Инерция затухает: вперёд по ходу тянем с трети экрана, назад — только
     // если границу едва переехали (короткое подтягивание, не откат).
@@ -353,9 +358,12 @@ function initSnapScroll(): void {
     if (best < 0 || bestDist < 4) return;
 
     settling = true;
+    // Длительность от дистанции: короткий довод быстрый, длинный плавный.
+    // Изинг мягкий (quint): выглядит как продолжение затухания, не телепорт.
+    const dur = gsap.utils.clamp(0.55, 1.35, bestDist / 520);
     lenis.scrollTo(best, {
-      duration: 0.65,
-      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+      duration: dur,
+      easing: (t: number) => 1 - Math.pow(1 - t, 5),
       onComplete: () => {
         settling = false;
       },
@@ -363,7 +371,7 @@ function initSnapScroll(): void {
     // Юзер перехватил колесо — Lenis оборвал твин, onComplete не придёт.
     window.setTimeout(() => {
       settling = false;
-    }, 900);
+    }, dur * 1000 + 350);
   });
 }
 
