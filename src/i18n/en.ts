@@ -99,7 +99,7 @@ export const en = {
   },
 
   ladder: {
-    title: 'A path you can repeat',
+    title: 'My path. Your goal.',
     body:
       'Yandex School, the internship, the staff job: I went through all of it myself, ' +
       'with no connections and no relocation. So I remember where the months get lost ' +
