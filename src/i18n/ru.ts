@@ -66,7 +66,6 @@ export const ru = {
    */
   offer: {
     docTitle: 'JOB OFFER',
-    status: 'ожидает подписи',
     rows: [
       { key: 'Кому', value: 'ВАМ' },
       { key: 'Формат', value: 'Удалённо, без релокации' },

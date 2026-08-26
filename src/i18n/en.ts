@@ -66,7 +66,6 @@ export const en = {
    */
   offer: {
     docTitle: 'JOB OFFER',
-    status: 'awaiting signature',
     rows: [
       { key: 'To', value: 'YOU' },
       { key: 'Format', value: 'Remote, no relocation' },
