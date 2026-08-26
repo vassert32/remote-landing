@@ -79,6 +79,8 @@ const rows = c.fit.yes.map((yes, i) => ({ yes, no: c.fit.no[i] ?? '' }));
 
   /* Мобайл: сетка складывается в две группы — сперва все «да», затем «нет». */
   @media (max-width: 780px) {
+    .fitcheck__title { margin-bottom: var(--space-8); }
+    .fitcheck__item { padding-block: var(--space-3); }
     .fitcheck__table { grid-template-columns: minmax(0, 1fr); }
     .fitcheck__colhead { order: 1; }
     .fitcheck__item { order: 2; }

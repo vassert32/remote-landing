@@ -121,6 +121,28 @@
   color: var(--fg);
 }
 
+/* На телефоне вертикаль дороже: секционный ритм и высота хедера ужимаются,
+   иначе контент секции перестаёт помещаться в экран. */
+@media (max-width: 780px) {
+  :root {
+    --section-y: clamp(3rem, 1.5rem + 5vw, 4.5rem);
+    --nav-h: 64px;
+  }
+}
+
+/* Низкий экран (старые андроиды, айфон SE): вертикали совсем мало,
+   режем ритм и дисплейные кегли ещё сильнее. */
+@media (max-height: 720px) and (max-width: 900px) {
+  :root {
+    --section-y: 2.25rem;
+    --fs-h1: clamp(1.9rem, 1.2rem + 3vw, 2.5rem);
+    --fs-h2: clamp(1.5rem, 1rem + 2.4vw, 2rem);
+    --fs-lead: clamp(1rem, 0.9rem + 0.5vw, 1.15rem);
+    --space-12: 2rem;
+    --space-8: 1.4rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --dur-fast: 1ms;

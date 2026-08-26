@@ -76,7 +76,16 @@ const c = t(Astro.currentLocale);
     .mentor__text { grid-column: 4 / 7; }
   }
 
+  /* Телефон: кадр ниже, текст плотнее — иначе секция вдвое выше экрана. */
+  @media (max-width: 780px) {
+    .mentor__grid { row-gap: var(--space-6); }
+    .mentor__text { gap: var(--space-4); }
+    .mentor__figure :global(img) { aspect-ratio: 4 / 3; }
+    .mentor__plate { padding: 0.2rem 0.8rem 0.35rem; }
+    .mentor__plate .doc__row { padding-block: 0.4rem; }
+  }
+
   @media (max-width: 560px) {
-    .mentor__figure { max-width: 24rem; }
+    .mentor__figure { max-width: none; }
   }
 </style>

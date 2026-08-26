@@ -178,8 +178,18 @@ const fmt = new Intl.NumberFormat(c.locale);
       padding-block: var(--space-4);
       border-top: var(--hair) solid var(--line);
     }
-    .col__bar { display: none; }
-    .col__num { grid-column: 2; margin-top: 0; justify-self: end; }
+    /* Столбца нет — сумма остаётся, превращаясь в шильдик справа от этапа.
+       Раньше она пряталась вместе со столбцом, потому что живёт внутри него. */
+    .col__bar {
+      grid-column: 2;
+      grid-row: 1;
+      width: auto;
+      height: auto;
+      justify-self: end;
+      padding: 0.3rem 0.55rem;
+      box-shadow: inset 0 2px 0 var(--stamp);
+    }
+    .col__num { font-size: var(--fs-small); }
     .col__stage { grid-column: 1; grid-row: 1; margin-top: 0; font-size: var(--fs-small); }
     .col__story {
       position: static;
@@ -188,8 +198,13 @@ const fmt = new Intl.NumberFormat(c.locale);
       opacity: 1;
       translate: none;
       pointer-events: auto;
-      margin-top: var(--space-3);
+      margin-top: var(--space-2);
+      padding: 0.6rem 0.8rem;
+      font-size: var(--fs-micro);
       border-top-width: 2px;
     }
+    .col { padding-block: var(--space-3); }
+    .ladder__head { margin-bottom: var(--space-4); }
+    .ladder__panel { padding: 1.4rem 1rem 1rem; }
   }
 </style>
