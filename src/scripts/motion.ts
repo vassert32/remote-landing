@@ -51,6 +51,16 @@ function initNavShrink(): void {
    Lenis
    ========================================================================== */
 
+/**
+ * Держит Lenis в курсе реальной высоты документа. Пины ScrollTrigger
+ * добавляют высоту ПОСЛЕ инициализации, а Lenis кэширует размеры: без
+ * пересчёта его лимит остаётся коротким и скролл упирается в невидимую
+ * стену задолго до конца страницы.
+ */
+function syncLenisHeight(): void {
+  lenisRef?.resize();
+}
+
 function initLenis(): Lenis {
   const lenis = new Lenis({
     duration: 1.05,
@@ -255,10 +265,17 @@ function initProgram(): void {
   // обязана расти от левого края.
   gsap.set(progress, { transformOrigin: 'left center', scaleX: 0 });
 
+  const segs = [...root.querySelectorAll<HTMLElement>('[data-route-seg]')];
+
   const setActive = (index: number) => {
     if (index === active) return;
     active = index;
     steps.forEach((s, n) => s.classList.toggle('is-active', n === index));
+    // Сегменты маршрута: пройденные тускло-оранжевые, текущий яркий.
+    segs.forEach((seg, n) => {
+      seg.classList.toggle('is-done', n < index);
+      seg.classList.toggle('is-active', n === index);
+    });
     const target = digitEls[index];
     if (target) {
       gsap.to(digits, { y: -target.offsetTop, duration: 0.5, ease: 'power3.inOut', overwrite: 'auto' });
@@ -577,6 +594,8 @@ function boot(): void {
   // Пины меняют высоту документа: сначала даём ScrollTrigger посчитать
   // геометрию, только потом снимаем с неё точки снапа.
   ScrollTrigger.refresh();
+  syncLenisHeight();
+  ScrollTrigger.addEventListener('refresh', syncLenisHeight);
   initSnap(lenis);
   if (finePointer.matches) {
     initCursor();
@@ -586,6 +605,8 @@ function boot(): void {
   // Пересчёт после стабилизации высот: шрифты и отложенные картинки.
   document.fonts?.ready.then(() => ScrollTrigger.refresh());
   window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+  // Страховка: высоты картинок и шрифтов доезжают позже первого refresh.
+  window.setTimeout(syncLenisHeight, 1200);
 }
 
 boot();

@@ -170,6 +170,8 @@ export const en = {
 
   fit: {
     title: 'This is not a get-into-tech course',
+    formTitle: 'Candidate form',
+    formNote: 'tick them mentally: four out of four on the left means yes',
     yesTitle: 'Good fit',
     noTitle: 'Not a fit',
     yes: [
@@ -191,6 +193,9 @@ export const en = {
     body:
       'Not a handful of calls, but six consecutive stages: from rebuilding your CV ' +
       'to your first weeks in the new job.',
+    routeFrom: 'start',
+    routeTo: 'offer',
+    routeSpan: '3-4 months',
     steps: [
       {
         num: '1',
@@ -253,6 +258,8 @@ export const en = {
 
   closer: {
     kicker: 'The first call is free',
+    bigNum: '$0',
+    bigNote: 'the cost of starting',
     title: 'The next offer could be yours',
     note:
       'We get on a call and look at your experience, your English and your goal. ' +

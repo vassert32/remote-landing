@@ -6,44 +6,61 @@ const c = t(Astro.currentLocale);
 
 /**
  * Пары «подойдёт/не подойдёт» лежат в одной грид-строке: их линии совпадают
- * по горизонтали. Визуально это те же две колонки, что и раньше.
+ * по горизонтали. Форма бланка-анкеты: номер строки, бокс отметки, текст.
  */
-const rows = c.fit.yes.map((yes, i) => ({ yes, no: c.fit.no[i] ?? '' }));
+const rows = c.fit.yes.map((yes, i) => ({ yes, no: c.fit.no[i] ?? '', n: i + 1 }));
 ---
 
 <section class="section fitcheck">
   <div class="shell">
     <h2 class="h2 fitcheck__title" data-split>{c.fit.title}</h2>
 
-    <div class="fitcheck__table">
-      <h3 class="fitcheck__colhead">
-        <Icon name="ph:check-bold" class="fitcheck__mark fitcheck__mark--yes" aria-hidden="true" />
-        <span>{c.fit.yesTitle}</span>
-      </h3>
-      <h3 class="fitcheck__colhead fitcheck__colhead--no">
-        <Icon name="ph:x-bold" class="fitcheck__mark" aria-hidden="true" />
-        <span>{c.fit.noTitle}</span>
-      </h3>
+    <div class="panel fitcheck__panel" data-reveal="up">
+      <span class="panel__tag">{c.fit.formTitle}</span>
 
-      {
-        rows.map((row) => (
-          <>
-            <p class="fitcheck__item" data-reveal="up">{row.yes}</p>
-            <p class="fitcheck__item fitcheck__item--no" data-reveal="up">{row.no}</p>
-          </>
-        ))
-      }
+      <div class="fitcheck__table">
+        <h3 class="fitcheck__colhead">
+          <Icon name="ph:check-bold" class="fitcheck__mark fitcheck__mark--yes" aria-hidden="true" />
+          <span>{c.fit.yesTitle}</span>
+        </h3>
+        <h3 class="fitcheck__colhead fitcheck__colhead--no">
+          <Icon name="ph:x-bold" class="fitcheck__mark" aria-hidden="true" />
+          <span>{c.fit.noTitle}</span>
+        </h3>
+
+        {
+          rows.map((row) => (
+            <>
+              <p class="fitcheck__item">
+                <span class="fitcheck__n num" aria-hidden="true">{String(row.n).padStart(2, '0')}</span>
+                <span class="fitcheck__box fitcheck__box--yes" aria-hidden="true">
+                  <Icon name="ph:check-bold" />
+                </span>
+                <span>{row.yes}</span>
+              </p>
+              <p class="fitcheck__item fitcheck__item--no">
+                <span class="fitcheck__box" aria-hidden="true"></span>
+                <span>{row.no}</span>
+              </p>
+            </>
+          ))
+        }
+      </div>
+
+      <p class="fitcheck__note">{c.fit.formNote}</p>
     </div>
   </div>
 </section>
 
 <style>
-  .fitcheck__title { margin-bottom: clamp(2.5rem, 1rem + 5vw, 5rem); max-width: 16ch; }
+  .fitcheck__title { margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem); max-width: 16ch; }
+
+  .fitcheck__panel { padding-top: clamp(2rem, 1.5rem + 1.8vw, 2.8rem); }
 
   .fitcheck__table {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: clamp(2rem, 1rem + 4vw, 5rem);
+    column-gap: clamp(1.5rem, 1rem + 3vw, 4rem);
     align-items: stretch;
   }
 
@@ -63,28 +80,59 @@ const rows = c.fit.yes.map((yes, i) => ({ yes, no: c.fit.no[i] ?? '' }));
   .fitcheck__mark { width: 0.8em; height: 0.8em; flex: none; }
   .fitcheck__mark--yes { color: var(--stamp); }
 
+  /* Строка анкеты: номер, бокс отметки, текст. */
   .fitcheck__item {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: start;
+    gap: 0.75rem;
     margin: 0;
     padding-block: var(--space-4);
     border-bottom: var(--hair) solid var(--line);
-    max-width: 44ch;
     text-wrap: pretty;
   }
   .fitcheck__item--no {
+    grid-template-columns: auto 1fr;
     color: var(--fg-mute);
-    text-decoration: line-through;
-    text-decoration-thickness: 1px;
-    text-decoration-color: var(--fg-faint);
   }
 
-  /* Мобайл: сетка складывается в две группы — сперва все «да», затем «нет». */
+  .fitcheck__n {
+    font-size: var(--fs-micro);
+    color: var(--fg-faint);
+    padding-top: 0.28em;
+  }
+
+  /* Бокс отметки: слева проставлен, справа намеренно пустой. */
+  .fitcheck__box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.05rem;
+    height: 1.05rem;
+    flex: none;
+    margin-top: 0.22em;
+    border: var(--hair) solid var(--line-strong);
+    color: var(--stamp);
+  }
+  .fitcheck__box--yes { border-color: var(--stamp); }
+  .fitcheck__box :global(svg) { width: 0.7rem; height: 0.7rem; }
+  .fitcheck__item--no .fitcheck__box { border-style: dashed; }
+
+  .fitcheck__note {
+    margin-top: var(--space-6);
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: var(--tr-mono);
+    color: var(--fg-mute);
+  }
+
+  /* Мобайл: сетка складывается в две группы порядком через order. */
   @media (max-width: 780px) {
-    .fitcheck__title { margin-bottom: var(--space-8); }
-    .fitcheck__item { padding-block: var(--space-3); }
+    .fitcheck__title { margin-bottom: var(--space-6); }
     .fitcheck__table { grid-template-columns: minmax(0, 1fr); }
     .fitcheck__colhead { order: 1; }
-    .fitcheck__item { order: 2; }
-    .fitcheck__colhead--no { order: 3; margin-top: var(--space-8); }
+    .fitcheck__item { order: 2; padding-block: var(--space-3); }
+    .fitcheck__colhead--no { order: 3; margin-top: var(--space-6); }
     .fitcheck__item--no { order: 4; }
   }
 </style>

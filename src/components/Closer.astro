@@ -11,7 +11,14 @@ const year = new Date().getFullYear();
   <div class="shell closer__inner">
     <p class="closer__kicker" data-reveal="up">{c.closer.kicker}</p>
 
-    <h2 class="closer__title h2" data-split>{c.closer.title}</h2>
+    <div class="closer__head">
+      <h2 class="closer__title h2" data-split>{c.closer.title}</h2>
+      <!-- Цена входа во весь рост: последний аргумент перед кнопкой. -->
+      <p class="closer__big" data-reveal="up">
+        <span class="closer__big-num num-font">{c.closer.bigNum}</span>
+        <span class="closer__big-note">{c.closer.bigNote}</span>
+      </p>
+    </div>
 
     <p class="closer__note body" data-reveal="blur">{c.closer.note}</p>
 
@@ -95,7 +102,39 @@ const year = new Date().getFullYear();
     color: var(--fg-mute);
   }
 
+  .closer__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-8);
+    width: 100%;
+  }
   .closer__title { max-width: 16ch; }
+
+  .closer__big {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
+    flex: none;
+  }
+  .closer__big-num {
+    font-size: clamp(3rem, 1.5rem + 6vw, 7rem);
+    font-weight: var(--fw-display);
+    line-height: 0.9;
+    color: var(--stamp);
+  }
+  .closer__big-note {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: var(--tr-mono);
+    color: var(--fg-mute);
+  }
+
+  @media (max-width: 780px) {
+    .closer__head { flex-direction: column; align-items: flex-start; gap: var(--space-4); }
+    .closer__big { align-items: flex-start; }
+  }
 
   .closer__note { color: var(--fg-soft); max-width: 44ch; }
 
