@@ -1,0 +1,68 @@
+---
+import { Icon } from 'astro-icon/components';
+import { fit } from '../data/content';
+---
+
+<section class="section fitcheck">
+  <div class="shell">
+    <h2 class="h2 fitcheck__title" data-split>Это не курс входа в IT</h2>
+
+    <div class="grid fitcheck__cols">
+      <div class="fitcheck__col" data-reveal="up">
+        <h3 class="fitcheck__colhead">
+          <Icon name="ph:check-bold" class="fitcheck__mark fitcheck__mark--yes" aria-hidden="true" />
+          <span>Подойдёт</span>
+        </h3>
+        <ul class="fitcheck__list">
+          {fit.yes.map((item) => <li class="fitcheck__item">{item}</li>)}
+        </ul>
+      </div>
+
+      <div class="fitcheck__col fitcheck__col--no" data-reveal="up">
+        <h3 class="fitcheck__colhead">
+          <Icon name="ph:x-bold" class="fitcheck__mark" aria-hidden="true" />
+          <span>Не подойдёт</span>
+        </h3>
+        <ul class="fitcheck__list">
+          {fit.no.map((item) => <li class="fitcheck__item">{item}</li>)}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fitcheck__title { margin-bottom: clamp(2.5rem, 1rem + 5vw, 5rem); max-width: 16ch; }
+
+  .fitcheck__cols { row-gap: var(--space-12); }
+
+  .fitcheck__col { grid-column: span 6; }
+  .fitcheck__col--no { color: var(--ink-mute); }
+
+  .fitcheck__colhead {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-bottom: var(--space-4);
+    border-bottom: 2px solid var(--ink);
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    letter-spacing: -0.014em;
+  }
+  .fitcheck__col--no .fitcheck__colhead { border-bottom-color: var(--rule-strong); }
+
+  .fitcheck__mark { width: 0.8em; height: 0.8em; flex: none; }
+  .fitcheck__mark--yes { color: var(--stamp); }
+
+  .fitcheck__item {
+    padding-block: var(--space-4);
+    border-bottom: var(--hair) solid var(--rule);
+    max-width: 44ch;
+    text-wrap: pretty;
+  }
+  .fitcheck__col--no .fitcheck__item { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: var(--ink-faint); }
+
+  @media (max-width: 900px) {
+    .fitcheck__col { grid-column: 1 / -1; }
+  }
+</style>

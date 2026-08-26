@@ -1,0 +1,92 @@
+---
+import { Image } from 'astro:assets';
+import mentor from '../assets/mentor.jpg';
+---
+
+<section class="section mentor">
+  <div class="shell grid mentor__grid">
+    <div class="mentor__aside">
+      <figure class="mentor__figure" data-reveal="up">
+        <Image
+          src={mentor}
+          alt="Евгений Геркулесов выступает с докладом перед схемой архитектуры сервиса"
+          widths={[420, 620, 900]}
+          sizes="(max-width: 900px) 84vw, 38vw"
+          loading="lazy"
+          decoding="async"
+        />
+      </figure>
+
+      <div class="mentor__card doc" data-reveal="doc">
+        <div class="doc__body">
+          <div class="doc__row">
+            <span class="doc__key">Имя</span>
+            <span class="doc__val">Евгений Геркулесов</span>
+          </div>
+          <div class="doc__row">
+            <span class="doc__key">Роль</span>
+            <span class="doc__val">Senior Backend Engineer</span>
+          </div>
+          <div class="doc__row">
+            <span class="doc__key">Формат</span>
+            <span class="doc__val">Один на один</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mentor__text">
+      <h2 class="h2" data-split>Со мной, а не с командой кураторов</h2>
+
+      <p class="body" data-reveal="up">
+        Я backend-разработчик. Школа Яндекса, стажировка, работа в штате, потом
+        удалённый контракт с зарубежной компанией и ставка в долларах. Тот же
+        путь, который вы видите на шкале выше, я прошёл без релокации.
+      </p>
+      <p class="body" data-reveal="up">
+        Резюме, отклики, разборы собеседований и переговоры по офферу идут через
+        меня лично. Никаких кураторов, общих чатов и записанных уроков.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .mentor__grid { row-gap: var(--space-12); align-items: start; }
+
+  .mentor__aside {
+    grid-column: 1 / 6;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .mentor__figure {
+    margin: 0;
+    border: var(--hair) solid var(--ink);
+  }
+  .mentor__figure :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 59 / 78;
+    object-fit: cover;
+  }
+
+  .mentor__text {
+    grid-column: 7 / 13;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    /* Оптический сдвиг: верхняя линия текста садится на верх фотографии. */
+    padding-top: clamp(0rem, -1rem + 2vw, 1.25rem);
+  }
+
+  @media (max-width: 900px) {
+    .mentor__aside { grid-column: 1 / 4; }
+    .mentor__text { grid-column: 4 / 7; padding-top: 0; }
+  }
+
+  @media (max-width: 560px) {
+    .mentor__aside { max-width: 22rem; }
+  }
+</style>

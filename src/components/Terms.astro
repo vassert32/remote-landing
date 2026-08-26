@@ -1,0 +1,84 @@
+---
+import { terms } from '../data/content';
+---
+
+<section class="section section--band terms" id="usloviya">
+  <div class="shell">
+    <header class="terms__head grid">
+      <h2 class="h2 terms__title" data-split>Ноль на старте. Считаю с результата</h2>
+      <p class="body terms__body" data-reveal="up">
+        Вся подготовка и сопровождение до оффера бесплатны. Мой счёт появляется
+        один раз: половина вашей первой зарплаты после выхода на работу. Нет
+        оффера, нет и счёта.
+      </p>
+    </header>
+
+    <!-- Расчёт во всю ширину: это не карточка, а строка счёта. -->
+    <dl class="bill">
+      {
+        terms.rows.map((row) => (
+          <div class="bill__row" data-reveal="up">
+            <dt class="bill__key">{row.key}</dt>
+            <dd class="bill__val num">{row.value}</dd>
+          </div>
+        ))
+      }
+      <div class="bill__row bill__row--final" data-reveal="up">
+        <dt class="bill__key bill__key--final">{terms.final.key}</dt>
+        <dd class="bill__val bill__val--final num">{terms.final.value}</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  .terms__head { row-gap: var(--space-6); margin-bottom: clamp(3rem, 1.5rem + 5vw, 6rem); }
+  .terms__title { grid-column: 1 / 8; }
+  .terms__body { grid-column: 1 / 7; }
+
+  .bill { margin: 0; }
+
+  .bill__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding-block: clamp(1.1rem, 0.6rem + 1.6vw, 2rem);
+    border-top: var(--hair) solid var(--rule-strong);
+  }
+  .bill__row:last-child { border-bottom: 2px solid var(--ink); }
+
+  .bill__key {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    letter-spacing: var(--tr-mono);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-wrap: balance;
+  }
+
+  .bill__val {
+    flex: none;
+    /* Моноширинный пробел на 4.5rem превращает «0 ₽» в две отдельные вещи. */
+    word-spacing: -0.35em;
+    font-size: clamp(2rem, 1rem + 4vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  /* Итоговая строка: единственная сумма, которая реально появится. */
+  .bill__row--final { border-top-width: 2px; border-top-color: var(--ink); }
+  .bill__key--final { color: var(--ink); font-weight: 700; }
+  .bill__val--final {
+    color: var(--stamp);
+    font-size: clamp(2.75rem, 1rem + 7vw, 7rem);
+  }
+
+  @media (max-width: 900px) {
+    .terms__title, .terms__body { grid-column: 1 / -1; }
+    .bill__row { gap: var(--space-4); }
+  }
+</style>

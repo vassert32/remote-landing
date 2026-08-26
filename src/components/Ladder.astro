@@ -1,0 +1,122 @@
+---
+import { ladder } from '../data/content';
+---
+
+<section class="section section--band ladder" id="put">
+  <div class="shell">
+    <header class="ladder__head grid">
+      <h2 class="h2 ladder__title" data-split>Этот маршрут я прошёл сам</h2>
+      <p class="body ladder__body" data-reveal="up">
+        Ни одного шага я не проскочил: школа, стажировка, штат, потом выход на
+        зарубежный рынок. Поэтому знаю, где на этом маршруте теряют месяцы
+        и на чём чаще всего срезаются собеседования.
+      </p>
+    </header>
+
+    <ol class="chart" aria-label="Рост дохода по этапам карьеры">
+      {
+        ladder.map((point, i) => (
+          <li
+            class:list={['chart__point', { 'chart__point--peak': i === ladder.length - 1 }]}
+            style={`--weight:${point.weight}`}
+          >
+            <span class="chart__stem" data-reveal="stem" aria-hidden="true"></span>
+            <span class="chart__tick" aria-hidden="true"></span>
+            <span class="chart__value num">{point.display}</span>
+            <span class="chart__stage">{point.stage}</span>
+          </li>
+        ))
+      }
+    </ol>
+    <hr class="rule rule--strong chart__base" data-reveal="rule" />
+  </div>
+</section>
+
+<style>
+  .ladder__head { row-gap: var(--space-6); margin-bottom: clamp(3rem, 1rem + 6vw, 6rem); }
+  .ladder__title { grid-column: 1 / 9; }
+  .ladder__body { grid-column: 1 / 8; color: var(--ink-soft); }
+
+  .chart {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: end;
+    column-gap: var(--col-gap);
+    /* Высота поля засечек. Пики читаются только если поле достаточно высокое. */
+    --field: clamp(9rem, 4rem + 14vw, 17rem);
+  }
+
+  .chart__point {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
+  /* Стойка растёт вверх от базовой линии на долю --weight от поля. */
+  .chart__stem {
+    display: block;
+    width: var(--hair);
+    height: calc(var(--field) * var(--weight));
+    background: var(--rule-strong);
+    transform-origin: bottom center;
+  }
+  .chart__tick {
+    display: block;
+    width: 9px;
+    height: var(--hair);
+    margin-bottom: 0.85rem;
+    background: var(--ink);
+  }
+
+  .chart__value {
+    display: block;
+    font-size: clamp(1rem, 0.55rem + 1.9vw, 1.75rem);
+    font-weight: 700;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .chart__stage {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: var(--fs-micro);
+    line-height: 1.35;
+    color: var(--ink-soft);
+  }
+
+  .chart__point--peak .chart__stem { width: 2px; background: var(--stamp); }
+  .chart__point--peak .chart__tick { width: 14px; height: 2px; background: var(--stamp); }
+  .chart__point--peak .chart__value { color: var(--stamp); }
+  .chart__point--peak .chart__stage { color: var(--ink); font-weight: 600; }
+
+  .chart__base { margin-top: var(--space-4); }
+
+  @media (max-width: 900px) {
+    .ladder__title, .ladder__body { grid-column: 1 / -1; }
+    .chart { --field: clamp(6rem, 2rem + 14vw, 10rem); }
+    .chart__value { font-size: clamp(0.8125rem, 0.4rem + 1.6vw, 1.125rem); }
+  }
+
+  /* Ниже 560px пять колонок нечитаемы: разворачиваем шкалу в вертикальный
+     список, где длина стойки становится длиной строки. */
+  @media (max-width: 560px) {
+    .chart {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 0;
+      --field: 100%;
+    }
+    .chart__point {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      column-gap: var(--space-4);
+      padding-block: 0.85rem;
+      border-top: var(--hair) solid var(--rule);
+    }
+    .chart__stem, .chart__tick { display: none; }
+    .chart__value { grid-column: 2; text-align: right; }
+    .chart__stage { grid-column: 1; grid-row: 1; margin-top: 0; font-size: var(--fs-small); }
+    .chart__base { display: none; }
+  }
+</style>

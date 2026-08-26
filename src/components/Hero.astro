@@ -1,0 +1,171 @@
+---
+import { Icon } from 'astro-icon/components';
+import { cta, offer } from '../data/content';
+---
+
+<section class="hero" id="top">
+  <div class="shell hero__inner grid">
+    <div class="hero__main">
+      <h1 class="display hero__title">
+        <span class="hero__mask"><span class="hero__line" data-hero="line">Тот же опыт.</span></span>
+        <span class="hero__mask"><span class="hero__line" data-hero="line">Другая валюта.</span></span>
+      </h1>
+
+      <p class="lead hero__lead" data-hero="fade">
+        Личное менторство для IT-специалистов с опытом. Довожу до удалённого оффера
+        в Великобритании и Европе за <span class="nowrap">3-4 месяца</span>.
+      </p>
+
+      <div class="hero__actions" data-hero="fade">
+        <a class="btn btn--ink" href={cta.href} target="_blank" rel="noopener">
+          <span>{cta.label}</span>
+          <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
+        </a>
+        <a class="btn btn--ghost" href="#programma">
+          <span>Как это устроено</span>
+          <Icon class="btn__arrow" name="ph:arrow-down-bold" />
+        </a>
+      </div>
+    </div>
+
+    <figure class="hero__aside" data-hero="doc">
+      <div class="doc offer">
+        <figcaption class="doc__head">
+          <span>{offer.docTitle}</span>
+          <span class="offer__owner">Мой собственный</span>
+        </figcaption>
+        <div class="doc__body">
+          {
+            offer.rows.map((row) => (
+              <div class="doc__row">
+                <span class="doc__key">{row.key}</span>
+                <span class="doc__val">{row.value}</span>
+              </div>
+            ))
+          }
+        </div>
+        <div class="offer__seal">
+          <span class="stamp" data-hero="stamp">{offer.stamp}</span>
+        </div>
+      </div>
+    </figure>
+  </div>
+
+  <div class="shell"><hr class="rule rule--strong" /></div>
+</section>
+
+<style>
+  .hero {
+    padding-top: clamp(2.5rem, 1rem + 5vw, 6rem);
+    padding-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
+  }
+
+  .hero__inner {
+    min-height: calc(100dvh - var(--nav-h) - clamp(4.5rem, 2rem + 8vw, 9.5rem));
+    align-content: center;
+    row-gap: var(--space-12);
+  }
+
+  .hero__main {
+    grid-column: 1 / 9;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 0.8rem + 2vw, 2.5rem);
+    container-type: inline-size;
+  }
+
+  .hero__title {
+    /* Кегль считается от ширины колонки, а не от вьюпорта: строки заданы
+       вручную и обязаны уместиться без переносов на любой ширине.
+       12.6cqi выведено из реальной ширины «Другая валюта.» в Onest 700
+       (около 7.6em на четырнадцать знаков) с запасом на подстановку шрифта. */
+    font-size: clamp(2.25rem, 12.6cqi, 6.25rem);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .hero__mask {
+    display: block;
+    overflow: hidden;
+    /* Запас под нижние выносные: маска не должна срезать «р» и «у». */
+    padding-bottom: 0.06em;
+  }
+  .hero__line { display: block; }
+
+  .hero__lead { max-width: 36ch; }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .hero__aside {
+    grid-column: 9 / 13;
+    align-self: center;
+    margin: 0;
+  }
+
+  .offer { position: relative; }
+  .offer__owner { color: var(--ink-mute); font-weight: 500; }
+
+  .offer__seal {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 1.1rem 1.3rem;
+  }
+
+  /* ---- Вход первого экрана ------------------------------------------------
+     Намеренно на CSS, а не на GSAP: первый экран не должен зависеть от того,
+     доехал ли JS-модуль, и не имеет права мигнуть при подмене состояния. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-hero] {
+      animation: hero-enter var(--dur-slow) var(--ease-out) both;
+      animation-delay: var(--delay, 0ms);
+    }
+    [data-hero="line"] {
+      animation-name: hero-line;
+      animation-duration: 900ms;
+    }
+    .hero__mask:nth-child(1) [data-hero="line"] { --delay: 60ms; }
+    .hero__mask:nth-child(2) [data-hero="line"] { --delay: 160ms; }
+    .hero__lead { --delay: 380ms; }
+    .hero__actions { --delay: 480ms; }
+    .hero__aside { --delay: 560ms; }
+    [data-hero="stamp"] {
+      animation-name: hero-stamp;
+      animation-duration: 460ms;
+      --delay: 1050ms;
+    }
+  }
+
+  @keyframes hero-line {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes hero-enter {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  /* Печать прикладывают, а не проявляют: приходит сверху и садится с недолётом. */
+  @keyframes hero-stamp {
+    0%   { opacity: 0; transform: rotate(-14deg) scale(1.5); }
+    70%  { opacity: 1; transform: rotate(-4deg) scale(0.96); }
+    100% { opacity: 1; transform: rotate(-6deg) scale(1); }
+  }
+
+  @media (max-width: 1100px) {
+    .hero__main { grid-column: 1 / 8; }
+    .hero__aside { grid-column: 8 / 13; }
+  }
+
+  @media (max-width: 900px) {
+    .hero__inner { min-height: 0; row-gap: var(--space-8); }
+    .hero__main { grid-column: 1 / -1; }
+    .hero__aside { grid-column: 1 / -1; max-width: 26rem; }
+  }
+
+  @media (max-width: 560px) {
+    .hero__actions .btn { flex: 1 1 100%; justify-content: space-between; }
+  }
+</style>

@@ -1,0 +1,92 @@
+---
+import '../styles/tokens.css';
+import '../styles/fonts.css';
+import '../styles/base.css';
+import { site } from '../data/content';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = site.title, description = site.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL('/og.jpg', Astro.site).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: site.name,
+  description,
+  url: canonical,
+  areaServed: 'Worldwide',
+  serviceType: 'Карьерное менторство для IT-специалистов',
+  provider: {
+    '@type': 'Person',
+    name: site.name,
+    jobTitle: 'Senior Backend Engineer',
+    sameAs: [site.telegram],
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'RUB',
+    description: 'Первый разбор бесплатно. Основная оплата составляет 50% от первой зарплаты после выхода на работу.',
+  },
+};
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#f2f1ed" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Шрифты первого экрана. Моноширинный подтягивается обычным путём:
+         он занят мелким текстом и на LCP не влияет. -->
+    <link
+      rel="preload"
+      href="/fonts/onest-cyrillic-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/onest-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <script is:inline>
+      // Ставим метку до первой отрисовки: только под ней CSS прячет элементы
+      // перед появлением. Без JS страница остаётся полностью читаемой.
+      document.documentElement.classList.add('js');
+    </script>
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">К основному содержанию</a>
+    <slot />
+    <div class="grain" aria-hidden="true"></div>
+  </body>
+</html>

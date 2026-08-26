@@ -1,0 +1,117 @@
+---
+import { Icon } from 'astro-icon/components';
+import { cta, site } from '../data/content';
+const year = new Date().getFullYear();
+---
+
+<!-- Единственная инверсия на странице: тёмная концовка как последний лист досье. -->
+<footer class="closer">
+  <div class="shell closer__inner">
+    <p class="closer__kicker" data-reveal="up">Первый разбор бесплатный</p>
+
+    <h2 class="closer__title" data-split>Следующий оффер может быть вашим</h2>
+
+    <p class="closer__note body" data-reveal="up">
+      Созваниваемся, смотрим ваш опыт, английский и цель. После этого я честно
+      говорю, есть ли смысл работать вместе.
+    </p>
+
+    <div class="closer__actions" data-reveal="up">
+      <a class="btn closer__btn" href={cta.href} target="_blank" rel="noopener">
+        <span>{cta.label}</span>
+        <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
+      </a>
+      <a class="closer__tg" href={cta.href} target="_blank" rel="noopener">
+        <Icon name="ph:telegram-logo" class="closer__tg-icon" aria-hidden="true" />
+        <span>{site.telegramHandle}</span>
+      </a>
+    </div>
+
+    <div class="closer__meta">
+      <span>{site.name}</span>
+      <span class="num">{year}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .closer {
+    background: var(--ink);
+    color: var(--paper);
+    padding-block: clamp(5rem, 3rem + 8vw, 10rem) 0;
+  }
+
+  .closer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-8);
+  }
+
+  .closer__kicker {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    letter-spacing: var(--tr-mono);
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--paper) 55%, transparent);
+  }
+
+  .closer__title {
+    font-size: clamp(2.25rem, 1.1rem + 4.8vw, 5.5rem);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tr-tight);
+    font-weight: 700;
+    max-width: 15ch;
+    text-wrap: balance;
+  }
+
+  .closer__note {
+    color: color-mix(in srgb, var(--paper) 72%, transparent);
+    max-width: 44ch;
+  }
+
+  .closer__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-6);
+    margin-top: var(--space-4);
+  }
+
+  .closer__btn {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--paper);
+  }
+  .closer__btn:hover,
+  .closer__btn:focus-visible { color: var(--paper); border-color: var(--stamp); }
+
+  .closer__tg {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: color-mix(in srgb, var(--paper) 72%, transparent);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .closer__tg:hover, .closer__tg:focus-visible { color: var(--paper); }
+  .closer__tg-icon { width: 1.1rem; height: 1.1rem; }
+
+  .closer__meta {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: clamp(3rem, 2rem + 5vw, 6rem);
+    padding-block: var(--space-6);
+    border-top: var(--hair) solid color-mix(in srgb, var(--paper) 22%, transparent);
+    font-size: var(--fs-small);
+    color: color-mix(in srgb, var(--paper) 55%, transparent);
+  }
+
+  @media (max-width: 560px) {
+    .closer__btn { width: 100%; justify-content: space-between; }
+  }
+</style>

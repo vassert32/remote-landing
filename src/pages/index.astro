@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import SiteNav from '../components/SiteNav.astro';
+import Hero from '../components/Hero.astro';
+import Ladder from '../components/Ladder.astro';
+import Mentor from '../components/Mentor.astro';
+import Terms from '../components/Terms.astro';
+import Fit from '../components/Fit.astro';
+import Program from '../components/Program.astro';
+import Faq from '../components/Faq.astro';
+import Closer from '../components/Closer.astro';
+---
+
+<Base>
+  <SiteNav />
+  <main id="main">
+    <Hero />
+    <Ladder />
+    <Mentor />
+    <Terms />
+    <Fit />
+    <Program />
+    <Faq />
+  </main>
+  <Closer />
+</Base>
+
+<style is:global>
+  /* Маска для построчного появления заголовков. Разметку создаёт motion.ts,
+     поэтому стили живут глобально, а не в компоненте. */
+  .split-mask {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    /* Запас под нижние выносные кириллицы: «у», «р», «д». */
+    padding-bottom: 0.08em;
+  }
+  .split-word { display: inline-block; }
+</style>
+
+<script>
+  // Мотор грузится отложенно: первый экран анимируется чистым CSS,
+  // поэтому задержка модуля не видна пользователю.
+  import('../scripts/motion');
+</script>

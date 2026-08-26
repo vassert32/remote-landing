@@ -1,0 +1,300 @@
+/* ==========================================================================
+   База: сброс, типографика, сетка, примитивы документа.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  background: var(--paper);
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-text);
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+h1, h2, h3, h4, p, figure, blockquote, ol, ul, dl, dd { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+img, svg, video { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+::selection { background: var(--stamp); color: var(--paper); }
+
+:focus-visible {
+  outline: 2px solid var(--stamp);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute; top: 0; left: 0; z-index: var(--z-overlay);
+  padding: var(--space-3) var(--space-6);
+  background: var(--ink); color: var(--paper);
+  font-family: var(--font-mono); font-size: var(--fs-small);
+  transform: translateY(-120%);
+}
+.skip-link:focus-visible { transform: translateY(0); }
+
+/* --- Зерно бумаги --------------------------------------------------------
+   Только фиксированный слой без событий указателя: не перекрашивается при
+   скролле и не жрёт GPU. */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+}
+
+/* ==========================================================================
+   Сетка
+   ========================================================================== */
+
+.shell {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-pad);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+}
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .grid > * { grid-column: 1 / -1 !important; }
+}
+
+.section { padding-block: var(--section-y); }
+.section--band { background: var(--paper-band); }
+
+/* ==========================================================================
+   Типографика
+   ========================================================================== */
+
+.display {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tr-tight);
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tr-tight);
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.h3 {
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+  letter-spacing: -0.014em;
+  font-weight: 600;
+}
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.42;
+  color: var(--ink-soft);
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+
+.body {
+  color: var(--ink-soft);
+  max-width: 58ch;
+  text-wrap: pretty;
+}
+
+/* Моноширинная микро-подпись. Расходуется по бюджету: не больше одной
+   на три секции, иначе страница начинает выглядеть шаблоном. */
+.label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: var(--tr-mono);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* Табличные цифры: колонки чисел выравниваются по разрядам. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  letter-spacing: -0.02em;
+}
+
+.accent { color: var(--stamp); }
+
+/* Держит вместе то, что нельзя рвать переносом: диапазоны, суммы, единицы. */
+.nowrap { white-space: nowrap; }
+
+/* ==========================================================================
+   Линейки
+   ========================================================================== */
+
+.rule {
+  display: block;
+  width: 100%;
+  height: var(--hair);
+  border: 0;
+  background: var(--rule);
+  transform-origin: left center;
+}
+.rule--strong { background: var(--rule-strong); }
+.rule--ink { background: var(--ink); }
+
+/* ==========================================================================
+   Кнопки
+   Заливка приходит слева, подпись инвертируется.
+   ========================================================================== */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 1.05rem 1.75rem;
+  border: var(--hair) solid var(--ink);
+  border-radius: var(--radius);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  isolation: isolate;
+  transition: border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-mid) var(--ease-out);
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--stamp);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-mid) var(--ease-out);
+}
+.btn:hover::before,
+.btn:focus-visible::before { transform: scaleX(1); }
+.btn:active { transform: translateY(1px); }
+
+.btn--ink { background: var(--ink); color: var(--paper); }
+.btn--ghost { background: transparent; color: var(--ink); }
+.btn--ghost:hover, .btn--ghost:focus-visible { color: var(--paper); border-color: var(--stamp); }
+.btn--ink:hover, .btn--ink:focus-visible { border-color: var(--stamp); }
+
+.btn__arrow {
+  width: 0.85em;
+  height: 0.85em;
+  flex: none;
+  transition: transform var(--dur-mid) var(--ease-out);
+}
+.btn:hover .btn__arrow { transform: translateX(3px); }
+
+/* ==========================================================================
+   Примитивы документа
+   ========================================================================== */
+
+.doc {
+  border: var(--hair) solid var(--ink);
+  background: var(--paper);
+}
+
+.doc__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 0.7rem 1.1rem;
+  border-bottom: var(--hair) solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: var(--tr-mono);
+  text-transform: uppercase;
+}
+
+.doc__body { padding: 1.1rem; }
+
+.doc__row {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 0.38fr) 1fr;
+  gap: var(--space-4);
+  padding-block: 0.62rem;
+  align-items: baseline;
+}
+.doc__row + .doc__row { border-top: var(--hair) solid var(--rule); }
+
+.doc__key {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--tr-mono);
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.doc__val { font-weight: 600; font-size: var(--fs-small); }
+
+/* Печать. Ставится один раз на странице, поэтому имеет право быть заметной. */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.42rem 0.8rem;
+  border: 2px solid var(--stamp);
+  color: var(--stamp);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: rotate(-6deg);
+}
+
+/* ==========================================================================
+   Появление при скролле
+   Класс .motion ставит сам модуль анимаций, поэтому если он не загрузился,
+   контент просто остаётся на месте видимым. Всё это живёт ниже первого
+   экрана, так что подмены состояния на глазах у пользователя не будет.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  .motion [data-reveal] { opacity: 0; }
+  .motion [data-reveal="up"] { transform: translateY(18px); }
+  .motion [data-reveal="rule"] { opacity: 1; transform: scaleX(0); }
+  .motion [data-reveal="stem"] { opacity: 1; transform: scaleY(0); }
+  .motion [data-reveal="doc"] { opacity: 0; transform: translateY(26px); }
+}

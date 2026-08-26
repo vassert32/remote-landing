@@ -1,0 +1,103 @@
+---
+import { Icon } from 'astro-icon/components';
+import { faq } from '../data/content';
+---
+
+<section class="section section--band faq" id="voprosy">
+  <div class="shell grid faq__grid">
+    <h2 class="h2 faq__title" data-split>Вопросы, которые задают до созвона</h2>
+
+    <div class="faq__list">
+      {
+        faq.map((item, i) => (
+          <details class="faq__item" name="faq" open={i === 0} data-reveal="up">
+            <summary class="faq__q">
+              <span class="faq__q-text">{item.q}</span>
+              <Icon name="ph:plus-bold" class="faq__icon" aria-hidden="true" />
+            </summary>
+            <div class="faq__a-wrap">
+              <p class="faq__a body">{item.a}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq__grid { row-gap: var(--space-8); align-items: start; }
+
+  .faq__title {
+    grid-column: 1 / 5;
+    position: sticky;
+    top: calc(var(--nav-h) + var(--space-8));
+  }
+
+  .faq__list { grid-column: 6 / 13; }
+
+  .faq__item { border-top: var(--hair) solid var(--rule-strong); }
+  .faq__item:last-child { border-bottom: var(--hair) solid var(--rule-strong); }
+
+  .faq__q {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding-block: var(--space-6);
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    letter-spacing: -0.014em;
+    line-height: 1.25;
+    cursor: pointer;
+    list-style: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .faq__q::-webkit-details-marker { display: none; }
+  .faq__q:hover { color: var(--stamp); }
+
+  .faq__icon {
+    width: 0.9rem;
+    height: 0.9rem;
+    flex: none;
+    align-self: center;
+    transition: transform var(--dur-mid) var(--ease-out);
+  }
+  .faq__item[open] .faq__icon { transform: rotate(45deg); color: var(--stamp); }
+
+  /* Плавное раскрытие на чистом CSS без магических высот. */
+  .faq__a-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--dur-mid) var(--ease-out);
+  }
+  .faq__item[open] .faq__a-wrap { grid-template-rows: 1fr; }
+  .faq__a {
+    overflow: hidden;
+    padding-bottom: 0;
+    transition: padding-bottom var(--dur-mid) var(--ease-out);
+  }
+  .faq__item[open] .faq__a { padding-bottom: var(--space-6); }
+
+  @media (max-width: 900px) {
+    .faq__title { grid-column: 1 / -1; position: static; }
+    .faq__list { grid-column: 1 / -1; }
+    .faq__q { font-size: var(--fs-lead); }
+  }
+</style>
+
+<script>
+  // details[name] схлопывает соседей мгновенно и рывком. Управляем сами:
+  // закрываем открытый после того, как отработала анимация раскрытия нового.
+  const items = [...document.querySelectorAll<HTMLDetailsElement>('.faq__item')];
+  for (const item of items) {
+    item.removeAttribute('name');
+    const summary = item.querySelector('summary');
+    summary?.addEventListener('click', () => {
+      if (item.open) return; // закрытие по клику оставляем нативным
+      for (const other of items) {
+        if (other !== item && other.open) other.open = false;
+      }
+    });
+  }
+</script>

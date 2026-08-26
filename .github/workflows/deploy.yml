@@ -19,6 +19,18 @@ jobs:
       - name: Download repository
         uses: actions/checkout@v4
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
       - name: Configure SSH
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
@@ -33,17 +45,16 @@ jobs:
           ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
+      # Уезжает только собранная папка. Исходники, node_modules и служебные
+      # скрипты на боевой сервер больше не попадают.
       - name: Deploy website
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
         run: |
           rsync -az --delete \
-            --exclude='.git/' \
-            --exclude='.github/' \
-            --exclude='.DS_Store' \
             -e "ssh -i ~/.ssh/landing_deploy" \
-            ./ "$VPS_USER@$VPS_HOST:/var/www/remote-landing/"
+            ./dist/ "$VPS_USER@$VPS_HOST:/var/www/remote-landing/"
 
       - name: Check deployed website
         env:
