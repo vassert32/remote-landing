@@ -1,6 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { cta, site, socials } from '../data/content';
+import { cta, site } from '../data/content';
 const year = new Date().getFullYear();
 ---
 
@@ -26,7 +26,8 @@ const year = new Date().getFullYear();
       </a>
     </div>
 
-    <!-- Информативный низ: навигация, контакт, реквизиты — без пустоты. -->
+    <!-- Информативный низ: разделы, контакты текстом, документы, реквизиты.
+         Иконки живут в хедере — здесь не дублируются. -->
     <div class="closer__foot">
       <nav class="closer__col" aria-label="Разделы страницы">
         <span class="closer__col-title">Разделы</span>
@@ -39,25 +40,16 @@ const year = new Date().getFullYear();
       <div class="closer__col">
         <span class="closer__col-title">Связь</span>
         <a class="closer__flink" href={cta.href} target="_blank" rel="noopener">{site.telegramHandle}</a>
-        <ul class="closer__socials">
-          {
-            socials.map((s) =>
-              s.href ? (
-                <li>
-                  <a class="iconbtn" href={s.href} target="_blank" rel="noopener" aria-label={s.name} data-magnetic>
-                    <Icon name={s.icon} />
-                  </a>
-                </li>
-              ) : (
-                <li>
-                  <span class="iconbtn closer__soon" aria-label={`${s.name}: ссылка скоро появится`} title="Скоро">
-                    <Icon name={s.icon} />
-                  </span>
-                </li>
-              ),
-            )
-          }
-        </ul>
+        <!-- TODO(заказчик): реальные почта и GitHub — слоты оживут со ссылками -->
+        <span class="closer__flink closer__flink--soon" title="Скоро">Почта</span>
+        <span class="closer__flink closer__flink--soon" title="Скоро">GitHub</span>
+      </div>
+
+      <div class="closer__col">
+        <span class="closer__col-title">Документы</span>
+        <a class="closer__flink" href="/oferta">Публичная оферта</a>
+        <a class="closer__flink" href="/dogovor">Договор менторства</a>
+        <a class="closer__flink" href="/privacy">Политика конфиденциальности</a>
       </div>
 
       <div class="closer__col closer__col--legal">
@@ -121,7 +113,7 @@ const year = new Date().getFullYear();
   .closer__foot {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr 1fr 1.4fr 1fr;
     gap: var(--space-8);
     margin-top: auto;
     padding-block: clamp(2rem, 1.5rem + 2vw, 3rem) var(--space-8);
@@ -152,18 +144,13 @@ const year = new Date().getFullYear();
   }
   .closer__flink:hover, .closer__flink:focus-visible { color: var(--fg); }
 
-  .closer__socials {
-    display: flex;
-    gap: var(--space-3);
-    margin-top: 0.35rem;
-  }
-  .closer__soon { opacity: 0.35; cursor: default; }
-  .closer__soon:hover { background: transparent; border-color: var(--line-strong); color: var(--fg); }
+  .closer__flink--soon { opacity: 0.4; cursor: default; }
+  .closer__flink--soon:hover { color: var(--fg-soft); }
 
   .closer__year { color: var(--fg-faint); }
 
   @media (max-width: 780px) {
-    .closer__foot { grid-template-columns: 1fr 1fr; }
+    .closer__foot { grid-template-columns: 1fr 1fr; row-gap: var(--space-6); }
     .closer__col--legal { grid-column: 1 / -1; align-items: flex-start; text-align: left; flex-direction: row; justify-content: space-between; width: 100%; }
   }
 

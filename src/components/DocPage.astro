@@ -1,0 +1,89 @@
+---
+import { Icon } from 'astro-icon/components';
+import Base from '../layouts/Base.astro';
+import { site, cta } from '../data/content';
+
+interface Props {
+  title: string;
+  /** Что это за документ, одним предложением. */
+  about: string;
+}
+
+const { title, about } = Astro.props;
+---
+
+<Base title={`${title}. ${site.name}`} description={about}>
+  <div class="doc-page">
+    <div class="shell doc-page__inner">
+      <a class="doc-page__back" href="/">
+        <Icon name="ph:arrow-left-bold" class="doc-page__back-icon" aria-hidden="true" />
+        <span>На главную</span>
+      </a>
+
+      <h1 class="h2 doc-page__title">{title}</h1>
+      <p class="body doc-page__about">{about}</p>
+
+      <!-- TODO(заказчик): заменить заглушку финальным текстом документа. -->
+      <div class="panel doc-page__note">
+        <span class="panel__tag">статус</span>
+        <p class="body">
+          Документ готовится. Актуальную редакцию вышлю по запросу в
+          Telegram до начала работы — подписываем до первого платного шага.
+        </p>
+        <a class="btn btn--ink doc-page__cta" href={cta.href} target="_blank" rel="noopener">
+          <span>Запросить в Telegram</span>
+          <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
+        </a>
+      </div>
+
+      <p class="doc-page__legal">{site.legal} · {new Date().getFullYear()}</p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .doc-page {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  .doc-page__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+    max-width: 46rem;
+  }
+
+  .doc-page__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--fg-mute);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .doc-page__back:hover, .doc-page__back:focus-visible { color: var(--fg); }
+  .doc-page__back-icon { width: 0.9em; height: 0.9em; }
+
+  .doc-page__title { max-width: 16ch; }
+  .doc-page__about { max-width: 48ch; }
+
+  .doc-page__note {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+  }
+  .doc-page__cta { margin-top: var(--space-2); }
+
+  .doc-page__legal {
+    margin-top: var(--space-8);
+    font-size: var(--fs-small);
+    color: var(--fg-faint);
+  }
+</style>

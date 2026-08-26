@@ -274,108 +274,6 @@ function initProgram(): void {
 }
 
 /* ==========================================================================
-   Доводка скролла
-   Скролл полностью свободный: колесо, тач, клавиши, скроллбар — всё
-   нативное чувство Lenis. Единственное вмешательство: когда инерция
-   затухает РЯДОМ с границей секции (или этапом горизонтальной сцены),
-   страницу плавно докатывает до неё. Пользователь продолжил крутить —
-   Lenis сам обрывает доводку, никакой борьбы за колесо.
-   ========================================================================== */
-
-function initSnapScroll(): void {
-  if (!lenisRef || !finePointer.matches) return;
-  const lenis = lenisRef;
-
-  let stops: number[] = [];
-
-  const collect = () => {
-    const vh = window.innerHeight;
-    const raw: number[] = [0, Math.round(vh * 1.7)]; // верх и конец hero-сцены
-
-    for (const el of document.querySelectorAll<HTMLElement>(
-      'main > section:not([data-program]), footer',
-    )) {
-      raw.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
-    }
-
-    // Этапы горизонтального проезда Программы.
-    const pin = document.querySelector<HTMLElement>('[data-program-pin]');
-    const host = pin?.parentElement ?? null;
-    if (host && pin) {
-      const top = Math.round(host.getBoundingClientRect().top + window.scrollY);
-      const travel = Math.max(0, host.getBoundingClientRect().height - vh);
-      const count = document.querySelectorAll('[data-program-step]').length;
-      for (let i = 0; i <= Math.max(1, count - 1); i++) {
-        raw.push(Math.round(top + (travel * i) / Math.max(1, count - 1)));
-      }
-    }
-
-    raw.sort((a, b) => a - b);
-    stops = raw.filter((v, i) => i === 0 || v - raw[i - 1]! > 60);
-  };
-
-  collect();
-  ScrollTrigger.addEventListener('refresh', collect);
-
-  // Аккордеон FAQ меняет высоту страницы без refresh — пересчитываем сами.
-  let resizeT = 0;
-  new ResizeObserver(() => {
-    window.clearTimeout(resizeT);
-    resizeT = window.setTimeout(collect, 220);
-  }).observe(document.body);
-
-  let settling = false;
-  let lastY = 0;
-  let dir = 1;
-  let lastWheel = 0;
-  window.addEventListener('wheel', () => { lastWheel = performance.now(); }, { passive: true });
-
-  lenis.on('scroll', ({ velocity }: { velocity: number }) => {
-    const y = lenis.actualScroll;
-    if (Math.abs(y - lastY) > 0.5) dir = y > lastY ? 1 : -1;
-    lastY = y;
-
-    // Подхватываем ещё НА замедлении (а не после полной остановки), но
-    // никогда — пока пользователь активно крутит колесо.
-    const speed = Math.abs(velocity);
-    if (settling || speed === 0 || speed > 1.25) return;
-    if (performance.now() - lastWheel < 160) return;
-
-    // Инерция затухает: вперёд по ходу тянем с трети экрана, назад — только
-    // если границу едва переехали (короткое подтягивание, не откат).
-    const vh = window.innerHeight;
-    let best = -1;
-    let bestDist = Infinity;
-    for (const point of stops) {
-      const d = Math.abs(point - y);
-      const ahead = dir > 0 ? point >= y - 8 : point <= y + 8;
-      const reach = ahead ? vh * 0.45 : vh * 0.28;
-      if (d <= reach && d < bestDist) {
-        bestDist = d;
-        best = point;
-      }
-    }
-    if (best < 0 || bestDist < 4) return;
-
-    settling = true;
-    // Длительность от дистанции: короткий довод быстрый, длинный плавный.
-    // Изинг мягкий (quint): выглядит как продолжение затухания, не телепорт.
-    const dur = gsap.utils.clamp(0.55, 1.35, bestDist / 520);
-    lenis.scrollTo(best, {
-      duration: dur,
-      easing: (t: number) => 1 - Math.pow(1 - t, 5),
-      onComplete: () => {
-        settling = false;
-      },
-    });
-    // Юзер перехватил колесо — Lenis оборвал твин, onComplete не придёт.
-    window.setTimeout(() => {
-      settling = false;
-    }, dur * 1000 + 350);
-  });
-}
-
-/* ==========================================================================
    Появление секций
    Каждый блок собирается ОДНИМ заходом: как только секция подходит к кадру,
    заголовок выезжает словами, тексты собираются из блюра, панели и колонны
@@ -551,7 +449,6 @@ function boot(): void {
   initHeroScene();
   initProgram();
   initSectionEntrances();
-  initSnapScroll();
   ScrollTrigger.refresh();
   if (finePointer.matches) {
     initCursor();
