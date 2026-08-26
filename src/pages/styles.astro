@@ -1,0 +1,384 @@
+---
+/**
+ * Пробник технического слоя. Служебная страница: /styles
+ * Одна и та же секция «Путь» в трёх стилистиках. Статичные наброски:
+ * без мотора, только CSS. После выбора страница удаляется.
+ */
+import '../styles/tokens.css';
+import '../styles/fonts.css';
+import { ladder } from '../data/content';
+
+const fmt = new Intl.NumberFormat('ru-RU');
+const cols = ladder.map((p) => ({ ...p, label: p.prefix + fmt.format(p.value) + p.suffix }));
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Пробник стилей</title>
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <p class="hint">
+      Один и тот же блок «Путь» в трёх технических стилях. Смотреть на детали:
+      фон, обвязку колонн, подписи. Механика (счётчики, ховеры) везде
+      сохраняется — здесь только статичный внешний вид.
+    </p>
+
+    <!-- ================= 01 ЧЕРТЁЖ ================= -->
+    <section class="probe probe--blueprint">
+      <header class="probe__label">
+        <span>01 · чертёж</span>
+        <span class="probe__note">координатная сетка, размерные выноски, реперы</span>
+      </header>
+      <div class="stage stage--blueprint">
+        <div class="bp-corner bp-corner--tl" aria-hidden="true"></div>
+        <div class="bp-corner bp-corner--br" aria-hidden="true"></div>
+        <span class="bp-ref" aria-hidden="true">путь · лист 1</span>
+
+        <h2 class="stage__title">Путь, который можно повторить</h2>
+
+        <div class="bp-dim" aria-hidden="true">
+          <span class="bp-dim__cap"></span>
+          <span class="bp-dim__line"></span>
+          <span class="bp-dim__val">≈ 680 000 ₽ / мес</span>
+          <span class="bp-dim__cap"></span>
+        </div>
+
+        <ol class="cols">
+          {
+            cols.map((p, i) => (
+              <li class="col" style={`--w:${p.weight}`}>
+                <span class:list={['col__bar', 'col__bar--bp', { peak: i === cols.length - 1 }]}></span>
+                <span class="col__num">{p.label}</span>
+                <span class="col__stage">{p.stage}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="probe__hintline">
+          В остальных секциях: сетка на тёмных полосах, тонкие реперы по углам
+          карточек, оранжевые пометки-маркеры у ключевых цифр.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= 02 ПРИБОРНАЯ ПАНЕЛЬ ================= -->
+    <section class="probe probe--device">
+      <header class="probe__label">
+        <span>02 · приборная панель</span>
+        <span class="probe__note">корпус-рамка, шильдик, шкалы делений, индикаторы</span>
+      </header>
+      <div class="stage stage--device">
+        <div class="dev-frame">
+          <span class="dev-tag">доход по этапам</span>
+          <span class="dev-led" aria-hidden="true"></span>
+
+          <h2 class="stage__title">Путь, который можно повторить</h2>
+
+          <ol class="cols">
+            {
+              cols.map((p, i) => (
+                <li class="col" style={`--w:${p.weight}`}>
+                  <span class="dev-ticks" aria-hidden="true"></span>
+                  <span class:list={['col__bar', 'col__bar--dev', { peak: i === cols.length - 1 }]}></span>
+                  <span class:list={['dev-readout', { peak: i === cols.length - 1 }]}>{p.label}</span>
+                  <span class="col__stage">{p.stage}</span>
+                </li>
+              ))
+            }
+          </ol>
+          <div class="dev-scale" aria-hidden="true">
+            <span>0</span><span>100к</span><span>250к</span><span>500к</span><span>$8 500</span>
+          </div>
+        </div>
+        <p class="probe__hintline">
+          В остальных секциях: каждая — модуль в тонком корпусе со своим
+          шильдиком, у данных окошки-табло и деления, оранжевые светодиоды
+          состояния.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= 03 ТЕРМИНАЛ-ТРЕЙС ================= -->
+    <section class="probe probe--term">
+      <header class="probe__label">
+        <span>03 · терминал-трейс</span>
+        <span class="probe__note">лог этапов, промпт-подписи, мигающая каретка</span>
+      </header>
+      <div class="stage stage--term">
+        <h2 class="stage__title"><span class="term-prompt">~/</span>путь, который можно повторить</h2>
+
+        <div class="term-grid">
+          <div class="term-log" aria-hidden="true">
+            {
+              cols.map((p, i) => (
+                <p class="term-line">
+                  <span class="term-prompt">&gt;</span> {p.stage.toLowerCase()}
+                  <span class="term-dots"></span>
+                  <span class:list={['term-status', { peak: i === cols.length - 1 }]}>{p.label}</span>
+                </p>
+              ))
+            }
+            <p class="term-line term-line--cursor"><span class="term-prompt">&gt;</span> твой этап<span class="term-caret"></span></p>
+          </div>
+
+          <ol class="cols cols--term">
+            {
+              cols.map((p, i) => (
+                <li class="col" style={`--w:${p.weight}`}>
+                  <span class:list={['col__bar', 'col__bar--term', { peak: i === cols.length - 1 }]}></span>
+                  <span class="col__num col__num--term">{p.label}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+        <p class="probe__hintline">
+          В остальных секциях: блоки появляются как вывод команд, у списков
+          промпт-маркеры, статусы этапов печатаются при скролле.
+        </p>
+      </div>
+    </section>
+  </body>
+</html>
+
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #4a4a44;
+    font-family: 'Onest Variable', sans-serif;
+    padding: 2rem clamp(1rem, 4vw, 4rem) 4rem;
+  }
+  .hint { color: #d8d6cf; max-width: 62ch; margin: 0 auto 2.5rem; font-size: 0.9rem; }
+
+  .probe { max-width: 1200px; margin: 0 auto 3rem; border: 1px solid #0c0c0a; }
+  .probe__label {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.6rem 1.2rem;
+    background: #f2f1ed;
+    color: #12120f;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+  }
+  .probe__note { color: #6a6a62; }
+
+  .stage {
+    position: relative;
+    background: #0c0c0a;
+    color: #f2f1ed;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    overflow: hidden;
+  }
+  .stage__title {
+    margin: 0 0 2.2rem;
+    font-family: 'Unbounded Variable', sans-serif;
+    font-weight: 500;
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+  }
+  .probe__hintline {
+    margin: 2rem 0 0;
+    max-width: 60ch;
+    color: #8b8b82;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  /* Общие колонны */
+  .cols {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: end;
+    column-gap: clamp(0.8rem, 2vw, 1.6rem);
+    --field: 13rem;
+  }
+  .col { display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; position: relative; }
+  .col__bar {
+    display: block;
+    width: 100%;
+    height: max(calc(var(--field) * var(--w)), 6px);
+  }
+  .col__num {
+    margin-top: 0.9rem;
+    font-family: 'Unbounded Variable', sans-serif;
+    font-weight: 550;
+    font-size: clamp(0.8rem, 1.5vw, 1.25rem);
+    white-space: nowrap;
+  }
+  .col__stage {
+    margin-top: 0.3rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: #97978d;
+  }
+
+  /* ---------------- 01 Чертёж ---------------- */
+  .stage--blueprint {
+    background:
+      repeating-linear-gradient(to right, rgb(242 241 237 / 0.045) 0 1px, transparent 1px 56px),
+      repeating-linear-gradient(to bottom, rgb(242 241 237 / 0.045) 0 1px, transparent 1px 56px),
+      #0c0c0a;
+  }
+  .col__bar--bp {
+    background: transparent;
+    border: 1px solid rgb(242 241 237 / 0.38);
+    border-bottom-width: 2px;
+  }
+  .col__bar--bp.peak {
+    border-color: #ff9e5e;
+    background: rgb(255 158 94 / 0.10);
+  }
+  .bp-corner {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgb(242 241 237 / 0.4);
+  }
+  .bp-corner--tl { top: 12px; left: 12px; border-right: 0; border-bottom: 0; }
+  .bp-corner--br { bottom: 12px; right: 12px; border-left: 0; border-top: 0; }
+  .bp-ref {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: #8b8b82;
+    border: 1px solid rgb(242 241 237 / 0.25);
+    padding: 0.2rem 0.55rem;
+  }
+  /* Размерная выноска пиковой колонны */
+  .bp-dim {
+    position: absolute;
+    right: clamp(2rem, 5vw, 3.5rem);
+    top: 7.2rem;
+    height: 13rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    translate: 2.4rem 0;
+  }
+  .bp-dim__cap { width: 11px; height: 1px; background: #ff9e5e; }
+  .bp-dim__line { flex: 1; width: 1px; background: #ff9e5e; opacity: 0.7; }
+  .bp-dim__val {
+    position: absolute;
+    top: 50%;
+    right: 0.8rem;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    writing-mode: vertical-rl;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: #ff9e5e;
+  }
+
+  /* ---------------- 02 Приборная панель ---------------- */
+  .dev-frame {
+    position: relative;
+    border: 1px solid rgb(242 241 237 / 0.28);
+    padding: clamp(1.4rem, 3vw, 2.4rem);
+  }
+  .dev-tag {
+    position: absolute;
+    top: -0.62rem;
+    left: 1.2rem;
+    background: #0c0c0a;
+    padding-inline: 0.55rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: #b9b9af;
+  }
+  .dev-led {
+    position: absolute;
+    top: -3px;
+    right: 1.4rem;
+    width: 7px;
+    height: 7px;
+    background: #ff9e5e;
+    box-shadow: 0 0 8px rgb(255 158 94 / 0.8);
+  }
+  .col__bar--dev { background: #1b1b18; box-shadow: inset 0 2px 0 #ff9e5e; }
+  .col__bar--dev.peak { background: rgb(255 158 94 / 0.22); }
+  .dev-ticks {
+    position: absolute;
+    left: -0.55rem;
+    bottom: 3.4rem;
+    width: 5px;
+    height: calc(13rem * var(--w));
+    background: repeating-linear-gradient(to top, rgb(242 241 237 / 0.4) 0 1px, transparent 1px 9px);
+  }
+  .dev-readout {
+    margin-top: 0.9rem;
+    align-self: flex-start;
+    border: 1px solid rgb(242 241 237 / 0.25);
+    background: #131311;
+    padding: 0.3rem 0.55rem;
+    font-family: 'Unbounded Variable', sans-serif;
+    font-weight: 550;
+    font-size: clamp(0.72rem, 1.35vw, 1.05rem);
+    white-space: nowrap;
+  }
+  .dev-readout.peak { color: #ff9e5e; border-color: #ff9e5e; }
+  .dev-scale {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.6rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgb(242 241 237 / 0.28);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: #8b8b82;
+  }
+
+  /* ---------------- 03 Терминал ---------------- */
+  .term-prompt { color: #ff9e5e; }
+  .term-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: end;
+  }
+  .term-log { border-left: 1px solid rgb(242 241 237 / 0.22); padding-left: 1.1rem; }
+  .term-line {
+    margin: 0 0 0.85rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: #cfcfc6;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+  .term-dots { flex: 1; border-bottom: 1px dotted rgb(242 241 237 / 0.25); }
+  .term-status { color: #b9b9af; }
+  .term-status.peak { color: #ff9e5e; }
+  .term-caret {
+    display: inline-block;
+    width: 0.5em;
+    height: 1em;
+    margin-left: 0.35rem;
+    background: #ff9e5e;
+    transform: translateY(0.15em);
+    animation: blink 950ms steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .cols--term { --field: 10.5rem; }
+  .col__bar--term {
+    background:
+      repeating-linear-gradient(to top, rgb(255 158 94 / 0.55) 0 6px, transparent 6px 9px);
+  }
+  .col__bar--term.peak { background: repeating-linear-gradient(to top, #ff9e5e 0 6px, transparent 6px 9px); }
+  .col__num--term { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 0.8rem; }
+
+  @media (max-width: 760px) {
+    .term-grid { grid-template-columns: 1fr; }
+    .bp-dim { display: none; }
+  }
+</style>

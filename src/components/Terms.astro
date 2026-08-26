@@ -13,21 +13,23 @@ import { terms } from '../data/content';
       </p>
     </header>
 
-    <!-- Расчёт во всю ширину: это не карточка, а строка счёта. -->
+    <div class="panel bill-panel">
+      <span class="panel__tag">расчёт</span>
     <dl class="bill">
       {
         terms.rows.map((row) => (
           <div class="bill__row" data-reveal="up">
             <dt class="bill__key">{row.key}</dt>
-            <dd class="bill__val num">{row.value}</dd>
+            <dd class="bill__val">{row.value}</dd>
           </div>
         ))
       }
       <div class="bill__row bill__row--final" data-reveal="up">
         <dt class="bill__key bill__key--final">{terms.final.key}</dt>
-        <dd class="bill__val bill__val--final num">{terms.final.value}</dd>
+        <dd class="bill__val bill__val--final">{terms.final.value}</dd>
       </div>
     </dl>
+    </div>
   </div>
 </section>
 
@@ -36,6 +38,7 @@ import { terms } from '../data/content';
   .terms__title { grid-column: 1 / 8; }
   .terms__body { grid-column: 1 / 7; }
 
+  .bill-panel { padding-block: 0.4rem; background: var(--bg); }
   .bill { margin: 0; }
 
   .bill__row {
@@ -46,24 +49,23 @@ import { terms } from '../data/content';
     padding-block: clamp(1.1rem, 0.6rem + 1.6vw, 2rem);
     border-top: var(--hair) solid var(--line-strong);
   }
-  .bill__row:last-child { border-bottom: 2px solid var(--fg); }
+  .bill__row:last-child { border-bottom: 0; }
+  .bill__row:first-child { border-top: 0; }
 
   .bill__key {
     font-family: var(--font-mono);
     font-size: var(--fs-small);
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: var(--tr-mono);
-    text-transform: uppercase;
     color: var(--fg-soft);
     text-wrap: balance;
   }
 
   .bill__val {
     flex: none;
-    /* Моноширинный пробел на 4.5rem превращает «0 ₽» в две отдельные вещи. */
-    word-spacing: -0.35em;
-    font-size: clamp(2rem, 1rem + 4vw, 4.5rem);
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 0.8rem + 3.2vw, 3.4rem);
+    font-weight: 550;
     line-height: 1;
     color: var(--fg-soft);
     margin: 0;
@@ -74,7 +76,7 @@ import { terms } from '../data/content';
   .bill__key--final { color: var(--fg); font-weight: 700; }
   .bill__val--final {
     color: var(--stamp);
-    font-size: clamp(2.75rem, 1rem + 7vw, 7rem);
+    font-size: clamp(2.4rem, 0.9rem + 6vw, 5.6rem);
   }
 
   @media (max-width: 900px) {
