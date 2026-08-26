@@ -398,6 +398,8 @@ function splitTexts(): void {
   }
 }
 
+const numFmt = new Intl.NumberFormat('ru-RU');
+
 function initSectionEntrances(): void {
   const blocks = document.querySelectorAll<HTMLElement>('main section, footer.closer');
 
@@ -407,8 +409,11 @@ function initSectionEntrances(): void {
     const rises = section.querySelectorAll<HTMLElement>('[data-reveal="up"], [data-reveal="doc"]');
     const bars = section.querySelectorAll<HTMLElement>('[data-reveal="bar"]');
     const rules = section.querySelectorAll<HTMLElement>('[data-reveal="rule"]');
+    const counters = section.querySelectorAll<HTMLElement>('[data-count-to]');
 
-    if (!words.length && !blurWords.length && !rises.length && !bars.length && !rules.length) continue;
+    if (!words.length && !blurWords.length && !rises.length && !bars.length && !rules.length && !counters.length) {
+      continue;
+    }
 
     const tl = gsap.timeline({
       defaults: { ease: 'power3.out' },
@@ -434,6 +439,21 @@ function initSectionEntrances(): void {
     }
     if (rules.length) {
       tl.fromTo(rules, { scaleX: 0 }, { scaleX: 1, duration: 0.75, ease: 'power3.inOut' }, 0.26);
+    }
+
+    // Тикающие цифры: порт CountUp (React Bits) на GSAP. В разметке лежит
+    // полное число (SEO и no-JS), мотор сбрасывает в ноль и докручивает
+    // вместе со всем блоком.
+    for (const el of counters) {
+      const to = Number(el.dataset.countTo ?? '0');
+      const prefix = el.dataset.countPrefix ?? '';
+      const suffix = el.dataset.countSuffix ?? '';
+      const state = { v: 0 };
+      const render = () => {
+        el.textContent = prefix + numFmt.format(Math.round(state.v)) + suffix;
+      };
+      render();
+      tl.to(state, { v: to, duration: 1.1, ease: 'expo.out', onUpdate: render }, 0.3);
     }
   }
 }
@@ -523,7 +543,6 @@ function boot(): void {
   initHeroScene();
   initProgram();
   initSectionEntrances();
-  initCounters();
   initSnapScroll();
   ScrollTrigger.refresh();
   if (finePointer.matches) {

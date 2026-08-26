@@ -3,9 +3,13 @@
   "configurations": [
     {
       "name": "landing",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 4321
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "node_modules/astro/astro.js",
+        "dev"
+      ],
+      "port": 4321,
+      "autoPort": true
     }
   ]
 }
