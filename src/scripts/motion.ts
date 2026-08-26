@@ -187,6 +187,10 @@ function initProgram(): void {
   const digitEls = [...digits.children] as HTMLElement[];
   let active = -1;
 
+  // GSAP масштабирует от центра, если не сказать иначе: линия прогресса
+  // обязана расти от левого края.
+  gsap.set(progress, { transformOrigin: 'left center', scaleX: 0 });
+
   const setActive = (index: number) => {
     if (index === active) return;
     active = index;
