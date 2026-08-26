@@ -46,6 +46,8 @@ const jsonLd = {
     <link rel="canonical" href={canonical} />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {/* Единственный захардкоженный цвет на проекте: meta не понимает
+        переменные CSS. Должен совпадать с --paper в tokens.css. */}
     <meta name="theme-color" content="#f2f1ed" />
 
     <meta property="og:type" content="website" />
