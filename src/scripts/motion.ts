@@ -72,6 +72,39 @@ function initLenis(): Lenis {
   gsap.ticker.add((time) => lenis.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
 
+  /*
+   * Тачпад против колеса. У тачпада (маки, precision-тачпады) поток мелких,
+   * часто дробных дельт с СОБСТВЕННОЙ инерцией ОС; виртуальный скролл поверх
+   * неё двоит инерцию — страница разгоняется и плывёт, ровно это увидел
+   * заказчик на ноутбуке. Детектим устройство по форме дельт: на тачпаде
+   * отдаём wheel нативному скроллу (родную инерцию не переиграть), мышь
+   * продолжает ехать через сглаживание Lenis. Переключатель двусторонний —
+   * мышь, воткнутая к ноуту, возвращает сглаживание первым же тиком.
+   */
+  let padVotes = 0;
+  window.addEventListener(
+    'wheel',
+    (e: WheelEvent) => {
+      if (e.deltaMode !== 0) {
+        // Дельты в строках/страницах шлют только мыши.
+        lenis.options.smoothWheel = true;
+        padVotes = 0;
+        return;
+      }
+      const a = Math.abs(e.deltaY);
+      if (a >= 80 && Number.isInteger(e.deltaY)) {
+        lenis.options.smoothWheel = true;
+        padVotes = 0;
+        return;
+      }
+      if ((a > 0 && a < 40) || !Number.isInteger(e.deltaY)) {
+        padVotes += 1;
+        if (padVotes >= 3) lenis.options.smoothWheel = false;
+      }
+    },
+    { passive: true, capture: true },
+  );
+
   // Отладочный хэндл под своим именем: window.lenis занят служебным
   // реестром самого Lenis ({version, horizontal, snap, touch}), и запись
   // инстанса туда ломает его собственную бухгалтерию и аддоны.
