@@ -55,7 +55,7 @@ const faq = c.faq.items;
     padding-block: var(--space-6);
     text-align: left;
     font-size: var(--fs-h3);
-    font-weight: 600;
+    font-weight: var(--fw-strong);
     letter-spacing: -0.014em;
     line-height: 1.25;
     transition: color var(--dur-fast) var(--ease-out);
@@ -81,15 +81,14 @@ const faq = c.faq.items;
   .faq__a {
     overflow: hidden;
     min-height: 0;
-    padding-bottom: 0;
-    transition: padding-bottom var(--dur-mid) var(--ease-out),
-                opacity var(--dur-mid) var(--ease-out);
     opacity: 0;
+    /* Анимируется только opacity: высоту ведёт grid-template-rows обёртки.
+       Паддинг здесь анимировать нельзя (layout-свойство, дёргает раскладку) —
+       нижний отступ дан ::after-ом, который клипается вместе с контентом. */
+    transition: opacity var(--dur-mid) var(--ease-out);
   }
-  .faq__item.is-open .faq__a {
-    padding-bottom: var(--space-6);
-    opacity: 1;
-  }
+  .faq__a::after { content: ''; display: block; height: var(--space-6); }
+  .faq__item.is-open .faq__a { opacity: 1; }
 
   @media (max-width: 900px) {
     .faq__title { grid-column: 1 / -1; position: static; }
@@ -104,6 +103,9 @@ const faq = c.faq.items;
   for (const item of items) {
     const btn = item.querySelector<HTMLButtonElement>('.faq__q');
     btn?.addEventListener('click', () => {
+      // Мотор глушит скролл-снап на время транзишна высоты: иначе он
+      // принимает ресайз контента за скролл и «доводит» страницу.
+      document.dispatchEvent(new CustomEvent('ui:reflow'));
       const willOpen = !item.classList.contains('is-open');
       for (const other of items) {
         other.classList.toggle('is-open', other === item && willOpen);

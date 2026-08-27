@@ -170,8 +170,6 @@ export const en = {
 
   fit: {
     title: 'This is not a get-into-tech course',
-    formTitle: 'Candidate form',
-    formNote: 'tick them mentally: four out of four on the left means yes',
     yesTitle: 'Good fit',
     noTitle: 'Not a fit',
     yes: [
@@ -191,8 +189,8 @@ export const en = {
   program: {
     title: 'Guidance across the whole route',
     body:
-      'Not a handful of calls, but six consecutive stages: from rebuilding your CV ' +
-      'to your first weeks in the new job.',
+      'Six consecutive stages: from rebuilding your CV to your first weeks ' +
+      'in the new job.',
     routeFrom: 'start',
     routeTo: 'offer',
     routeSpan: '3-4 months',
@@ -243,7 +241,7 @@ export const en = {
       },
       {
         q: 'How long does it take?',
-        a: 'Three months and up. The exact timeline depends on your level, your English, and how many hours you genuinely put in.',
+        a: 'Three months and up. The exact timeline depends on your level, your English, and how many hours you put in.',
       },
       {
         q: 'Why do you get paid only on results?',
@@ -251,7 +249,7 @@ export const en = {
       },
       {
         q: 'What if I fail every interview?',
-        a: 'We debrief every attempt: what they asked, where you fell short, what to rewrite for the next one. A failed interview is data for the next.',
+        a: 'We debrief every attempt: what they asked, where you fell short, what to rewrite for the next one.',
       },
     ],
   },

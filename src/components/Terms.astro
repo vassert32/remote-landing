@@ -64,7 +64,7 @@ const c = t(Astro.currentLocale);
   .bill__key {
     font-family: var(--font-mono);
     font-size: var(--fs-small);
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     letter-spacing: var(--tr-mono);
     color: var(--fg-soft);
     text-wrap: balance;
@@ -73,7 +73,7 @@ const c = t(Astro.currentLocale);
   .bill__val {
     flex: none;
     font-size: clamp(1.35rem, 0.7rem + 2.2vw, 2.4rem);
-    font-weight: 550;
+    font-weight: var(--fw-num);
     line-height: 1;
     color: var(--fg-soft);
     margin: 0;
@@ -99,7 +99,7 @@ const c = t(Astro.currentLocale);
 
   /* Итоговая строка: единственная сумма, которая реально появится. */
   .bill__row--final { border-top-width: 2px; border-top-color: var(--fg); }
-  .bill__key--final { color: var(--fg); font-weight: 700; }
+  .bill__key--final { color: var(--fg); font-weight: var(--fw-strong); }
   .bill__val--final {
     color: var(--stamp);
     font-size: clamp(2rem, 0.8rem + 4vw, 4rem);

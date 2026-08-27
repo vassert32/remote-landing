@@ -76,7 +76,7 @@ const roadmap = c.program.steps;
     display: flex;
     align-items: baseline;
     gap: var(--space-2);
-    font-weight: 600;
+    font-weight: var(--fw-num);
     flex: none;
     padding-bottom: 0.3rem;
   }
@@ -144,7 +144,7 @@ const roadmap = c.program.steps;
     font-family: var(--font-mono);
     font-size: var(--fs-micro);
     letter-spacing: var(--tr-mono);
-    color: var(--fg-faint);
+    color: var(--fg-mute);
   }
 
   /* --- Этапы: вертикальный список (база и мобайл) ----------------------- */
@@ -173,8 +173,8 @@ const roadmap = c.program.steps;
   /* Акцент живёт на этапе, а не на цифре: номер тихий, заголовок звучит. */
   .program__num {
     font-size: var(--fs-small);
-    font-weight: 600;
-    color: var(--fg-faint);
+    font-weight: var(--fw-num);
+    color: var(--fg-mute);
     padding-top: 0.5rem;
     transition: color var(--dur-mid) var(--ease-out);
   }

@@ -98,7 +98,7 @@ const fmt = new Intl.NumberFormat(c.locale);
   .ladder__panel { padding-top: clamp(1.8rem, 1.4rem + 1.6vw, 2.6rem); }
 
   .col__num {
-    font-weight: 600;
+    font-weight: var(--fw-num);
     font-size: clamp(0.7rem, 0.45rem + 0.8vw, 0.95rem);
     line-height: 1.1;
     white-space: nowrap;
@@ -152,7 +152,7 @@ const fmt = new Intl.NumberFormat(c.locale);
     box-shadow: inset 0 2px 0 var(--stamp);
   }
   .col--peak .col__num { color: var(--stamp); }
-  .col--peak .col__stage { color: var(--fg); font-weight: 600; }
+  .col--peak .col__stage { color: var(--fg); font-weight: var(--fw-strong); }
   .col--peak .col__stage-icon { color: var(--stamp); }
 
   @media (max-width: 900px) {
@@ -200,7 +200,7 @@ const fmt = new Intl.NumberFormat(c.locale);
       pointer-events: auto;
       margin-top: var(--space-2);
       padding: 0.6rem 0.8rem;
-      font-size: var(--fs-micro);
+      font-size: var(--fs-small);
       border-top-width: 2px;
     }
     .col { padding-block: var(--space-3); }

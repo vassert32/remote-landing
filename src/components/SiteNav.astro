@@ -131,7 +131,7 @@ const alt = otherLang(Astro.currentLocale);
   .nav__mark {
     display: inline-flex;
     align-items: center;
-    font-weight: 650;
+    font-weight: var(--fw-strong);
     font-size: calc(1.5rem - 0.42rem * var(--nav-t));
     letter-spacing: -0.01em;
     white-space: nowrap;
@@ -146,7 +146,7 @@ const alt = otherLang(Astro.currentLocale);
   .nav__link {
     position: relative;
     font-size: calc(1.2rem - 0.22rem * var(--nav-t));
-    font-weight: 500;
+    font-weight: var(--fw-medium);
     opacity: 0.72;
     padding-block: 0.35rem;
     transition: opacity var(--dur-fast) var(--ease-out);
@@ -177,11 +177,11 @@ const alt = otherLang(Astro.currentLocale);
     font-family: var(--font-mono);
     font-size: var(--fs-micro);
     letter-spacing: var(--tr-mono);
-    opacity: 0.45;
+    opacity: 0.62;
     transition: opacity var(--dur-fast) var(--ease-out);
   }
   .nav__lang:hover,
-  .nav__lang:focus-visible { opacity: 0.85; }
+  .nav__lang:focus-visible { opacity: 1; }
   .nav__lang-icon { width: 1em; height: 1em; flex: none; }
 
   .nav__socials {
@@ -221,6 +221,17 @@ const alt = otherLang(Astro.currentLocale);
   /* Без мотора: хедер виден и сразу компактный, подложка активна. */
   :global(html:not(.motion)) .nav,
   :global(html:not(.motion)) .veil { --nav-t: 1; }
+
+  /* Тач: переключатель языка был 36x17, марка 107x30 — обе меньше 44px.
+     Растим только высоту касания, вид не трогаем. */
+  @media (hover: none) {
+    .nav__lang,
+    .nav__mark {
+      min-height: 44px;
+      align-items: center;
+    }
+    .nav__mark { display: inline-flex; }
+  }
 
   @media (max-width: 1180px) {
     .nav__links { display: none; }

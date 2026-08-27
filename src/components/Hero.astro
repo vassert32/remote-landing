@@ -42,10 +42,23 @@ const total = i;
             ))}
           </h2>
 
-          <p class="lead hero__lead" data-hero-rise>
+          <p class="lead hero__lead" data-hero-lead>
             {
+              /*
+               * Выделенное слово лежит в маркере дважды: снизу обычным текстом,
+               * сверху — накладкой белым по оранжевому. Накладка прочерчивается
+               * клипом слева направо, и буквы под ней перекрашиваются ровно так,
+               * как это делает выделение текста мышью.
+               *
+               * Пробелов и переносов внутри <mark> быть не должно: любой отступ
+               * в разметке станет текстовым узлом и разъедет накладку.
+               */
               c.hero.leadParts.map((part) =>
-                part.mark ? <mark class="mark">{part.t}</mark> : <Fragment>{part.t}</Fragment>,
+                part.mark ? (
+                  <mark class="mark"><span class="mark__hl" aria-hidden="true">{part.t}</span>{part.t}</mark>
+                ) : (
+                  <Fragment>{part.t}</Fragment>
+                ),
               )
             }
           </p>
@@ -248,7 +261,7 @@ const total = i;
   .offer__title {
     font-family: var(--font-mono);
     font-size: var(--fs-small);
-    font-weight: 600;
+    font-weight: var(--fw-strong);
     letter-spacing: 0.14em;
   }
   /* Поля листа: широкие сверху и по бокам, как у печатного бланка. */
@@ -270,11 +283,11 @@ const total = i;
     font-family: var(--font-mono);
     font-size: var(--fs-micro);
     letter-spacing: var(--tr-mono);
-    color: color-mix(in srgb, var(--ink) 55%, transparent);
+    color: color-mix(in srgb, var(--ink) 60%, transparent);
   }
   .offer__val {
     font-size: var(--fs-body);
-    font-weight: 600;
+    font-weight: var(--fw-strong);
     text-wrap: balance;
   }
 
@@ -300,7 +313,7 @@ const total = i;
     font-family: var(--font-mono);
     font-size: var(--fs-micro);
     letter-spacing: var(--tr-mono);
-    color: color-mix(in srgb, var(--ink) 55%, transparent);
+    color: color-mix(in srgb, var(--ink) 60%, transparent);
   }
   /* Подпись ставится кликом: кнопка ведёт на то же целевое действие. */
   .offer__sign-btn {
@@ -311,7 +324,7 @@ const total = i;
     border: var(--hair) solid var(--ink);
     font-family: var(--font-mono);
     font-size: var(--fs-micro);
-    font-weight: 600;
+    font-weight: var(--fw-strong);
     letter-spacing: var(--tr-mono);
     color: var(--ink);
     transition: background-color var(--dur-fast) var(--ease-out),

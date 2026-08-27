@@ -8,6 +8,11 @@ html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
   background: var(--bg);
+  /* Скролл-якорение браузера воюет с Lenis: при схлопывании аккордеона
+     Chrome сам доскролливал страницу на полвысоты ответа, «удерживая
+     якорь», — снизу вылезала полоса соседней секции. Скроллом здесь
+     владеет Lenis, браузерная компенсация только мешает. */
+  overflow-anchor: none;
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -141,7 +146,7 @@ main > .section[data-program] { padding-block: 0; }
   font-size: var(--fs-h3);
   line-height: 1.2;
   letter-spacing: -0.014em;
-  font-weight: 600;
+  font-weight: var(--fw-strong);
 }
 
 .lead {
@@ -164,7 +169,7 @@ main > .section[data-program] { padding-block: 0; }
   display: block;
   font-family: var(--font-mono);
   font-size: var(--fs-micro);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
   letter-spacing: var(--tr-mono);
   color: var(--fg-mute);
 }
@@ -181,16 +186,43 @@ main > .section[data-program] { padding-block: 0; }
 
 .accent { color: var(--stamp); }
 
-/* Маркер: выделение ключевого слова заливкой акцента.
-   box-decoration-break обязателен — иначе на переносе строки заливка
-   обрывается прямоугольником без боковых полей. */
+/* Маркер: выделение ключевого слова, работающее как выделение текста мышью.
+   Слово лежит дважды — снизу обычным текстом, сверху накладкой .mark__hl
+   белым по оранжевому. Накладка прочерчивается клипом слева направо, и
+   буквы под ней перекрашиваются вместе с приходом заливки.
+
+   background: none обязателен. У <mark> в браузерном стиле жёлтая заливка,
+   и стоит убрать её из шортката — она проглядывает всюду, где наша ещё не
+   прочерчена. Ровно на это я и напоролся. */
 .mark {
-  background: var(--stamp);
-  color: var(--paper);
+  position: relative;
+  background: none;
+  color: var(--ink);
   padding: 0.06em 0.2em;
   margin-inline: -0.05em;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
+  /* Накладка рисуется одним боксом, поэтому переносить маркер нельзя:
+     на переносе она разъехалась бы поперёк двух строк. */
+  white-space: nowrap;
+}
+
+.mark__hl {
+  position: absolute;
+  inset: 0;
+  padding: inherit;
+  /* Обязателен. Слова под накладкой несут will-change: filter и filter:
+     blur(), а это не none — значит каждое слово создаёт свой контекст
+     наложения и рисуется в одном слое с позиционированной накладкой.
+     В разметке слова идут после неё, поэтому без z-index чернильные буквы
+     проступают поверх оранжевой плашки дырками. */
+  z-index: 1;
+  background: var(--stamp);
+  color: var(--paper);
+  /* Единственный канал видимости — клип. Мотор прочерчивает его вправо на
+     подходе и увозит влево на реверсе; отдельного opacity у плашки нет,
+     полупрозрачный оранж поверх тающего текста выглядел кашей.
+     Без мотора накладка просто залита целиком. */
+  clip-path: inset(0 0 0 0);
+  pointer-events: none;
 }
 
 /* Шрифт цифр: отдельный токен, чтобы менять одним движением. */
@@ -247,7 +279,7 @@ main > .section[data-program] { padding-block: 0; }
   border: var(--hair) solid var(--fg);
   border-radius: var(--radius);
   font-size: var(--fs-small);
-  font-weight: 600;
+  font-weight: var(--fw-strong);
   letter-spacing: 0.01em;
   white-space: nowrap;
   overflow: hidden;
@@ -298,7 +330,7 @@ main > .section[data-program] { padding-block: 0; }
 .iconbtn:hover, .iconbtn:focus-visible {
   background: var(--stamp);
   border-color: var(--stamp);
-  color: var(--paper);
+  color: var(--bg);
 }
 .iconbtn svg { width: 1.1rem; height: 1.1rem; }
 
@@ -320,7 +352,7 @@ main > .section[data-program] { padding-block: 0; }
   border-bottom: var(--hair) solid var(--fg);
   font-family: var(--font-mono);
   font-size: var(--fs-micro);
-  font-weight: 600;
+  font-weight: var(--fw-strong);
   letter-spacing: var(--tr-mono);
 }
 
@@ -342,7 +374,7 @@ main > .section[data-program] { padding-block: 0; }
   color: var(--fg-mute);
 }
 
-.doc__val { font-weight: 600; font-size: var(--fs-small); }
+.doc__val { font-weight: var(--fw-strong); font-size: var(--fs-small); }
 
 /* ==========================================================================
    Приборный слой (выбор заказчика: панель + лёгкий чертёж)
@@ -386,7 +418,7 @@ main > .section[data-program] { padding-block: 0; }
   color: var(--stamp);
   font-family: var(--font-mono);
   font-size: var(--fs-micro);
-  font-weight: 600;
+  font-weight: var(--fw-strong);
   letter-spacing: 0.1em;
   text-transform: uppercase; /* печать остаётся капсом: это штамп, не подпись */
   transform: rotate(-6deg);

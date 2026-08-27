@@ -97,6 +97,9 @@ function initHeroScene(): void {
 
   const lines = scene.querySelectorAll<HTMLElement>('[data-hero-line]');
   const rises = scene.querySelectorAll<HTMLElement>('[data-hero-rise]');
+  const leadWords = scene.querySelectorAll<HTMLElement>('[data-hero-lead] .bw');
+  const marks = scene.querySelectorAll<HTMLElement>('[data-hero-lead] .mark');
+  const marksHl = scene.querySelectorAll<HTMLElement>('[data-hero-lead] .mark__hl');
   const doc = scene.querySelector<HTMLElement>('[data-hero-doc]');
   const stamp = scene.querySelector<HTMLElement>('[data-hero-stamp]');
 
@@ -108,9 +111,29 @@ function initHeroScene(): void {
   // стилей и yPercent GSAP не складываются, строки застревали бы за маской.
   gsap.set(lines, { yPercent: 110 });
   gsap.set(rises, { opacity: 0, y: 22 });
+  // Лид проявляется словами с размытием — тем же приёмом, что абзацы Ментора.
+  // Хинт will-change здесь постоянный законно: слова ездят по скрабу
+  // в обе стороны всё время, пока герой запинен.
+  gsap.set(leadWords, { opacity: 0, y: 12, filter: 'blur(9px)', willChange: 'transform, filter, opacity' });
+  // Накладка маркера: не прочерчена. CSS держит противоположное — залито
+  // целиком — на случай, когда мотор не доехал.
+  gsap.set(marksHl, { clipPath: 'inset(0 100% 0 0)' });
   // Лист приходит из-за нижней кромки экрана: это подача документа,
   // а не появление карточки интерфейса.
   if (doc) gsap.set(doc, { opacity: 0, y: () => window.innerHeight * 0.62, rotate: 1.5 });
+
+  // Пока идёт пересчёт, запиненная сцена прогоняется до конца: и progress,
+  // и scroll() кратковременно показывают конец пина. Любое «сработай один
+  // раз, когда доехали» без этого флага срабатывает прямо на загрузке.
+  let marksDrawn = false;
+  let marksTween: gsap.core.Tween | null = null;
+  let refreshing = false;
+  ScrollTrigger.addEventListener('refreshInit', () => {
+    refreshing = true;
+  });
+  ScrollTrigger.addEventListener('refresh', () => {
+    refreshing = false;
+  });
 
   const setSceneDark = (dark: boolean) => {
     if (dark) scene.setAttribute('data-band', 'dark');
@@ -142,16 +165,75 @@ function initHeroScene(): void {
         setSceneDark(self.progress < 0.33);
         setNavAway(self.progress < 0.24);
         gsap.set(scene, { backgroundColor: mixBg(self.progress) });
+        // Маркер прочерчивается один раз и в реальном времени: на скрабе
+        // отмотка назад возила бы заливку туда-сюда. Порог 0.66 — сразу за
+        // последним словом лида (оно догорает к 0.60), но ещё до того, как
+        // документ заберёт внимание на себя.
+        //
+        // Порог считается от ФАКТИЧЕСКОЙ позиции скролла, а не от progress.
+        // Грабли, на которые я наступил трижды: при ScrollTrigger.refresh()
+        // запиненная сцена прогоняется до конца, и progress кратковременно
+        // равен 1. Любая проверка по нему (tl.call, self.progress) срабатывает
+        // прямо на загрузке, и маркер оказывается залит до появления текста.
+        // Отдельный триггер по запиненному stage тоже не годится: его
+        // геометрия при пине не пересекает точку старта. Скролл же refresh
+        // не двигает — по нему и сверяемся.
+        if (!refreshing && marks.length) {
+          const pos = self.scroll() - self.start;
+          const range = self.end - self.start;
+          if (!marksDrawn && pos > range * 0.66) {
+            marksDrawn = true;
+            marksTween?.kill();
+            marksTween = gsap.to(marksHl, {
+              clipPath: 'inset(0 0% 0 0)',
+              duration: 0.5,
+              ease: 'power2.inOut',
+              stagger: 0.22,
+            });
+          } else if (marksDrawn && pos < range * 0.62) {
+            // Реверс: плашки уезжают влево ДО того, как текст начнёт таять
+            // (слова держат полную видимость до ~0.60). Зазор 0.62/0.66 —
+            // гистерезис, чтобы на границе не мигало туда-сюда.
+            marksDrawn = false;
+            marksTween?.kill();
+            marksTween = gsap.to(marksHl, {
+              clipPath: 'inset(0 100% 0 0)',
+              duration: 0.35,
+              ease: 'power2.in',
+              stagger: { each: 0.1, from: 'end' },
+            });
+          }
+          // Резкий прыжок вверх (якорь, восстановление позиции): отъезд ещё
+          // играет, а вокруг уже тёмная фаза — доводим мгновенно, чтобы
+          // оранжевые плашки не мигали на чёрном.
+          if (!marksDrawn && marksTween?.isActive() && pos < range * 0.45) {
+            marksTween.progress(1);
+          }
+        }
       },
     },
   });
+
+  // Отладочный хэндл: без него прогресс сцены приходится вычислять по
+  // положению скролла, а пин смещает точку отсчёта.
+  if (import.meta.env.DEV) {
+    (window as unknown as { __hero: gsap.core.Timeline }).__hero = tl;
+  }
 
   // Фаза 1: вопрос уходит вверх и тает.
   tl.to(question, { yPercent: -30, autoAlpha: 0, duration: 0.3 }, 0.06);
 
   // Фаза 2: ответ. Строки из-под маски, текст и кнопки поднимаются, документ въезжает.
   tl.to(lines, { yPercent: 0, duration: 0.2, ease: 'power2.out', stagger: 0.045 }, 0.5);
-  tl.to(rises, { opacity: 1, y: 0, duration: 0.16, ease: 'power2.out', stagger: 0.04 }, 0.58);
+  // Лид набирается словами: каждое выходит из размытия. Шаг мелкий — на
+  // скрабе стагтер растягивается по всей длине сцены, а не по секундам.
+  tl.to(
+    leadWords,
+    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.12, ease: 'power2.out', stagger: 0.005 },
+    0.55,
+  );
+  tl.to(rises, { opacity: 1, y: 0, duration: 0.16, ease: 'power2.out', stagger: 0.04 }, 0.62);
+
   // Лист подаётся ПОСЛЕ основного текста и заметно спокойнее его: сначала
   // читаешь обещание, потом получаешь на руки бумагу.
   if (doc) tl.to(doc, { opacity: 1, y: 0, rotate: 0, duration: 0.46, ease: 'power2.out' }, 0.72);
@@ -378,33 +460,105 @@ function initSnap(lenis: Lenis): void {
   // Точек hero здесь нет: за сцену отвечает отдельный сторож ниже.
   // Общий снап работает от Ментора и дальше.
 
-  // Обычные секции: начало секции = её контент по центру экрана,
-  // потому что внутри он отцентрован вёрсткой.
-  for (const el of document.querySelectorAll<HTMLElement>(
-    'main section:not([data-hero]):not([data-program]), footer.closer',
-  )) {
-    snap.addElement(el, { align: ['start'] });
-  }
-
   /*
-   * Программа — исключение. Её пин длиной в несколько экранов везёт
-   * горизонтальную сцену со своим ритмом, и притягивать к началу секции
-   * изнутри проезда нельзя. Поэтому у неё только две точки: вход в пин
-   * и выход из него, между ними снап молчит.
+   * ВСЕ точки — числовые, через snap.add. addElement НЕ использовать:
+   * аддон обмеряет элементы собственным ResizeObserver'ом в произвольные
+   * моменты (инерция, транзишны, пересчёт пинов) и получает сдвинутые
+   * значения — FAQ, например, стабильно парковался на 40px ниже начала,
+   * и снизу подглядывал чёрный сосед. Числовые точки пересчитываются
+   * только здесь, в заведомо спокойный момент после refresh.
+   *
+   * Программа — исключение по составу точек: её пин длиной в несколько
+   * экранов везёт горизонтальную сцену со своим ритмом, и притягивать к
+   * началу секции изнутри проезда нельзя. У неё только вход и выход пина.
    */
-  const addProgramEdges = () => {
+  let snapPoints: number[] = [];
+
+  const rebuildSnaps = () => {
+    // У аддона нет remove: чистим его реестр напрямую.
+    (snap as unknown as { snaps: Map<number, unknown> }).snaps.clear();
+    snapPoints = [];
+
+    const push = (v: number) => {
+      snap.add(v);
+      snapPoints.push(v);
+    };
+
+    for (const el of document.querySelectorAll<HTMLElement>(
+      'main section:not([data-hero]):not([data-program]), footer.closer',
+    )) {
+      push(Math.round(el.getBoundingClientRect().top + window.scrollY));
+    }
+
     const pin = document.querySelector<HTMLElement>('[data-program-pin]');
     const host = pin?.closest<HTMLElement>('.pin-spacer') ?? pin;
     if (!host) return;
     const top = Math.round(host.getBoundingClientRect().top + window.scrollY);
     const exit = Math.round(top + host.offsetHeight - window.innerHeight);
-    snap.add(top);
-    if (exit > top) snap.add(exit);
+    push(top);
+    if (exit > top) push(exit);
   };
-  addProgramEdges();
+  rebuildSnaps();
 
-  // Пины меняют геометрию документа: после пересчёта обновляем точки.
-  ScrollTrigger.addEventListener('refresh', () => snap.resize());
+  /*
+   * Микро-доводчик. Родной снап не трогает мелкие недолёты: колесо,
+   * остановившееся в 40px от начала секции, так и оставляло снизу полосу
+   * соседней полосы. Сторож ждёт полной остановки (два тика подряд на
+   * одном месте, нулевая скорость) и дожимает последние пиксели сам.
+   * Дальше 64px не лезет — это уже осознанная позиция читателя.
+   */
+  let prevY = -1;
+  let nudged = -1;
+  window.setInterval(() => {
+    if (snap.isStopped) return;
+    const y = Math.round(lenis.scroll);
+    const still = y === prevY;
+    prevY = y;
+    if (!still || Math.abs(lenis.velocity) > 0.05) return;
+    let best = -1;
+    for (const p of snapPoints) if (best === -1 || Math.abs(p - y) < Math.abs(best - y)) best = p;
+    if (best === -1) return;
+    const dist = Math.abs(best - y);
+    if (dist < 2 || dist > 64) {
+      if (dist > 96) nudged = -1; // ушли далеко: сторож снова заряжен
+      return;
+    }
+    if (nudged === best) return; // уже доводили сюда: не зацикливаемся
+    nudged = best;
+    lenis.scrollTo(best, { duration: 0.45, easing: (t: number) => 1 - Math.pow(1 - t, 3) });
+  }, 160);
+
+  // Пины меняют геометрию документа: после пересчёта собираем точки заново.
+  ScrollTrigger.addEventListener('refresh', () => {
+    snap.resize();
+    rebuildSnaps();
+  });
+
+  /*
+   * Аккордеон FAQ (и любой другой ресайз контента по месту) дёргает
+   * ResizeObserver Lenis'а, снап принимает это за скролл-активность и после
+   * своего дебаунса «доводит» страницу к точке — при клике по вопросу
+   * страница уезжала на десятки пикселей, снизу вылезал чёрный сосед.
+   * Хуже того, точка могла быть посчитана во время инерции, когда сглаженный
+   * скролл расходится с фактическим, — и довод целился мимо начала секции.
+   *
+   * Поэтому на время локального ресайза снап глушится, а после — пересчёт
+   * точек в покое и только затем включение.
+   */
+  if (import.meta.env.DEV) {
+    (window as unknown as { __snap: Snap }).__snap = snap;
+  }
+
+  let reflowTimer = 0;
+  document.addEventListener('ui:reflow', () => {
+    snap.stop();
+    window.clearTimeout(reflowTimer);
+    reflowTimer = window.setTimeout(() => {
+      snap.resize();
+      rebuildSnaps();
+      snap.start();
+    }, 550);
+  });
 }
 
 /* ==========================================================================
@@ -436,6 +590,45 @@ function splitTexts(): void {
     el.setAttribute('aria-label', words.join(' '));
     el.innerHTML = words.map((w) => `<span class="bw" aria-hidden="true">${w}</span>`).join(' ');
   }
+
+  // Лид героя режем на месте: подход через textContent, как выше, стёр бы
+  // <mark>, а без него нечего прочерчивать маркером.
+  for (const el of document.querySelectorAll<HTMLElement>('[data-hero-lead]')) {
+    wrapWordsInPlace(el);
+  }
+}
+
+/**
+ * Оборачивает слова в .bw, не разрушая разметку внутри. Разделители
+ * переносятся дословно: среди них неразрывные пробелы, которые держат
+ * маркер от начала строки. Слова остаются обычным текстом для скринридера —
+ * aria-hidden здесь не нужен, инлайновые span-ы читаются слитно.
+ */
+function wrapWordsInPlace(node: Node): void {
+  for (const child of [...node.childNodes]) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      const text = child.textContent ?? '';
+      if (!text.trim()) continue;
+      const frag = document.createDocumentFragment();
+      for (const chunk of text.split(/(\s+)/)) {
+        if (!chunk) continue;
+        if (/^\s+$/.test(chunk)) {
+          frag.append(chunk);
+          continue;
+        }
+        const span = document.createElement('span');
+        span.className = 'bw';
+        span.textContent = chunk;
+        frag.append(span);
+      }
+      child.replaceWith(frag);
+    } else if (child.nodeType === Node.ELEMENT_NODE) {
+      // Накладка маркера — цельная плашка, её резать на слова нельзя.
+      // Помечена aria-hidden, потому что дублирует текст под собой.
+      if ((child as HTMLElement).getAttribute('aria-hidden') === 'true') continue;
+      wrapWordsInPlace(child);
+    }
+  }
 }
 
 const numFmt = new Intl.NumberFormat('ru-RU');
@@ -444,6 +637,12 @@ function initSectionEntrances(): void {
   const blocks = document.querySelectorAll<HTMLElement>('main section, footer.closer');
 
   for (const section of blocks) {
+    // Герой живёт своим пином и своим таймлайном. Пока в нём не было .bw,
+    // цикл проскакивал его сам; со словами лида — подхватил бы, и два
+    // таймлайна начали бы драться за одни и те же слова: вход показывал их
+    // ещё на нулевом скролле, а скраб сцены тут же утаскивал обратно.
+    if (section.matches('[data-hero]')) continue;
+
     const words = section.querySelectorAll<HTMLElement>('.split-word');
     const blurWords = section.querySelectorAll<HTMLElement>('.bw');
     const rises = section.querySelectorAll<HTMLElement>('[data-reveal="up"], [data-reveal="doc"]');
@@ -468,10 +667,20 @@ function initSectionEntrances(): void {
       tl.fromTo(words, { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power4.out', stagger: 0.045 }, 0);
     }
     if (blurWords.length) {
+      // will-change живёт только на время анимации: постоянный хинт на всех
+      // словах страницы держал бы им слои растровыми без всякой пользы.
       tl.fromTo(
         blurWords,
-        { opacity: 0, y: 12, filter: 'blur(9px)' },
-        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power2.out', stagger: 0.018 },
+        { opacity: 0, y: 12, filter: 'blur(9px)', willChange: 'transform, filter, opacity' },
+        {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 0.5,
+          ease: 'power2.out',
+          stagger: 0.018,
+          onComplete: () => gsap.set(blurWords, { clearProps: 'will-change,filter' }),
+        },
         0.16,
       );
     }
