@@ -3,6 +3,10 @@ import '../styles/tokens.css';
 import '../styles/fonts.css';
 import '../styles/base.css';
 import { t, links, LANGS, path } from '../i18n';
+// Шрифты первого экрана импортом: preload получает тот же хэшированный
+// адрес (с учётом base), что и @font-face в собранном CSS.
+import onestCyrillicUrl from '../assets/fonts/onest-cyrillic-wght-normal.woff2';
+import onestLatinUrl from '../assets/fonts/onest-latin-wght-normal.woff2';
 
 interface Props {
   title?: string;
@@ -13,11 +17,20 @@ const c = t(Astro.currentLocale);
 const lang = Astro.currentLocale ?? 'ru';
 const { title = c.site.title, description = c.site.description } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const ogImage = new URL('/og.jpg', Astro.site).href;
+/* Подпапка деплоя (GitHub Pages). На своём домене пустая строка. */
+const basePrefix = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-/** Тот же документ на другом языке: для hreflang и переключателя. */
-const pathWithoutLang = Astro.url.pathname.replace(/^\/en(?=\/|$)/, '') || '/';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(`${basePrefix}/og.jpg`, Astro.site).href;
+
+/** Тот же документ на другом языке: для hreflang и переключателя.
+ * Astro.url.pathname при деплое в подпапку начинается с base — срезаем его
+ * до языкового разбора, path() вернёт префикс обратно. */
+const bare =
+  basePrefix && Astro.url.pathname.startsWith(basePrefix)
+    ? Astro.url.pathname.slice(basePrefix.length)
+    : Astro.url.pathname;
+const pathWithoutLang = bare.replace(/^\/en(?=\/|$)/, '') || '/';
 const alternates = LANGS.map((l) => ({
   lang: l,
   href: new URL(path(l, pathWithoutLang), Astro.site).href,
@@ -56,9 +69,9 @@ const jsonLd = {
     <link rel="canonical" href={canonical} />
 
     {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
-    <link rel="alternate" hreflang="x-default" href={new URL(pathWithoutLang, Astro.site).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL(path('ru', pathWithoutLang), Astro.site).href} />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href={`${basePrefix}/favicon.svg`} type="image/svg+xml" />
     <meta name="theme-color" content="#f2f1ed" />
 
     <meta property="og:type" content="website" />
@@ -73,8 +86,8 @@ const jsonLd = {
 
     <!-- Шрифты первого экрана. Моноширинный подтягивается обычным путём:
          он занят мелким текстом и на LCP не влияет. -->
-    <link rel="preload" href="/fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={onestCyrillicUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={onestLatinUrl} as="font" type="font/woff2" crossorigin />
 
     <script is:inline>
       // Ставим метку до первой отрисовки: только под ней CSS прячет элементы
@@ -82,16 +95,18 @@ const jsonLd = {
       document.documentElement.classList.add('js');
     </script>
 
-    <script is:inline define:vars={{ lang }}>
+    <script is:inline define:vars={{ lang, root: import.meta.env.BASE_URL }}>
       // Автоопределение языка — ровно один раз и только с главной в корне.
       // Явный выбор пользователя (клик по переключателю) запоминается и
       // побеждает: никаких повторных редиректов против его воли.
+      // root приходит из base: на стенде в подпапке корень — не «/».
       (() => {
         try {
           const KEY = 'lang-choice';
           const stored = localStorage.getItem(KEY);
+          const home = root.endsWith('/') ? root : root + '/';
           const p = location.pathname;
-          const isRoot = p === '/' || p === '';
+          const isRoot = p === home || p + '/' === home;
 
           // Клик по переключателю фиксирует выбор.
           document.addEventListener('click', (e) => {
@@ -100,14 +115,14 @@ const jsonLd = {
           });
 
           if (stored) {
-            if (stored === 'en' && isRoot) location.replace('/en/');
+            if (stored === 'en' && isRoot) location.replace(home + 'en/');
             return;
           }
           if (!isRoot || lang !== 'ru') return;
 
           const prefers = (navigator.languages || [navigator.language || ''])
             .some((l) => l.toLowerCase().startsWith('ru'));
-          if (!prefers) location.replace('/en/');
+          if (!prefers) location.replace(home + 'en/');
         } catch {
           /* приватный режим без localStorage: остаёмся на языке страницы */
         }

@@ -1,12 +1,12 @@
 /**
- * Копирует нужные подмножества шрифтов из node_modules в public/fonts.
+ * Копирует нужные подмножества шрифтов из node_modules в src/assets/fonts (собираются vite'ом: хэш в имени, учёт base).
  * latin-ext обязателен: в нём живёт знак рубля U+20BD (U+20AD-20C0).
  * Запуск: npm run fonts:sync
  */
 import { copyFileSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 
-const OUT = 'public/fonts';
+const OUT = 'src/assets/fonts';
 const SUBSETS = ['latin', 'latin-ext', 'cyrillic'];
 
 /** Переменные семейства: один файл на подмножество. */
@@ -20,7 +20,7 @@ const STATIC = [{ pkg: '@fontsource/ibm-plex-mono', file: 'ibm-plex-mono', weigh
 
 mkdirSync(OUT, { recursive: true });
 
-// Прибираем устаревшее, чтобы в public не копились мёртвые шрифты.
+// Прибираем устаревшее, чтобы не копились мёртвые шрифты.
 for (const f of readdirSync(OUT)) unlinkSync(join(OUT, f));
 
 for (const { pkg, file } of VARIABLE) {

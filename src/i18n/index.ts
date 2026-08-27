@@ -28,15 +28,22 @@ export function socialHref(key: string): string {
   return (links as Record<string, string>)[key] ?? '';
 }
 
+/**
+ * Подпапка деплоя. На своём домене пусто; на тестовом стенде GitHub Pages
+ * сайт живёт в /имя-репозитория, и каждый внутренний адрес обязан начинаться
+ * с него. Значение приходит из base в astro.config.
+ */
+const SITE_BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
+
 /** Префикс языка: русский в корне, английский под /en. */
 export function base(lang: string | undefined): string {
-  return lang === 'en' ? '/en' : '';
+  return lang === 'en' ? `${SITE_BASE}/en` : SITE_BASE;
 }
 
 /** Абсолютный путь внутри текущего языка: path('en', '/terms') → '/en/terms'. */
 export function path(lang: string | undefined, to: string): string {
   const prefix = base(lang);
-  if (to === '/') return prefix || '/';
+  if (to === '/') return prefix ? `${prefix}/` : '/';
   return `${prefix}${to}`;
 }
 
@@ -55,5 +62,5 @@ export const docPaths = {
 } as const;
 
 export function docHref(lang: string | undefined, key: keyof typeof docPaths.ru): string {
-  return docPaths[(lang as Lang) === 'en' ? 'en' : 'ru'][key];
+  return SITE_BASE + docPaths[(lang as Lang) === 'en' ? 'en' : 'ru'][key];
 }
