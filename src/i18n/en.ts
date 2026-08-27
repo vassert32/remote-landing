@@ -88,8 +88,8 @@ export const en = {
       { key: 'Format', value: 'One on one' },
     ],
     paragraphs: [
-      "I'm Evgeny, a backend engineer. I started at Yandex School, worked my way onto " +
-        'the staff, then signed a remote contract with a company abroad without leaving home.',
+      "I'm Evgeny, a backend engineer. I went through the entire grind of the " +
+        'tech industry and reached the international market on my own.',
       'You work with me, not with a team of coordinators: your CV, applications, ' +
         'interview debriefs and offer negotiation all go through me personally. ' +
         'No group chats, no recorded lessons.',
@@ -101,9 +101,9 @@ export const en = {
   ladder: {
     title: 'My path. Your goal.',
     body:
-      'Yandex School, the internship, the staff job: I went through all of it myself, ' +
-      'with no connections and no relocation. So I remember where the months get lost ' +
-      'and what interviews actually ask about.',
+      'I climbed every step on this chart myself, from the start to a contract ' +
+      'in hard currency. I know this route from the inside: where the months get ' +
+      'lost and what interviews actually ask about.',
     panelTag: 'income by stage',
     chartLabel: 'Income growth across career stages',
     points: [

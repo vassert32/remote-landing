@@ -582,6 +582,10 @@ function initSnap(lenis: Lenis): void {
     (window as unknown as { __snap: Snap }).__snap = snap;
   }
 
+  if (import.meta.env.DEV) {
+    (window as unknown as { __snap: Snap }).__snap = snap;
+  }
+
   let reflowTimer = 0;
   document.addEventListener('ui:reflow', () => {
     snap.stop();
