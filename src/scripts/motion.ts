@@ -137,7 +137,6 @@ function initHeroScene(): void {
   const stamp = scene.querySelector<HTMLElement>('[data-hero-stamp]');
   const docPaper = scene.querySelector<HTMLElement>('[data-doc-paper]');
   const docCurl = scene.querySelector<SVGElement>('[data-doc-curl]');
-  const docDrop = scene.querySelector<HTMLElement>('[data-doc-drop]');
 
   // На фазе вопроса хедера нет (страховку от не доехавшего мотора
   // снимает инлайн-скрипт в SiteNav).
@@ -157,7 +156,6 @@ function initHeroScene(): void {
   // Лист приходит из-за нижней кромки экрана как брошенный на стол:
   // с наклоном и чуть крупнее (ближе к глазу). Наклон гасится о «стол».
   if (doc) gsap.set(doc, { opacity: 0, y: () => window.innerHeight * 0.62, rotate: -7, scale: 1.06 });
-  if (docDrop) gsap.set(docDrop, { scaleX: 1.16, scaleY: 1.5 });
 
   /*
    * Завиток угла. Пока лист летит, левый нижний угол закручен трубочкой;
@@ -303,10 +301,6 @@ function initHeroScene(): void {
   if (doc) {
     tl.to(doc, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 0.68);
     tl.to(doc, { rotate: 0, scale: 1, duration: 0.44, ease: 'back.out(1.4)' }, 0.74);
-  }
-  if (docDrop) {
-    tl.to(docDrop, { opacity: 1, duration: 0.12 }, 0.72);
-    tl.to(docDrop, { scaleX: 1, scaleY: 1, duration: 0.4, ease: 'power2.out' }, 0.76);
   }
   // Угол распускается после посадки, перед печатью.
   if (docCurl && docPaper) {

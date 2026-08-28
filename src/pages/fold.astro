@@ -71,10 +71,6 @@ const knobs = [
         </div>
 
         <div class="scene">
-          {/* Тень листа на столе: отдельным слоем, живёт по своему закону —
-              в полёте растянута и разрежена, на столе собирается. */}
-          <div class="drop" data-drop></div>
-
           <div class="sheet" data-sheet>
             <div class="sheet__paper" data-paper>
               <OfferDoc />
@@ -122,7 +118,6 @@ const knobs = [
       const curl = stage.querySelector<SVGElement>('[data-curl]')!;
       const face = stage.querySelector<SVGPathElement>('[data-face]')!;
       const cast = stage.querySelector<SVGPathElement>('[data-cast]')!;
-      const drop = stage.querySelector<HTMLElement>('[data-drop]')!;
       const dump = stage.querySelector<HTMLElement>('[data-dump]')!;
 
       const p = { size: 50, tipX: 100, tipY: 5, bow: 2, fat: 0 };
@@ -198,13 +193,10 @@ const knobs = [
       // глазу), гасит наклон о стол с лёгким перелётом и только у касания
       // распускает угол.
       gsap.set(sheet, { yPercent: 70, rotate: -7, scale: 1.06, opacity: 0 });
-      gsap.set(drop, { opacity: 0, scaleX: 1.16, scaleY: 1.5 });
 
       tl.to(sheet, { opacity: 1, duration: 0.16 }, 0)
         .to(sheet, { yPercent: 0, duration: 0.5, ease: 'power2.out' }, 0)
         .to(sheet, { rotate: 0, scale: 1, duration: 0.62, ease: 'back.out(1.4)' }, 0.08)
-        .to(drop, { opacity: 1, duration: 0.2 }, 0.02)
-        .to(drop, { scaleX: 1, scaleY: 1, duration: 0.55, ease: 'power2.out' }, 0.08)
         .to(state, { k: 0, duration: 0.42, ease: 'power2.inOut', onUpdate: draw }, 0.5);
 
       ScrollTrigger.addEventListener('refresh', draw);
@@ -248,20 +240,7 @@ const knobs = [
       /* Лист ужат: тут важно рассмотреть механику, а не натуральный размер. */
       .scene { position: relative; max-width: 330px; justify-self: center; }
 
-      /* Тень листа на столе. Нарисованное затухание, не размытие: эллипс
-         плотнее к нижней кромке и сходит в ноль к краям. */
-      .drop {
-        position: absolute;
-        inset: 4% 0 -6% 0;
-        background: radial-gradient(
-          ellipse 62% 46% at 50% 96%,
-          rgb(28 26 22 / 0.3),
-          rgb(28 26 22 / 0.1) 55%,
-          rgb(28 26 22 / 0) 78%
-        );
-        transform-origin: 50% 100%;
-        will-change: transform, opacity;
-      }
+
 
       .sheet { position: relative; will-change: transform; }
       .sheet__paper { position: relative; }

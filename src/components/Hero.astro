@@ -77,10 +77,6 @@ const total = i;
         </div>
 
         <figure class="hero__aside" data-hero-doc>
-          <!-- Тень листа на столе: нарисованное затухание, не размытие.
-               Без мотора скрыта — статичный лист лежит как раньше. -->
-          <div class="hero__drop" data-doc-drop aria-hidden="true"></div>
-
           <div class="hero__sheet">
             <div class="hero__paper" data-doc-paper>
               <OfferDoc />
@@ -259,22 +255,6 @@ const total = i;
   .hero__sheet { position: relative; }
   .hero__paper { position: relative; }
 
-  /* Тень листа на столе: эллипс затухающей плотности, без размытия.
-     Появляется только под мотором — растянутая в «полёте», собирается
-     при посадке. */
-  .hero__drop {
-    position: absolute;
-    inset: 4% 0 -6% 0;
-    background: radial-gradient(
-      ellipse 62% 46% at 50% 96%,
-      rgb(28 26 22 / 0.3),
-      rgb(28 26 22 / 0.1) 55%,
-      rgb(28 26 22 / 0) 78%
-    );
-    transform-origin: 50% 100%;
-    opacity: 0;
-    will-change: transform, opacity;
-  }
 
   /* Завиток: без мотора скрыт, лист остаётся обычным. Размер и вырез
      на листе ведёт мотор — они меняются одной величиной. */
