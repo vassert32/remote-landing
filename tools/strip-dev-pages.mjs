@@ -11,7 +11,7 @@
 import { rm, access } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const DEV_ONLY = ['viz'];
+const DEV_ONLY = ['viz', 'fold'];
 const DIST = 'dist';
 
 for (const page of DEV_ONLY) {

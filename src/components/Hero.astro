@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { t, links } from '../i18n';
+import OfferDoc from './OfferDoc.astro';
 
 const c = t(Astro.currentLocale);
 
@@ -76,33 +77,7 @@ const total = i;
         </div>
 
         <figure class="hero__aside" data-hero-doc>
-          <div class="doc offer">
-            <figcaption class="doc__head offer__head">
-              <span class="offer__title">{c.offer.docTitle}</span>
-            </figcaption>
-
-            <div class="offer__body">
-              {
-                c.offer.rows.map((row) => (
-                  <div class="offer__row">
-                    <span class="offer__key">{row.key}</span>
-                    <span class="offer__val">{row.value}</span>
-                  </div>
-                ))
-              }
-            </div>
-
-            <!-- Печать работодателя стоит, подпись читателя ещё нет:
-                 приглашение, а не запись о состоявшемся факте.
-                 Пустая линия и есть смысл документа: место оставлено ЗА ТОБОЙ. -->
-            <div class="offer__sign">
-              <div class="offer__sign-field">
-                <span class="offer__sign-label">{c.offer.signLabel}</span>
-                <span class="offer__sign-line" aria-hidden="true"></span>
-              </div>
-              <span class="stamp offer__stamp" data-hero-stamp>{c.offer.stamp}</span>
-            </div>
-          </div>
+          <OfferDoc />
         </figure>
       </div>
     </div>
@@ -240,96 +215,6 @@ const total = i;
     margin: 0;
   }
 
-  /* Лист бумаги, а не панель интерфейса: сам лист светлее страницы,
-     край тонкий, поля широкие как у настоящего бланка, тени нет. */
-  .offer {
-    background: #fbfaf7;
-    border-width: var(--hair);
-    border-color: color-mix(in srgb, var(--ink) 28%, transparent);
-    color: var(--ink);
-  }
-
-  .offer__head {
-    justify-content: center;
-    padding: 1.5rem var(--offer-pad) 1.1rem;
-    border-bottom-width: var(--hair);
-    border-bottom-color: color-mix(in srgb, var(--ink) 22%, transparent);
-  }
-  .offer__title {
-    font-family: var(--font-mono);
-    font-size: var(--fs-small);
-    font-weight: var(--fw-strong);
-    letter-spacing: 0.14em;
-  }
-  /* Поля листа: широкие сверху и по бокам, как у печатного бланка. */
-  .offer { --offer-pad: clamp(1.4rem, 0.9rem + 1.7vw, 2.6rem); }
-  .offer__body { padding: 0.5rem var(--offer-pad) 0.9rem; }
-
-  .offer__row {
-    display: grid;
-    grid-template-columns: minmax(7rem, 0.34fr) 1fr;
-    gap: var(--space-4);
-    align-items: baseline;
-    padding-block: 0.78rem;
-  }
-  .offer__row + .offer__row {
-    border-top: var(--hair) solid color-mix(in srgb, var(--ink) 12%, transparent);
-  }
-
-  .offer__key {
-    font-family: var(--font-mono);
-    font-size: var(--fs-micro);
-    letter-spacing: var(--tr-mono);
-    color: color-mix(in srgb, var(--ink) 60%, transparent);
-  }
-  .offer__val {
-    font-size: var(--fs-body);
-    font-weight: var(--fw-strong);
-    text-wrap: balance;
-  }
-
-  /* Блок подписи: короткая линия под подпись и настоящая кнопка вместо
-     имитации поля ввода. Печать работодателя уже стоит. */
-  .offer__sign {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--space-6);
-    padding: 1.3rem var(--offer-pad) 1.8rem;
-    border-top: var(--hair) solid color-mix(in srgb, var(--ink) 22%, transparent);
-  }
-
-  .offer__sign-field {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    min-width: 0;
-  }
-  .offer__sign-label {
-    font-family: var(--font-mono);
-    font-size: var(--fs-micro);
-    letter-spacing: var(--tr-mono);
-    color: color-mix(in srgb, var(--ink) 60%, transparent);
-  }
-  /* Пустая линия под подпись: как в настоящем бланке. */
-  .offer__sign-line {
-    display: block;
-    width: min(13rem, 100%);
-    height: 1.7em;
-    border-bottom: var(--hair) solid color-mix(in srgb, var(--ink) 45%, transparent);
-  }
-
-  .offer__stamp {
-    flex: none;
-    align-self: center;
-    padding: 0.5rem 0.95rem;
-    font-size: var(--fs-small);
-    letter-spacing: 0.14em;
-    /* Печать всегда чернильно-оранжевая: лист светлый в обеих темах. */
-    border-color: #d9531e;
-    color: #d9531e;
-  }
 
   /* --- Наложение фаз в режиме мотора ------------------------------------ */
 
@@ -351,18 +236,10 @@ const total = i;
     .hero__main { gap: var(--space-4); }
     .hero__answer { padding-block: calc(var(--nav-h) + var(--space-4)) var(--space-6); }
     .hero__lead { max-width: none; font-size: var(--fs-body); }
-    .offer { --offer-pad: 1.1rem; }
-    .offer__head { padding-block: 1rem 0.8rem; }
-    .offer__body { padding-block: 0.2rem 0.5rem; }
-    .offer__row { padding-block: 0.55rem; }
-    .offer__sign { padding-block: 0.9rem 1.1rem; }
     .hero__q { font-size: clamp(1.75rem, 1.1rem + 3.4vw, 2.4rem); }
   }
 
   @media (max-width: 560px) {
-    .offer__row { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
-    .offer__sign { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
-    .offer__stamp { align-self: flex-end; margin-top: -2.4rem; }
     .hero__actions .btn { padding-block: 0.85rem; }
   }
 
