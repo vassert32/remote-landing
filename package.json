@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node tools/strip-dev-pages.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "fonts:sync": "node tools/sync-fonts.mjs",

@@ -1,0 +1,66 @@
+---
+import { Icon } from 'astro-icon/components';
+import Base from '../layouts/Base.astro';
+import { t, path } from '../i18n';
+
+/**
+ * 404 в метафоре документа: вместо «страница не найдена» — бланк с печатью
+ * NOT FOUND. Одна на оба языка: nginx отдаёт её по error_page, и языковой
+ * префикс в этот момент неизвестен.
+ */
+const c = t(Astro.currentLocale);
+---
+
+<Base title={`${c.notFound.title}. ${c.site.name}`} description={c.notFound.text}>
+  <main class="nf" id="main">
+    <div class="shell nf__inner">
+      <div class="panel nf__doc">
+        <span class="panel__tag">{c.notFound.code}</span>
+        <span class="stamp nf__stamp">{c.notFound.stamp}</span>
+
+        <h1 class="h2 nf__title">{c.notFound.title}</h1>
+        <p class="body nf__text">{c.notFound.text}</p>
+
+        <a class="btn btn--ink nf__cta" href={path(Astro.currentLocale, '/')}>
+          <span>{c.ui.back}</span>
+          <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
+        </a>
+      </div>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .nf {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    padding-block: var(--section-y);
+  }
+
+  .nf__doc {
+    position: relative;
+    max-width: 46rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding-top: clamp(2rem, 1.5rem + 1.8vw, 2.8rem);
+  }
+
+  /* Печать в углу бланка: тот же приём, что на JOB OFFER. */
+  .nf__stamp {
+    position: absolute;
+    top: clamp(1.2rem, 1rem + 1vw, 2rem);
+    right: clamp(1.2rem, 1rem + 1vw, 2rem);
+    rotate: -6deg;
+  }
+
+  .nf__title { max-width: 18ch; }
+  .nf__text { max-width: 42ch; }
+  .nf__cta { margin-top: var(--space-2); }
+
+  @media (max-width: 560px) {
+    .nf__stamp { position: static; rotate: none; align-self: flex-start; }
+  }
+</style>

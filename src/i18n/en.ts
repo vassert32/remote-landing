@@ -40,6 +40,14 @@ export const en = {
     howItWorks: 'How it works',
   },
 
+  /** 404 page: kept inside the document metaphor. */
+  notFound: {
+    code: '404',
+    stamp: 'Not found',
+    title: 'No such document',
+    text: 'The address has a typo, or the page is gone. Everything there is lives on the home page.',
+  },
+
   socials: [
     { name: 'Telegram', icon: 'ph:telegram-logo', key: 'telegram' },
     { name: 'GitHub', icon: 'ph:github-logo', key: 'github' },

@@ -40,6 +40,14 @@ export const ru = {
     howItWorks: 'Как это устроено',
   },
 
+  /** Страница 404: выдержана в метафоре документа. */
+  notFound: {
+    code: '404',
+    stamp: 'Not found',
+    title: 'Такого документа нет',
+    text: 'Адрес набран с ошибкой или страницу убрали. Всё, что есть, собрано на главной.',
+  },
+
   socials: [
     { name: 'Telegram', icon: 'ph:telegram-logo', key: 'telegram' },
     { name: 'GitHub', icon: 'ph:github-logo', key: 'github' },
