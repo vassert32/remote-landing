@@ -94,14 +94,11 @@ const total = i;
 
             <!-- Печать работодателя стоит, подпись читателя ещё нет:
                  приглашение, а не запись о состоявшемся факте.
-                 Поле ввода не имитируем — подписью служит настоящая кнопка. -->
+                 Пустая линия и есть смысл документа: место оставлено ЗА ТОБОЙ. -->
             <div class="offer__sign">
               <div class="offer__sign-field">
                 <span class="offer__sign-label">{c.offer.signLabel}</span>
-                <a class="offer__sign-btn" href={links.telegram} target="_blank" rel="noopener">
-                  <span>{c.offer.signCta}</span>
-                  <Icon class="offer__sign-arrow" name="ph:arrow-up-right-bold" aria-hidden="true" />
-                </a>
+                <span class="offer__sign-line" aria-hidden="true"></span>
               </div>
               <span class="stamp offer__stamp" data-hero-stamp>{c.offer.stamp}</span>
             </div>
@@ -315,29 +312,13 @@ const total = i;
     letter-spacing: var(--tr-mono);
     color: color-mix(in srgb, var(--ink) 60%, transparent);
   }
-  /* Подпись ставится кликом: кнопка ведёт на то же целевое действие. */
-  .offer__sign-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.8rem;
-    border: var(--hair) solid var(--ink);
-    font-family: var(--font-mono);
-    font-size: var(--fs-micro);
-    font-weight: var(--fw-strong);
-    letter-spacing: var(--tr-mono);
-    color: var(--ink);
-    transition: background-color var(--dur-fast) var(--ease-out),
-                color var(--dur-fast) var(--ease-out),
-                border-color var(--dur-fast) var(--ease-out);
+  /* Пустая линия под подпись: как в настоящем бланке. */
+  .offer__sign-line {
+    display: block;
+    width: min(13rem, 100%);
+    height: 1.7em;
+    border-bottom: var(--hair) solid color-mix(in srgb, var(--ink) 45%, transparent);
   }
-  .offer__sign-btn:hover,
-  .offer__sign-btn:focus-visible {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: #fbfaf7;
-  }
-  .offer__sign-arrow { width: 0.8em; height: 0.8em; flex: none; }
 
   .offer__stamp {
     flex: none;

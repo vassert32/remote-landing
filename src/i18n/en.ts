@@ -12,7 +12,7 @@ export const en = {
   site: {
     name: 'Evgeny Gerkulesov',
     // TODO(client): full sole-trader details for the footer.
-    legal: 'Sole trader E. Gerkulesov',
+    legal: 'E. Gerkulesov',
     given: 'Evgeny ',
     family: 'Gerkulesov',
     telegramHandle: '@gerkulesov35',
@@ -75,7 +75,6 @@ export const en = {
       { key: 'Search time', value: '3-4 months' },
     ],
     signLabel: 'Signature',
-    signCta: 'Sign it',
     stamp: 'Approved',
   },
 
@@ -257,19 +256,11 @@ export const en = {
   closer: {
     kicker: 'The first call is free',
     bigNum: '$0',
-    bigNote: 'the cost of starting',
+    bigNote: 'the start',
     title: 'The next offer could be yours',
     note:
       'We get on a call and look at your experience, your English and your goal. ' +
       'After that I tell you honestly whether it makes sense to work together.',
-    foot: {
-      sections: 'Sections',
-      contact: 'Contact',
-      docs: 'Documents',
-      legalTitle: 'Legal',
-      email: 'Email',
-      github: 'GitHub',
-    },
   },
 
   docs: {

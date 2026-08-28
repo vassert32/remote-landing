@@ -1,9 +1,8 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { t, links, docHref } from '../i18n';
+import { t, links } from '../i18n';
 
 const c = t(Astro.currentLocale);
-const lang = Astro.currentLocale;
 const year = new Date().getFullYear();
 ---
 
@@ -33,46 +32,10 @@ const year = new Date().getFullYear();
       </a>
     </div>
 
-    <!-- Информативный низ: разделы, контакты текстом, документы, реквизиты.
-         Иконки живут в хедере — здесь не дублируются. -->
+    <!-- Разделы, связь и документы убраны по просьбе заказчика: пока
+         страница-визитка, футер несёт только имя и год. -->
     <div class="closer__foot">
-      <nav class="closer__col" aria-label={c.ui.navLabel}>
-        <span class="closer__col-title">{c.closer.foot.sections}</span>
-        {c.nav.map((item) => <a class="closer__flink" href={item.href}>{item.label}</a>)}
-      </nav>
-
-      <div class="closer__col">
-        <span class="closer__col-title">{c.closer.foot.contact}</span>
-        <a class="closer__flink" href={links.telegram} target="_blank" rel="noopener">{c.site.telegramHandle}</a>
-        {
-          links.email ? (
-            <a class="closer__flink" href={`mailto:${links.email}`}>{c.closer.foot.email}</a>
-          ) : (
-            /* TODO(заказчик): реальная почта — слот оживёт со ссылкой */
-            <span class="closer__flink closer__flink--soon" title={c.ui.soon}>{c.closer.foot.email}</span>
-          )
-        }
-        {
-          links.github ? (
-            <a class="closer__flink" href={links.github} target="_blank" rel="noopener">{c.closer.foot.github}</a>
-          ) : (
-            <span class="closer__flink closer__flink--soon" title={c.ui.soon}>{c.closer.foot.github}</span>
-          )
-        }
-      </div>
-
-      <div class="closer__col">
-        <span class="closer__col-title">{c.closer.foot.docs}</span>
-        <a class="closer__flink" href={docHref(lang, 'oferta')}>{c.docs.oferta.title}</a>
-        <a class="closer__flink" href={docHref(lang, 'dogovor')}>{c.docs.dogovor.title}</a>
-        <a class="closer__flink" href={docHref(lang, 'privacy')}>{c.docs.privacy.title}</a>
-      </div>
-
-      <div class="closer__col closer__col--legal">
-        <span class="closer__col-title">{c.closer.foot.legalTitle}</span>
-        <span>{c.site.legal}</span>
-        <span class="num closer__year">{year}</span>
-      </div>
+      <span class="closer__legal">{c.site.legal} · <span class="num">{year}</span></span>
     </div>
   </div>
 </footer>
@@ -160,9 +123,8 @@ const year = new Date().getFullYear();
 
   .closer__foot {
     width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1.4fr 1fr;
-    gap: var(--space-8);
+    display: flex;
+    justify-content: center;
     margin-top: auto;
     padding-block: clamp(2rem, 1.5rem + 2vw, 3rem) var(--space-8);
     border-top: var(--hair) solid var(--line);
@@ -170,48 +132,12 @@ const year = new Date().getFullYear();
     color: var(--fg-mute);
   }
 
-  .closer__col {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.55rem;
-  }
-  .closer__col--legal { align-items: flex-end; text-align: right; }
-
-  .closer__col-title {
-    font-family: var(--font-mono);
-    font-size: var(--fs-micro);
-    letter-spacing: var(--tr-mono);
-    color: var(--fg-mute);
-    margin-bottom: 0.25rem;
-  }
-
-  .closer__flink {
-    color: var(--fg-soft);
-    transition: color var(--dur-fast) var(--ease-out);
-  }
-  .closer__flink:hover, .closer__flink:focus-visible { color: var(--fg); }
-
-  .closer__flink--soon { opacity: 0.55; cursor: default; }
-  .closer__flink--soon:hover { color: var(--fg-soft); }
-
-  .closer__year { color: var(--fg-mute); }
-
-  /* На таче ссылки-строки футера были высотой 20px. Добираем до 44px полями,
-     а межстрочный зазор убираем: иначе список расползается вдвое. */
   @media (hover: none) {
-    .closer__col { gap: 0; }
-    .closer__flink,
     .closer__tg {
       display: inline-flex;
       align-items: center;
       min-height: 44px;
     }
-  }
-
-  @media (max-width: 780px) {
-    .closer__foot { grid-template-columns: 1fr 1fr; row-gap: var(--space-6); }
-    .closer__col--legal { grid-column: 1 / -1; align-items: flex-start; text-align: left; flex-direction: row; justify-content: space-between; width: 100%; }
   }
 
   @media (max-width: 560px) {

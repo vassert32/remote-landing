@@ -3,13 +3,13 @@ import { defineConfig } from 'astro/config';
 import icon from 'astro-icon';
 
 export default defineConfig({
-  // TODO: заменить на боевой домен, когда он появится (нужно для canonical и og:url)
+  // Боевой домен. DEPLOY_SITE переопределяет его для стенда на GitHub Pages.
   // DEPLOY_SITE / DEPLOY_BASE задаёт CI: тестовый стенд на GitHub Pages живёт
   // в подпапке репозитория, и все внутренние пути собираются от base.
   // DEPLOY_BASE передаётся БЕЗ ведущего слэша («remote-landing»): Git Bash на
   // Windows перемалывает env-значения, похожие на абсолютный путь, в
   // «C:/Program Files/Git/…» — слэш дописываем здесь сами.
-  site: process.env.DEPLOY_SITE || 'https://gerkulesov.dev',
+  site: process.env.DEPLOY_SITE || 'https://remote-mentor.ru',
   base: process.env.DEPLOY_BASE ? `/${process.env.DEPLOY_BASE.replace(/^\/+/, '')}` : '/',
   integrations: [icon()],
   build: { inlineStylesheets: 'auto' },

@@ -19,8 +19,15 @@ const fmt = new Intl.NumberFormat(c.locale);
       {
         c.ladder.points.map((point, i) => (
           <li
-            class:list={['col', { 'col--peak': i === c.ladder.points.length - 1 }]}
-            style={`--w:${Math.sqrt(point.weight).toFixed(3)}`}
+            class:list={[
+              'col',
+              {
+                'col--peak': i === c.ladder.points.length - 1,
+                /* Низкий столбик: сумма не влезает внутрь и встаёт над гранью. */
+                'col--low': point.weight < 0.18,
+              },
+            ]}
+            style={`--w:${point.weight.toFixed(3)}`}
             tabindex="0"
           >
             <div class="col__story" role="note">
@@ -82,17 +89,28 @@ const fmt = new Intl.NumberFormat(c.locale);
     transition: color var(--dur-fast) var(--ease-out);
   }
 
-  /* Столбец: узкий и высокий, сумма напечатана внутри у основания. */
+  /* Столбец: узкий и высокий, сумма напечатана внутри у основания.
+     Масштаб ЛИНЕЙНЫЙ по рублёвому эквиваленту — просьба заказчика: разрыв
+     между штатом и валютным оффером должен бить в глаза по-настоящему.
+     Пол высоты — только чтобы грань нуля не исчезла совсем. */
   .col__bar {
     position: relative;
     display: flex;
     align-items: flex-end;
     width: clamp(4.5rem, 2.5rem + 4.5vw, 8.5rem);
-    height: max(calc(var(--field) * var(--w)), 3.4rem);
+    height: max(calc(var(--field) * var(--w)), 0.4rem);
     padding: 0.55rem 0.7rem;
     background: color-mix(in srgb, var(--paper) 9%, var(--bg));
     box-shadow: inset 0 2px 0 var(--stamp);
     transform-origin: bottom center;
+  }
+
+  /* Сумма низкого столбика живёт над гранью: внутрь ей уже не влезть. */
+  .col--low .col__bar { padding: 0; }
+  .col--low .col__num {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.45rem);
   }
 
   .ladder__panel { padding-top: clamp(1.8rem, 1.4rem + 1.6vw, 2.6rem); }
@@ -189,6 +207,9 @@ const fmt = new Intl.NumberFormat(c.locale);
       padding: 0.3rem 0.55rem;
       box-shadow: inset 0 2px 0 var(--stamp);
     }
+    /* В шильдике сумма возвращается в поток: absolute тут не про что. */
+    .col--low .col__bar { padding: 0.3rem 0.55rem; }
+    .col--low .col__num { position: static; }
     .col__num { font-size: var(--fs-small); }
     .col__stage { grid-column: 1; grid-row: 1; margin-top: 0; font-size: var(--fs-small); }
     .col__story {

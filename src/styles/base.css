@@ -242,8 +242,7 @@ main > .section[data-program] { padding-block: 0; }
 @media (hover: none) {
   .btn,
   .iconbtn,
-  .faq__q,
-  .offer__sign-btn {
+  .faq__q {
     min-height: 44px;
   }
   /* Ховер-подсказки колонн на таче открыты всегда: наводить нечем. */
