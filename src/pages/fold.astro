@@ -1,23 +1,27 @@
 ---
 /**
- * Пробник разворота листа. Служебная страница: /fold
- * Три прочтения одной идеи — лист приходит снизу изнанкой и разворачивается
- * в наш JOB OFFER. Крутить колесом: разворот привязан к скроллу, как в герое.
+ * Пробник: лист прилетает на стол и раскладывается. Страница /fold.
  *
- * 3D-ассет не нужен: всё на CSS-перспективе, лист остаётся живым текстом —
- * выделяется мышью, читается скринридером, весит ноль.
+ * Загнут левый нижний угол — не плоским треугольником, а завитком: бумага
+ * скручивается трубочкой, поэтому у неё блик по внешней дуге и затемнение
+ * у линии сгиба. Всё рисуется одним SVG, 3D-ассет не нужен.
  *
- * После выбора страница удаляется, победивший вариант переезжает в Hero.
+ * ТЕНИ. Правило «теней нет» не нарушено: ни одного box-shadow и ни одного
+ * размытия здесь нет. Вся светотень нарисована градиентами — это не тень
+ * объекта, а собственная светотень бумаги, то есть часть её рисунка.
+ * Ровно то, о чём говорит правило: плотность вместо размытия.
+ *
+ * После выбора страница удаляется, механика переезжает в Hero.
  */
 import '../styles/tokens.css';
 import '../styles/fonts.css';
 import '../styles/base.css';
 import OfferDoc from '../components/OfferDoc.astro';
 
-const variants = [
-  { id: 'flip', n: 'А', title: 'Переворот листа', note: 'приходит изнанкой, поворачивается к тебе целиком' },
-  { id: 'corner', n: 'Б', title: 'Загнутый угол', note: 'уголок отогнут назад и распрямляется на подъёме' },
-  { id: 'half', n: 'В', title: 'Сложен пополам', note: 'как письмо: нижняя половина откидывается вниз' },
+/** Варианты отличаются только характером прилёта, завиток общий. */
+const takes = [
+  { id: 'toss', n: 'А', title: 'Бросок на стол', note: 'прилетает с наклоном, гасит его о стол и раскладывается' },
+  { id: 'settle', n: 'Б', title: 'Мягкая посадка', note: 'приходит ровно, завиток распускается на подлёте' },
 ];
 ---
 
@@ -26,16 +30,16 @@ const variants = [
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>Пробник разворота листа</title>
+    <title>Пробник: лист на стол</title>
   </head>
   <body>
     <header class="shell probe__head">
-      <h1 class="h2">Разворот листа</h1>
-      <p class="label">служебная страница · крути колесом, разворот привязан к скроллу</p>
+      <h1 class="h2">Лист прилетает на стол</h1>
+      <p class="label">служебная страница · крути колесом, движение привязано к скроллу</p>
     </header>
 
     {
-      variants.map((v) => (
+      takes.map((v) => (
         <section class="stage" data-stage data-kind={v.id}>
           <div class="shell stage__inner">
             <div class="stage__meta">
@@ -45,48 +49,61 @@ const variants = [
             </div>
 
             <div class="scene">
-              {/* Обёртка несёт подъём, .paper — только разворот: смешивать
-                  их в одном transform нельзя, они живут по разным законам. */}
-              <div class="lift" data-lift>
-                {v.id === 'flip' && (
-                  <div class="paper" data-paper>
-                    <div class="face">
-                      <OfferDoc />
-                    </div>
-                    <div class="face face--back" aria-hidden="true" />
-                  </div>
-                )}
+              {/* Тень стола: отдельным слоем под листом, потому что живёт
+                  по своему закону — в полёте шире и мягче, на столе собранная. */}
+              <div class="drop" data-drop />
 
-                {v.id === 'corner' && (
-                  <div class="paper paper--corner">
-                    {/* Лицо с вырезанным углом: бумага не может быть в двух
-                        местах сразу, поэтому там, где угол отогнут, лист пуст. */}
-                    <div class="face" data-front>
-                      <OfferDoc />
-                    </div>
-                    {/* Отогнутый угол — квадрат, обрезанный до треугольника
-                        и повёрнутый на 180° вокруг своей главной диагонали. */}
-                    <div class="dogear" data-fold aria-hidden="true">
-                      <div class="dogear__skin" />
-                    </div>
-                  </div>
-                )}
+              <div class="sheet" data-sheet>
+                <div class="sheet__paper" data-paper>
+                  <OfferDoc />
+                </div>
 
-                {v.id === 'half' && (
-                  <div class="paper paper--half">
-                    {/* Обе половины — полноразмерные копии листа, отличаются
-                        только обрезкой. Ось сгиба у обеих одна: середина. */}
-                    <div class="half half--top">
-                      <OfferDoc />
-                    </div>
-                    <div class="half half--bottom" data-half>
-                      <div class="face">
-                        <OfferDoc hidden />
-                      </div>
-                      <div class="face face--back" aria-hidden="true" />
-                    </div>
-                  </div>
-                )}
+                {/* Завиток. viewBox фиксированный, размер задают стили: при
+                    распускании меняется одна величина, форма и градиенты
+                    остаются на месте. */}
+                <svg
+                  class="curl"
+                  data-curl
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <linearGradient
+                      id={`face-${v.id}`}
+                      x1="50"
+                      y1="50"
+                      x2="100"
+                      y2="0"
+                      gradientUnits="userSpaceOnUse"
+                    >
+                      {/* У сгиба бумага в тени, к внешней дуге выходит на блик
+                          и снова уходит в полутон на самом краю трубочки. */}
+                      <stop offset="0" stop-color="#9c9990" />
+                      <stop offset="0.45" stop-color="#fcfbf8" />
+                      <stop offset="1" stop-color="#cdc9c0" />
+                    </linearGradient>
+                    <linearGradient
+                      id={`cast-${v.id}`}
+                      x1="35"
+                      y1="35"
+                      x2="105"
+                      y2="-5"
+                      gradientUnits="userSpaceOnUse"
+                    >
+                      {/* Затухание нарисовано стопами, а не размытием:
+                          у сгиба плотно, к краю сходит в ноль. */}
+                      <stop offset="0" stop-color="#1c1a16" stop-opacity="0.34" />
+                      <stop offset="0.55" stop-color="#1c1a16" stop-opacity="0.12" />
+                      <stop offset="1" stop-color="#1c1a16" stop-opacity="0" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Тень завитка на листе: тот же контур чуть крупнее, залит
+                      затухающим градиентом. Размытия нет — только плотность. */}
+                  <path class="curl__cast" d="M0,0 C74,2 104,34 104,104 Z" fill={`url(#cast-${v.id})`} />
+                  <path class="curl__face" d="M0,0 C70,0 100,30 100,100 Z" fill={`url(#face-${v.id})`} />
+                </svg>
               </div>
             </div>
           </div>
@@ -103,63 +120,62 @@ const variants = [
       import { ScrollTrigger } from 'gsap/ScrollTrigger';
       gsap.registerPlugin(ScrollTrigger);
 
-      const EASE = 'power2.out';
-      /* Размер отогнутого угла держим в одном месте: он нужен и повороту,
-         и вырезу на лице листа. */
-      const EAR = 132;
+      /** Размер завитка в долях ширины листа при полном загибе. */
+      const CURL = 0.28;
 
       for (const stage of document.querySelectorAll<HTMLElement>('[data-stage]')) {
         const kind = stage.dataset.kind;
-        const lift = stage.querySelector<HTMLElement>('[data-lift]');
-        if (!lift) continue;
+        const sheet = stage.querySelector<HTMLElement>('[data-sheet]');
+        const paper = stage.querySelector<HTMLElement>('[data-paper]');
+        const curl = stage.querySelector<SVGElement>('[data-curl]');
+        const drop = stage.querySelector<HTMLElement>('[data-drop]');
+        if (!sheet || !paper || !curl || !drop) continue;
+
+        /* Завиток и вырез на листе — одна величина: бумага не может быть
+           в двух местах сразу, поэтому там, где угол закручен, лист пуст. */
+        const state = { k: 1 };
+        const setCurl = () => {
+          const px = Math.round(paper.offsetWidth * CURL * state.k);
+          gsap.set(curl, { width: px, height: px, autoAlpha: state.k > 0.02 ? 1 : 0 });
+          gsap.set(paper, {
+            clipPath: `polygon(0 0, 100% 0, 100% 100%, ${px}px 100%, 0 calc(100% - ${px}px))`,
+          });
+        };
+        setCurl();
 
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: stage, start: 'top top', end: '+=130%', pin: true, scrub: 0.6 },
+          scrollTrigger: { trigger: stage, start: 'top top', end: '+=140%', pin: true, scrub: 0.65 },
         });
 
-        // Подъём общий для всех вариантов: лист приходит из-за нижней кромки.
-        gsap.set(lift, { yPercent: 58, opacity: 0 });
-        tl.to(lift, { yPercent: 0, opacity: 1, duration: 0.55, ease: EASE }, 0);
+        if (kind === 'toss') {
+          // Брошенный лист: приходит снизу с наклоном, гасит его о стол
+          // и только у «касания» распускает угол.
+          gsap.set(sheet, { yPercent: 70, rotate: -7, scale: 1.06, opacity: 0 });
+          gsap.set(drop, { opacity: 0, scaleX: 1.16, scaleY: 1.5 });
 
-        if (kind === 'flip') {
-          const paper = stage.querySelector<HTMLElement>('[data-paper]');
-          if (paper) {
-            gsap.set(paper, { rotateX: 180 });
-            tl.to(paper, { rotateX: 0, duration: 0.62, ease: EASE }, 0.2);
-          }
+          tl.to(sheet, { opacity: 1, duration: 0.16 }, 0)
+            .to(sheet, { yPercent: 0, duration: 0.5, ease: 'power2.out' }, 0)
+            // back.out даёт лёгкий перелёт: лист касается стола и осаживается.
+            .to(sheet, { rotate: 0, scale: 1, duration: 0.62, ease: 'back.out(1.4)' }, 0.08)
+            .to(drop, { opacity: 1, duration: 0.2 }, 0.02)
+            .to(drop, { scaleX: 1, scaleY: 1, duration: 0.55, ease: 'power2.out' }, 0.08)
+            .to(state, { k: 0, duration: 0.42, ease: 'power2.inOut', onUpdate: setCurl }, 0.5);
         }
 
-        if (kind === 'corner') {
-          const fold = stage.querySelector<HTMLElement>('[data-fold]');
-          const front = stage.querySelector<HTMLElement>('[data-front]');
-          if (fold && front) {
-            // Угол отогнут, у листа вырезан тот же угол. Величины идут в ногу.
-            const cut = (px: number) =>
-              `polygon(0 0, calc(100% - ${px}px) 0, 100% ${px}px, 100% 100%, 0 100%)`;
-            gsap.set(fold, { '--fold': '180deg' });
-            gsap.set(front, { clipPath: cut(EAR) });
-            const state = { px: EAR };
-            tl.to(fold, { '--fold': '0deg', duration: 0.62, ease: EASE }, 0.2).to(
-              state,
-              {
-                px: 0,
-                duration: 0.62,
-                ease: EASE,
-                onUpdate: () => gsap.set(front, { clipPath: cut(state.px) }),
-              },
-              0.2,
-            );
-          }
+        if (kind === 'settle') {
+          // Спокойная подача: угол распускается уже на подлёте.
+          gsap.set(sheet, { yPercent: 46, rotate: -2, opacity: 0 });
+          gsap.set(drop, { opacity: 0, scaleX: 1.1, scaleY: 1.32 });
+
+          tl.to(sheet, { opacity: 1, duration: 0.16 }, 0)
+            .to(sheet, { yPercent: 0, rotate: 0, duration: 0.6, ease: 'power3.out' }, 0)
+            .to(drop, { opacity: 1, duration: 0.2 }, 0.02)
+            .to(drop, { scaleX: 1, scaleY: 1, duration: 0.6, ease: 'power2.out' }, 0.04)
+            .to(state, { k: 0, duration: 0.5, ease: 'power2.out', onUpdate: setCurl }, 0.22);
         }
 
-        if (kind === 'half') {
-          const bottom = stage.querySelector<HTMLElement>('[data-half]');
-          if (bottom) {
-            // Нижняя половина откинута вверх на себя: видно её изнанку.
-            gsap.set(bottom, { rotateX: 180 });
-            tl.to(bottom, { rotateX: 0, duration: 0.62, ease: EASE }, 0.2);
-          }
-        }
+        // Ширина листа зависит от окна — при пересчёте обновляем завиток.
+        ScrollTrigger.addEventListener('refresh', setCurl);
       }
     </script>
 
@@ -171,7 +187,7 @@ const variants = [
 
       .stage__inner {
         display: grid;
-        grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 0.75fr) minmax(0, 1fr);
         gap: var(--space-12);
         align-items: center;
       }
@@ -183,69 +199,40 @@ const variants = [
       .stage__n { font-size: var(--fs-giant); line-height: 0.8; color: var(--stamp); }
       .stage__note { max-width: 26ch; }
 
-      /* Перспектива живёт на сцене, а не на самом листе: иначе поворот
-         считается от его собственного центра и выглядит плоской разверткой. */
-      .scene { perspective: 1600px; perspective-origin: 50% 45%; }
+      .scene { position: relative; }
 
-      .lift { will-change: transform, opacity; }
-
-      .paper {
-        position: relative;
-        transform-style: preserve-3d;
-      }
-
-      .face { backface-visibility: hidden; }
-
-      /* Изнанка лежит ровно под лицом и повёрнута от нас. Тени в проекте
-         запрещены, поэтому «неосвещённость» даётся градиентом по бумаге. */
-      .face--back {
+      /* Падающая тень листа. Отдельным слоем, а не box-shadow: ей нужен свой
+         закон движения — в полёте шире и мягче, чем на столе. */
+      .drop {
         position: absolute;
-        inset: 0;
-        transform: rotateX(180deg);
-        background-color: #e2dfd6;
-        background-image: linear-gradient(
-          160deg,
-          rgb(0 0 0 / 0.30),
-          rgb(0 0 0 / 0.10) 45%,
-          rgb(0 0 0 / 0.24)
+        inset: 4% 0 -6% 0;
+        /* Нарисованное затухание, не размытие: эллипс плотнее к низу листа
+           и сходит в ноль к краям. */
+        background: radial-gradient(
+          ellipse 62% 46% at 50% 96%,
+          rgb(28 26 22 / 0.30),
+          rgb(28 26 22 / 0.10) 55%,
+          rgb(28 26 22 / 0) 78%
         );
-        border: var(--hair) solid color-mix(in srgb, var(--ink) 22%, transparent);
+        transform-origin: 50% 100%;
+        will-change: transform, opacity;
       }
 
-      /* --- Б: загнутый угол ------------------------------------------- */
+      .sheet { position: relative; will-change: transform; }
+      .sheet__paper { position: relative; }
 
-      .dogear {
+      /* Завиток сидит в левом нижнем углу листа и распускается в ноль.
+         Контур нарисован для правого верхнего угла, здесь он зеркалится. */
+      .curl {
         position: absolute;
-        top: 0;
-        right: 0;
-        width: 132px;
-        height: 132px;
-        transform-origin: 0 0;
-        transform: rotate3d(1, 1, 0, var(--fold, 180deg));
+        left: 0;
+        bottom: 0;
+        transform: scale(-1, -1);
+        overflow: visible;
+        pointer-events: none;
       }
-      .dogear__skin {
-        position: absolute;
-        inset: 0;
-        /* Треугольник A-B-C: он же угол листа. Гипотенуза — главная
-           диагональ квадрата, вокруг неё и происходит сгиб. */
-        clip-path: polygon(0 0, 100% 0, 100% 100%);
-        background-color: #ddd9d0;
-        background-image: linear-gradient(225deg, rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.26));
-        border: var(--hair) solid color-mix(in srgb, var(--ink) 20%, transparent);
-      }
-
-      /* --- В: сложен пополам ------------------------------------------- */
-
-      .paper--half { transform-style: preserve-3d; }
-      .half { transform-style: preserve-3d; }
-      .half--top { clip-path: inset(0 0 50% 0); }
-      .half--bottom {
-        position: absolute;
-        inset: 0;
-        clip-path: inset(50% 0 0 0);
-        /* Ось сгиба — середина листа, она же центр обеих копий. */
-        transform-origin: 50% 50%;
-      }
+      .curl__face { stroke: none; }
+      .curl__cast { transform: translate(2px, 3px); }
     </style>
   </body>
 </html>
