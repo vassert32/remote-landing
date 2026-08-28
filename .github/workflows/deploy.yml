@@ -1,63 +1,68 @@
-name: Deploy to VPS
+# Прод: https://remote-mentor.ru
+# Каждый пуш в main собирает сайт и выкатывает его на сервер.
+#
+# Нужен один секрет репозитория: VPS_SSH_KEY — приватный ключ ed25519,
+# публичная половина которого лежит в /root/.ssh/authorized_keys на сервере.
+# Адрес и пользователь секретом не являются: IP и так виден в DNS домена.
+name: deploy
 
 on:
   push:
-    branches:
-      - main
-
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
   group: production-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
+
+env:
+  VPS_HOST: 37.220.86.196
+  VPS_USER: root
+  VPS_PATH: /var/www/remote-landing
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Download repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
-      - name: Build site
+      # Собирается под боевой домен: site в astro.config по умолчанию уже
+      # remote-mentor.ru, поэтому переменные окружения тут не нужны.
+      - name: Сборка
         run: npm run build
 
-      - name: Configure SSH
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+      - name: Ключ доступа
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
-          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/landing_deploy
-          chmod 600 ~/.ssh/landing_deploy
-
-          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-
-      # Уезжает только собранная папка. Исходники, node_modules и служебные
-      # скрипты на боевой сервер больше не попадают.
-      - name: Deploy website
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
+      # rsync на сервере не установлен, поэтому льём tar-потоком.
+      # Каталог сносится целиком: файлы, которых больше нет в сборке,
+      # должны исчезнуть и с прода.
+      - name: Выкатка
         run: |
-          rsync -az --delete \
-            -e "ssh -i ~/.ssh/landing_deploy" \
-            ./dist/ "$VPS_USER@$VPS_HOST:/var/www/remote-landing/"
+          tar czf - -C dist . | ssh -i ~/.ssh/deploy "$VPS_USER@$VPS_HOST" \
+            "rm -rf $VPS_PATH && mkdir -p $VPS_PATH \
+             && tar xzf - -C $VPS_PATH \
+             && chown -R www-data:www-data $VPS_PATH \
+             && find $VPS_PATH -type d -exec chmod 755 {} \; \
+             && find $VPS_PATH -type f -exec chmod 644 {} \;"
 
-      - name: Check deployed website
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
+      # Проверяем не только главную: 404 обязан отвечать 404, иначе где-то
+      # снова включился SPA-фолбэк и поисковик начнёт есть мусор.
+      - name: Проверка
         run: |
-          curl --fail --retry 5 --retry-delay 2 "http://$VPS_HOST/"
+          curl --fail --retry 5 --retry-delay 2 -sSo /dev/null https://remote-mentor.ru/
+          curl --fail --retry 3 -sSo /dev/null https://remote-mentor.ru/en/
+          code=$(curl -s -o /dev/null -w '%{http_code}' https://remote-mentor.ru/definitely-not-a-page)
+          test "$code" = "404" || { echo "битый адрес ответил $code вместо 404"; exit 1; }
+          echo "прод отвечает, 404 честный"

@@ -1,12 +1,12 @@
-# Тестовый стенд: GitHub Pages, https://vassert32.github.io/remote-landing/
-# Собирает ветку redesign при каждом пуше. Это ВРЕМЕННАЯ витрина для
-# заказчика и живёт отдельно от боевого деплоя на VPS (deploy.yml, ветка
-# main). При переезде редизайна на боевой домен этот файл удаляется.
+# Превью: GitHub Pages, https://vassert32.github.io/remote-landing/
+# Собирает ветку preview — безопасная песочница перед выкаткой на прод.
+# Порядок работы: правки в preview → смотрим здесь → мёрж в main → прод.
+# Прод живёт отдельным workflow (deploy.yml, ветка main).
 name: pages-stage
 
 on:
   push:
-    branches: [redesign]
+    branches: [preview]
   workflow_dispatch:
 
 permissions:
