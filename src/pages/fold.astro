@@ -2,26 +2,32 @@
 /**
  * Пробник: лист прилетает на стол и раскладывается. Страница /fold.
  *
- * Загнут левый нижний угол — не плоским треугольником, а завитком: бумага
- * скручивается трубочкой, поэтому у неё блик по внешней дуге и затемнение
- * у линии сгиба. Всё рисуется одним SVG, 3D-ассет не нужен.
+ * Загнут левый нижний угол — завитком, а не плоским треугольником: бумага
+ * скручивается трубочкой, поэтому у неё блик по гребню и тень у сгиба.
+ * Линия сгиба — дуга, не прямая, а у завитка есть острый кончик: это сам
+ * угол листа, укатившийся внутрь.
  *
- * ТЕНИ. Правило «теней нет» не нарушено: ни одного box-shadow и ни одного
- * размытия здесь нет. Вся светотень нарисована градиентами — это не тень
- * объекта, а собственная светотень бумаги, то есть часть её рисунка.
- * Ровно то, о чём говорит правило: плотность вместо размытия.
+ * ТЕНИ. Правило «теней нет» не нарушено: ни box-shadow, ни размытия здесь
+ * нет. Вся светотень нарисована градиентами — это не тень объекта, а
+ * собственная светотень бумаги. Ровно то, о чём правило: плотность вместо
+ * размытия.
  *
- * После выбора страница удаляется, механика переезжает в Hero.
+ * У сцены есть панель настройки: силуэт подбирается ползунками вживую,
+ * значения печатаются строкой снизу. Перед переездом в Hero числа
+ * зашиваются в код, а панель уходит вместе со страницей.
  */
 import '../styles/tokens.css';
 import '../styles/fonts.css';
 import '../styles/base.css';
 import OfferDoc from '../components/OfferDoc.astro';
 
-/** Варианты отличаются только характером прилёта, завиток общий. */
-const takes = [
-  { id: 'toss', n: 'А', title: 'Бросок на стол', note: 'прилетает с наклоном, гасит его о стол и раскладывается' },
-  { id: 'settle', n: 'Б', title: 'Мягкая посадка', note: 'приходит ровно, завиток распускается на подлёте' },
+/** Ползунки: имя, подпись, диапазон, стартовое значение. */
+const knobs = [
+  { id: 'size', label: 'размер завитка, % ширины листа', min: 15, max: 50, step: 1, value: 34 },
+  { id: 'tipX', label: 'кончик по горизонтали', min: 40, max: 100, step: 1, value: 78 },
+  { id: 'tipY', label: 'кончик по вертикали', min: 5, max: 60, step: 1, value: 30 },
+  { id: 'bow', label: 'изгиб линии сгиба', min: -20, max: 30, step: 1, value: 8 },
+  { id: 'fat', label: 'толщина трубочки', min: 0, max: 40, step: 1, value: 16 },
 ];
 ---
 
@@ -35,81 +41,71 @@ const takes = [
   <body>
     <header class="shell probe__head">
       <h1 class="h2">Лист прилетает на стол</h1>
-      <p class="label">служебная страница · крути колесом, движение привязано к скроллу</p>
+      <p class="label">крути колесом — движение по скроллу · ползунками подбирается силуэт завитка</p>
     </header>
 
-    {
-      takes.map((v) => (
-        <section class="stage" data-stage data-kind={v.id}>
-          <div class="shell stage__inner">
-            <div class="stage__meta">
-              <span class="stage__n num-font">{v.n}</span>
-              <h2 class="h3">{v.title}</h2>
-              <p class="label stage__note">{v.note}</p>
+    <section class="stage" data-stage>
+      <div class="shell stage__inner">
+        <div class="knobs">
+          {
+            knobs.map((k) => (
+              <label class="knob">
+                <span class="knob__label label">{k.label}</span>
+                <input
+                  class="knob__range"
+                  type="range"
+                  data-knob={k.id}
+                  min={k.min}
+                  max={k.max}
+                  step={k.step}
+                  value={k.value}
+                />
+                <output class="knob__out num" data-out={k.id}>{k.value}</output>
+              </label>
+            ))
+          }
+          <p class="knob__dump label" data-dump>—</p>
+          <p class="knob__hint label">
+            Подкрути и пришли мне эту строку — зашью числа в код.
+          </p>
+        </div>
+
+        <div class="scene">
+          {/* Тень листа на столе: отдельным слоем, живёт по своему закону —
+              в полёте растянута и разрежена, на столе собирается. */}
+          <div class="drop" data-drop></div>
+
+          <div class="sheet" data-sheet>
+            <div class="sheet__paper" data-paper>
+              <OfferDoc />
             </div>
 
-            <div class="scene">
-              {/* Тень стола: отдельным слоем под листом, потому что живёт
-                  по своему закону — в полёте шире и мягче, на столе собранная. */}
-              <div class="drop" data-drop />
+            {/* Завиток. viewBox фиксированный 100×100, размер задают стили:
+                при распускании меняется одна величина, форма остаётся. */}
+            <svg class="curl" data-curl viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="curl-face" x1="26" y1="26" x2="86" y2="8" gradientUnits="userSpaceOnUse">
+                  {/* У сгиба бумага в тени, по гребню выходит на блик,
+                      на кромке трубочки снова уходит в полутон. */}
+                  <stop offset="0" stop-color="#9c9990"></stop>
+                  <stop offset="0.45" stop-color="#fcfbf8"></stop>
+                  <stop offset="1" stop-color="#cdc9c0"></stop>
+                </linearGradient>
+                <linearGradient id="curl-cast" x1="35" y1="35" x2="105" y2="-5" gradientUnits="userSpaceOnUse">
+                  {/* Затухание нарисовано стопами, а не размытием. */}
+                  <stop offset="0" stop-color="#1c1a16" stop-opacity="0.34"></stop>
+                  <stop offset="0.55" stop-color="#1c1a16" stop-opacity="0.12"></stop>
+                  <stop offset="1" stop-color="#1c1a16" stop-opacity="0"></stop>
+                </linearGradient>
+              </defs>
 
-              <div class="sheet" data-sheet>
-                <div class="sheet__paper" data-paper>
-                  <OfferDoc />
-                </div>
-
-                {/* Завиток. viewBox фиксированный, размер задают стили: при
-                    распускании меняется одна величина, форма и градиенты
-                    остаются на месте. */}
-                <svg
-                  class="curl"
-                  data-curl
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
-                  aria-hidden="true"
-                >
-                  <defs>
-                    <linearGradient
-                      id={`face-${v.id}`}
-                      x1="50"
-                      y1="50"
-                      x2="100"
-                      y2="0"
-                      gradientUnits="userSpaceOnUse"
-                    >
-                      {/* У сгиба бумага в тени, к внешней дуге выходит на блик
-                          и снова уходит в полутон на самом краю трубочки. */}
-                      <stop offset="0" stop-color="#9c9990" />
-                      <stop offset="0.45" stop-color="#fcfbf8" />
-                      <stop offset="1" stop-color="#cdc9c0" />
-                    </linearGradient>
-                    <linearGradient
-                      id={`cast-${v.id}`}
-                      x1="35"
-                      y1="35"
-                      x2="105"
-                      y2="-5"
-                      gradientUnits="userSpaceOnUse"
-                    >
-                      {/* Затухание нарисовано стопами, а не размытием:
-                          у сгиба плотно, к краю сходит в ноль. */}
-                      <stop offset="0" stop-color="#1c1a16" stop-opacity="0.34" />
-                      <stop offset="0.55" stop-color="#1c1a16" stop-opacity="0.12" />
-                      <stop offset="1" stop-color="#1c1a16" stop-opacity="0" />
-                    </linearGradient>
-                  </defs>
-
-                  {/* Тень завитка на листе: тот же контур чуть крупнее, залит
-                      затухающим градиентом. Размытия нет — только плотность. */}
-                  <path class="curl__cast" d="M0,0 C74,2 104,34 104,104 Z" fill={`url(#cast-${v.id})`} />
-                  <path class="curl__face" d="M0,0 C70,0 100,30 100,100 Z" fill={`url(#face-${v.id})`} />
-                </svg>
-              </div>
-            </div>
+              <path class="curl__cast" data-cast fill="url(#curl-cast)"></path>
+              <path class="curl__face" data-face fill="url(#curl-face)"></path>
+            </svg>
           </div>
-        </section>
-      ))
-    }
+        </div>
+      </div>
+    </section>
 
     <section class="stage stage--end">
       <p class="shell label">конец пробника</p>
@@ -120,98 +116,147 @@ const takes = [
       import { ScrollTrigger } from 'gsap/ScrollTrigger';
       gsap.registerPlugin(ScrollTrigger);
 
-      /** Размер завитка в долях ширины листа при полном загибе. */
-      const CURL = 0.28;
+      const stage = document.querySelector<HTMLElement>('[data-stage]')!;
+      const sheet = stage.querySelector<HTMLElement>('[data-sheet]')!;
+      const paper = stage.querySelector<HTMLElement>('[data-paper]')!;
+      const curl = stage.querySelector<SVGElement>('[data-curl]')!;
+      const face = stage.querySelector<SVGPathElement>('[data-face]')!;
+      const cast = stage.querySelector<SVGPathElement>('[data-cast]')!;
+      const drop = stage.querySelector<HTMLElement>('[data-drop]')!;
+      const dump = stage.querySelector<HTMLElement>('[data-dump]')!;
 
-      for (const stage of document.querySelectorAll<HTMLElement>('[data-stage]')) {
-        const kind = stage.dataset.kind;
-        const sheet = stage.querySelector<HTMLElement>('[data-sheet]');
-        const paper = stage.querySelector<HTMLElement>('[data-paper]');
-        const curl = stage.querySelector<SVGElement>('[data-curl]');
-        const drop = stage.querySelector<HTMLElement>('[data-drop]');
-        if (!sheet || !paper || !curl || !drop) continue;
+      const p = { size: 34, tipX: 78, tipY: 30, bow: 8, fat: 16 };
 
-        /* Завиток и вырез на листе — одна величина: бумага не может быть
-           в двух местах сразу, поэтому там, где угол закручен, лист пуст. */
-        const state = { k: 1 };
-        const setCurl = () => {
-          const px = Math.round(paper.offsetWidth * CURL * state.k);
-          gsap.set(curl, { width: px, height: px, autoAlpha: state.k > 0.02 ? 1 : 0 });
-          gsap.set(paper, {
-            clipPath: `polygon(0 0, 100% 0, 100% 100%, ${px}px 100%, 0 calc(100% - ${px}px))`,
-          });
-        };
-        setCurl();
+      /**
+       * Силуэт завитка в системе 100×100. Угол листа — точка (0,100),
+       * P1(0,0) на левой кромке листа, P2(100,100) на нижней.
+       *
+       * Три участка: наружная дуга P1 → кончик, обратная дуга кончик → P2,
+       * и дуга сгиба P2 → P1. В кончике касательные разные, поэтому он
+       * острый — плавное сопряжение и давало «пятно вместо угла».
+       */
+      const path = (o: number) => {
+        const { tipX, tipY, bow, fat } = p;
+        return (
+          `M0,0 ` +
+          `C${(tipX * 0.36).toFixed(1)},${(tipY * 0.2).toFixed(1)} ` +
+          `${(tipX * 0.74).toFixed(1)},${(tipY * 0.4).toFixed(1)} ` +
+          `${tipX + o},${tipY - o * 0.4} ` +
+          `C${(tipX + fat * 0.9 + o).toFixed(1)},${(tipY + fat * 1.5).toFixed(1)} ` +
+          `${(96 + o).toFixed(1)},${(74).toFixed(1)} ${100 + o},${100 + o} ` +
+          `C${(62 - bow).toFixed(1)},${(74 + bow * 0.35).toFixed(1)} ` +
+          `${(28 - bow * 0.5).toFixed(1)},${(40 + bow).toFixed(1)} 0,0 Z`
+        );
+      };
 
-        const tl = gsap.timeline({
-          scrollTrigger: { trigger: stage, start: 'top top', end: '+=140%', pin: true, scrub: 0.65 },
+      /* Вырез на листе идёт по ТОЙ ЖЕ дуге сгиба, поэтому clip-path — это
+         path(), а не polygon(): многоугольником кривую не задать. */
+      const state = { k: 1 };
+      const draw = () => {
+        const px = Math.round(paper.offsetWidth * (p.size / 100) * state.k);
+        face.setAttribute('d', path(0));
+        cast.setAttribute('d', path(4));
+        gsap.set(curl, { width: px, height: px, autoAlpha: state.k > 0.02 ? 1 : 0 });
+
+        const w = paper.offsetWidth;
+        const h = paper.offsetHeight;
+        const b = p.bow / 100;
+        gsap.set(paper, {
+          clipPath:
+            px < 1
+              ? 'none'
+              : `path('M0,0 H${w} V${h} H${px} C${px * (0.62 - b)},${h - px * (0.26 + b * 0.35)} ` +
+                `${px * (0.28 - b * 0.5)},${h - px * (0.6 + b)} 0,${h - px} Z')`,
         });
+      };
 
-        if (kind === 'toss') {
-          // Брошенный лист: приходит снизу с наклоном, гасит его о стол
-          // и только у «касания» распускает угол.
-          gsap.set(sheet, { yPercent: 70, rotate: -7, scale: 1.06, opacity: 0 });
-          gsap.set(drop, { opacity: 0, scaleX: 1.16, scaleY: 1.5 });
-
-          tl.to(sheet, { opacity: 1, duration: 0.16 }, 0)
-            .to(sheet, { yPercent: 0, duration: 0.5, ease: 'power2.out' }, 0)
-            // back.out даёт лёгкий перелёт: лист касается стола и осаживается.
-            .to(sheet, { rotate: 0, scale: 1, duration: 0.62, ease: 'back.out(1.4)' }, 0.08)
-            .to(drop, { opacity: 1, duration: 0.2 }, 0.02)
-            .to(drop, { scaleX: 1, scaleY: 1, duration: 0.55, ease: 'power2.out' }, 0.08)
-            .to(state, { k: 0, duration: 0.42, ease: 'power2.inOut', onUpdate: setCurl }, 0.5);
-        }
-
-        if (kind === 'settle') {
-          // Спокойная подача: угол распускается уже на подлёте.
-          gsap.set(sheet, { yPercent: 46, rotate: -2, opacity: 0 });
-          gsap.set(drop, { opacity: 0, scaleX: 1.1, scaleY: 1.32 });
-
-          tl.to(sheet, { opacity: 1, duration: 0.16 }, 0)
-            .to(sheet, { yPercent: 0, rotate: 0, duration: 0.6, ease: 'power3.out' }, 0)
-            .to(drop, { opacity: 1, duration: 0.2 }, 0.02)
-            .to(drop, { scaleX: 1, scaleY: 1, duration: 0.6, ease: 'power2.out' }, 0.04)
-            .to(state, { k: 0, duration: 0.5, ease: 'power2.out', onUpdate: setCurl }, 0.22);
-        }
-
-        // Ширина листа зависит от окна — при пересчёте обновляем завиток.
-        ScrollTrigger.addEventListener('refresh', setCurl);
+      /* --- Панель настройки ------------------------------------------- */
+      const show = () => {
+        dump.textContent = Object.entries(p)
+          .map(([k, v]) => `${k}=${v}`)
+          .join('  ');
+      };
+      for (const input of stage.querySelectorAll<HTMLInputElement>('[data-knob]')) {
+        const key = input.dataset.knob as keyof typeof p;
+        const out = stage.querySelector<HTMLElement>(`[data-out="${key}"]`)!;
+        input.addEventListener('input', () => {
+          p[key] = Number(input.value);
+          out.textContent = input.value;
+          draw();
+          show();
+        });
       }
+      show();
+      draw();
+
+      /* --- Прилёт ------------------------------------------------------ */
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: stage, start: 'top top', end: '+=140%', pin: true, scrub: 0.65 },
+      });
+
+      // Брошенный лист: приходит снизу с наклоном и чуть крупнее (ближе к
+      // глазу), гасит наклон о стол с лёгким перелётом и только у касания
+      // распускает угол.
+      gsap.set(sheet, { yPercent: 70, rotate: -7, scale: 1.06, opacity: 0 });
+      gsap.set(drop, { opacity: 0, scaleX: 1.16, scaleY: 1.5 });
+
+      tl.to(sheet, { opacity: 1, duration: 0.16 }, 0)
+        .to(sheet, { yPercent: 0, duration: 0.5, ease: 'power2.out' }, 0)
+        .to(sheet, { rotate: 0, scale: 1, duration: 0.62, ease: 'back.out(1.4)' }, 0.08)
+        .to(drop, { opacity: 1, duration: 0.2 }, 0.02)
+        .to(drop, { scaleX: 1, scaleY: 1, duration: 0.55, ease: 'power2.out' }, 0.08)
+        .to(state, { k: 0, duration: 0.42, ease: 'power2.inOut', onUpdate: draw }, 0.5);
+
+      ScrollTrigger.addEventListener('refresh', draw);
     </script>
 
     <style is:global>
-      .probe__head { padding-block: var(--space-16) var(--space-8); display: grid; gap: var(--space-2); }
+      .probe__head { padding-block: var(--space-12) var(--space-6); display: grid; gap: var(--space-2); }
 
       .stage { min-height: 100dvh; display: flex; align-items: center; }
-      .stage--end { min-height: 60dvh; }
+      .stage--end { min-height: 50dvh; }
 
       .stage__inner {
         display: grid;
-        grid-template-columns: minmax(0, 0.75fr) minmax(0, 1fr);
-        gap: var(--space-12);
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+        gap: var(--space-8);
         align-items: center;
       }
       @media (max-width: 900px) {
         .stage__inner { grid-template-columns: minmax(0, 1fr); }
       }
 
-      .stage__meta { display: grid; gap: var(--space-3); align-content: center; }
-      .stage__n { font-size: var(--fs-giant); line-height: 0.8; color: var(--stamp); }
-      .stage__note { max-width: 26ch; }
+      .knobs { display: grid; gap: var(--space-3); align-content: center; }
+      .knob {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.2rem 0.6rem;
+        align-items: center;
+      }
+      .knob__label { grid-column: 1 / -1; }
+      .knob__range { width: 100%; accent-color: var(--stamp); }
+      .knob__out { min-width: 3ch; text-align: right; }
+      .knob__dump {
+        margin-top: var(--space-3);
+        padding: var(--space-3);
+        border: var(--hair) solid var(--line-strong);
+        color: var(--fg);
+        user-select: all;
+      }
+      .knob__hint { color: var(--fg-mute); }
 
-      .scene { position: relative; }
+      /* Лист ужат: тут важно рассмотреть механику, а не натуральный размер. */
+      .scene { position: relative; max-width: 330px; justify-self: center; }
 
-      /* Падающая тень листа. Отдельным слоем, а не box-shadow: ей нужен свой
-         закон движения — в полёте шире и мягче, чем на столе. */
+      /* Тень листа на столе. Нарисованное затухание, не размытие: эллипс
+         плотнее к нижней кромке и сходит в ноль к краям. */
       .drop {
         position: absolute;
         inset: 4% 0 -6% 0;
-        /* Нарисованное затухание, не размытие: эллипс плотнее к низу листа
-           и сходит в ноль к краям. */
         background: radial-gradient(
           ellipse 62% 46% at 50% 96%,
-          rgb(28 26 22 / 0.30),
-          rgb(28 26 22 / 0.10) 55%,
+          rgb(28 26 22 / 0.3),
+          rgb(28 26 22 / 0.1) 55%,
           rgb(28 26 22 / 0) 78%
         );
         transform-origin: 50% 100%;
@@ -221,13 +266,11 @@ const takes = [
       .sheet { position: relative; will-change: transform; }
       .sheet__paper { position: relative; }
 
-      /* Завиток сидит в левом нижнем углу листа и распускается в ноль.
-         Контур нарисован для правого верхнего угла, здесь он зеркалится. */
+      /* Завиток сидит в левом нижнем углу листа и распускается в ноль. */
       .curl {
         position: absolute;
         left: 0;
         bottom: 0;
-        transform: scale(-1, -1);
         overflow: visible;
         pointer-events: none;
       }
