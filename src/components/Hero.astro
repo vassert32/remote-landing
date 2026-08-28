@@ -77,7 +77,47 @@ const total = i;
         </div>
 
         <figure class="hero__aside" data-hero-doc>
-          <OfferDoc />
+          <!-- Тень листа на столе: нарисованное затухание, не размытие.
+               Без мотора скрыта — статичный лист лежит как раньше. -->
+          <div class="hero__drop" data-doc-drop aria-hidden="true"></div>
+
+          <div class="hero__sheet">
+            <div class="hero__paper" data-doc-paper>
+              <OfferDoc />
+            </div>
+
+            <!-- Завиток левого нижнего угла. Силуэт подобран заказчиком в
+                 пробнике /fold: size=50 tipX=100 tipY=5 bow=2 fat=0.
+                 Мотор распускает его на «посадке» листа; вырез на листе
+                 идёт по той же дуге сгиба (clip-path в motion.ts). -->
+            <svg
+              class="hero__curl"
+              data-doc-curl
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <linearGradient id="hero-curl-face" x1="26" y1="26" x2="86" y2="8" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#9c9990"></stop>
+                  <stop offset="0.45" stop-color="#fcfbf8"></stop>
+                  <stop offset="1" stop-color="#cdc9c0"></stop>
+                </linearGradient>
+                <linearGradient id="hero-curl-cast" x1="35" y1="35" x2="105" y2="-5" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#1c1a16" stop-opacity="0.34"></stop>
+                  <stop offset="0.55" stop-color="#1c1a16" stop-opacity="0.12"></stop>
+                  <stop offset="1" stop-color="#1c1a16" stop-opacity="0"></stop>
+                </linearGradient>
+              </defs>
+              <path
+                class="hero__curl-cast"
+                d="M0,0 C36,1 74,2 104,3.4 C104,5 100,74 104,104 C60,74.7 27,42 0,0 Z"
+                fill="url(#hero-curl-cast)"></path>
+              <path
+                d="M0,0 C36,1 74,2 100,5 C100,5 96,74 100,100 C60,74.7 27,42 0,0 Z"
+                fill="url(#hero-curl-face)"></path>
+            </svg>
+          </div>
         </figure>
       </div>
     </div>
@@ -211,9 +251,44 @@ const total = i;
   }
 
   .hero__aside {
+    position: relative;
     grid-column: 8 / 13;
     margin: 0;
   }
+
+  .hero__sheet { position: relative; }
+  .hero__paper { position: relative; }
+
+  /* Тень листа на столе: эллипс затухающей плотности, без размытия.
+     Появляется только под мотором — растянутая в «полёте», собирается
+     при посадке. */
+  .hero__drop {
+    position: absolute;
+    inset: 4% 0 -6% 0;
+    background: radial-gradient(
+      ellipse 62% 46% at 50% 96%,
+      rgb(28 26 22 / 0.3),
+      rgb(28 26 22 / 0.1) 55%,
+      rgb(28 26 22 / 0) 78%
+    );
+    transform-origin: 50% 100%;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  /* Завиток: без мотора скрыт, лист остаётся обычным. Размер и вырез
+     на листе ведёт мотор — они меняются одной величиной. */
+  .hero__curl {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .hero__curl-cast { transform: translate(2px, 3px); }
 
 
   /* --- Наложение фаз в режиме мотора ------------------------------------ */

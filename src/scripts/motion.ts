@@ -135,6 +135,9 @@ function initHeroScene(): void {
   const marksHl = scene.querySelectorAll<HTMLElement>('[data-hero-lead] .mark__hl');
   const doc = scene.querySelector<HTMLElement>('[data-hero-doc]');
   const stamp = scene.querySelector<HTMLElement>('[data-hero-stamp]');
+  const docPaper = scene.querySelector<HTMLElement>('[data-doc-paper]');
+  const docCurl = scene.querySelector<SVGElement>('[data-doc-curl]');
+  const docDrop = scene.querySelector<HTMLElement>('[data-doc-drop]');
 
   // На фазе вопроса хедера нет (страховку от не доехавшего мотора
   // снимает инлайн-скрипт в SiteNav).
@@ -151,9 +154,36 @@ function initHeroScene(): void {
   // Накладка маркера: не прочерчена. CSS держит противоположное — залито
   // целиком — на случай, когда мотор не доехал.
   gsap.set(marksHl, { clipPath: 'inset(0 100% 0 0)' });
-  // Лист приходит из-за нижней кромки экрана: это подача документа,
-  // а не появление карточки интерфейса.
-  if (doc) gsap.set(doc, { opacity: 0, y: () => window.innerHeight * 0.62, rotate: 1.5 });
+  // Лист приходит из-за нижней кромки экрана как брошенный на стол:
+  // с наклоном и чуть крупнее (ближе к глазу). Наклон гасится о «стол».
+  if (doc) gsap.set(doc, { opacity: 0, y: () => window.innerHeight * 0.62, rotate: -7, scale: 1.06 });
+  if (docDrop) gsap.set(docDrop, { scaleX: 1.16, scaleY: 1.5 });
+
+  /*
+   * Завиток угла. Пока лист летит, левый нижний угол закручен трубочкой;
+   * на посадке распускается. Величина одна на всё: размер SVG-завитка и
+   * вырез на листе (там, где угол закручен, бумаги нет) идут в ногу.
+   * Силуэт подобран заказчиком в пробнике /fold: size=50 bow=2.
+   */
+  const CURL_SIZE = 0.5;
+  const curlState = { k: 1 };
+  const drawCurl = () => {
+    if (!docCurl || !docPaper) return;
+    const px = Math.round(docPaper.offsetWidth * CURL_SIZE * curlState.k);
+    gsap.set(docCurl, { width: px, height: px, autoAlpha: px > 2 ? 1 : 0 });
+    const w = docPaper.offsetWidth;
+    const h = docPaper.offsetHeight;
+    gsap.set(docPaper, {
+      clipPath:
+        px < 1
+          ? 'none'
+          : `path('M0,0 H${w} V${h} H${px} C${(px * 0.6).toFixed(1)},${(h - px * 0.267).toFixed(1)} ` +
+            `${(px * 0.27).toFixed(1)},${(h - px * 0.62).toFixed(1)} 0,${h - px} Z')`,
+    });
+  };
+  drawCurl();
+  // Размер листа зависит от окна: после пересчёта перерисовываем завиток.
+  ScrollTrigger.addEventListener('refresh', drawCurl);
 
   // Пока идёт пересчёт, запиненная сцена прогоняется до конца: и progress,
   // и scroll() кратковременно показывают конец пина. Любое «сработай один
@@ -267,9 +297,21 @@ function initHeroScene(): void {
   );
   tl.to(rises, { opacity: 1, y: 0, duration: 0.16, ease: 'power2.out', stagger: 0.04 }, 0.62);
 
-  // Лист подаётся ПОСЛЕ основного текста и заметно спокойнее его: сначала
-  // читаешь обещание, потом получаешь на руки бумагу.
-  if (doc) tl.to(doc, { opacity: 1, y: 0, rotate: 0, duration: 0.46, ease: 'power2.out' }, 0.72);
+  // Лист подаётся ПОСЛЕ основного текста: сначала читаешь обещание, потом
+  // получаешь на руки бумагу. Подъём и выправление разнесены: back.out
+  // на выправлении даёт лёгкий перелёт — лист «касается стола» и оседает.
+  if (doc) {
+    tl.to(doc, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 0.68);
+    tl.to(doc, { rotate: 0, scale: 1, duration: 0.44, ease: 'back.out(1.4)' }, 0.74);
+  }
+  if (docDrop) {
+    tl.to(docDrop, { opacity: 1, duration: 0.12 }, 0.72);
+    tl.to(docDrop, { scaleX: 1, scaleY: 1, duration: 0.4, ease: 'power2.out' }, 0.76);
+  }
+  // Угол распускается после посадки, перед печатью.
+  if (docCurl && docPaper) {
+    tl.to(curlState, { k: 0, duration: 0.22, ease: 'power2.inOut', onUpdate: drawCurl }, 0.97);
+  }
 
   // Печать прикладывается в конце: быстрый удар, а не проявление.
   if (stamp) {

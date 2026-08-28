@@ -23,11 +23,11 @@ import OfferDoc from '../components/OfferDoc.astro';
 
 /** Ползунки: имя, подпись, диапазон, стартовое значение. */
 const knobs = [
-  { id: 'size', label: 'размер завитка, % ширины листа', min: 15, max: 50, step: 1, value: 34 },
-  { id: 'tipX', label: 'кончик по горизонтали', min: 40, max: 100, step: 1, value: 78 },
-  { id: 'tipY', label: 'кончик по вертикали', min: 5, max: 60, step: 1, value: 30 },
-  { id: 'bow', label: 'изгиб линии сгиба', min: -20, max: 30, step: 1, value: 8 },
-  { id: 'fat', label: 'толщина трубочки', min: 0, max: 40, step: 1, value: 16 },
+  { id: 'size', label: 'размер завитка, % ширины листа', min: 15, max: 70, step: 1, value: 50 },
+  { id: 'tipX', label: 'кончик по горизонтали', min: 40, max: 120, step: 1, value: 100 },
+  { id: 'tipY', label: 'кончик по вертикали', min: 0, max: 60, step: 1, value: 5 },
+  { id: 'bow', label: 'изгиб линии сгиба', min: -20, max: 30, step: 1, value: 2 },
+  { id: 'fat', label: 'толщина трубочки', min: 0, max: 40, step: 1, value: 0 },
 ];
 ---
 
@@ -125,7 +125,7 @@ const knobs = [
       const drop = stage.querySelector<HTMLElement>('[data-drop]')!;
       const dump = stage.querySelector<HTMLElement>('[data-dump]')!;
 
-      const p = { size: 34, tipX: 78, tipY: 30, bow: 8, fat: 16 };
+      const p = { size: 50, tipX: 100, tipY: 5, bow: 2, fat: 0 };
 
       /**
        * Силуэт завитка в системе 100×100. Угол листа — точка (0,100),
