@@ -98,9 +98,9 @@ export const en = {
       "I'm Evgeny, a backend engineer. I went through the entire grind of the " +
         'tech industry and reached the international market on my own: I started ' +
         'at 19, and by 21 I was already working remotely for a foreign company.',
-      'You work with me, not with a team of coordinators: your CV, applications, ' +
-        'interview debriefs and offer negotiation all go through me personally. ' +
-        'No group chats, no recorded lessons.',
+      'With me, not a team of coordinators, we go through your CV, applications, ' +
+        'interviews and offer negotiation. All of it personally — no group chats, ' +
+        'no recorded lessons.',
       'Why you can trust this: I am not selling access to materials. My income is tied ' +
         'to your offer. Until you start the job, I earn exactly nothing.',
     ],
