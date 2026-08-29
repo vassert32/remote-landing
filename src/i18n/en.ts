@@ -115,7 +115,8 @@ export const en = {
     panelTag: 'income by stage',
     chartLabel: 'Income growth across career stages',
     timeStart: '2024',
-    timeEnd: '2025',
+    timeMid: '2025',
+    timeEnd: '2026',
     points: [
       {
         value: 0,
