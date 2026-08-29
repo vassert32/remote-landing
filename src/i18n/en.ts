@@ -50,7 +50,6 @@ export const en = {
 
   socials: [
     { name: 'Telegram', icon: 'ph:telegram-logo', key: 'telegram' },
-    { name: 'GitHub', icon: 'ph:github-logo', key: 'github' },
     { name: 'Email', icon: 'ph:envelope-simple', key: 'email' },
     { name: 'Instagram', icon: 'ph:instagram-logo', key: 'instagram' },
   ],

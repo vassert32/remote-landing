@@ -17,10 +17,8 @@ export function t(lang: string | undefined): typeof ru {
 /** Постоянные ссылки, одинаковые для обоих языков. */
 export const links = {
   telegram: 'https://t.me/gerkulesov35',
-  // TODO(заказчик): реальные адреса — пустая строка рендерит слот неактивным.
-  github: '',
-  email: '',
-  instagram: '',
+  email: 'mailto:akbjenya@gmail.com',
+  instagram: 'https://www.instagram.com/hercules_eugene/',
 };
 
 /** Адрес соцсети по ключу из словаря. */

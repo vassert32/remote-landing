@@ -49,9 +49,9 @@ export const ru = {
     text: 'Адрес набран с ошибкой или страницу убрали. Всё, что есть, собрано на главной.',
   },
 
+  /* GitHub вырезан по решению заказчика: профиль показывать не хочет. */
   socials: [
     { name: 'Telegram', icon: 'ph:telegram-logo', key: 'telegram' },
-    { name: 'GitHub', icon: 'ph:github-logo', key: 'github' },
     { name: 'Почта', icon: 'ph:envelope-simple', key: 'email' },
     { name: 'Instagram', icon: 'ph:instagram-logo', key: 'instagram' },
   ],
