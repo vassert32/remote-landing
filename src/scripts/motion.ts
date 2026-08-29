@@ -609,9 +609,28 @@ function initSnapDesktop(lenis: Lenis): void {
  */
 function initSnapMobile(lenis: Lenis): void {
   // Точек hero здесь нет: за сцену отвечает отдельный сторож в initHeroScene.
+  //
+  // У Программы точек три — по её мобильному флоу:
+  //  - вход: верх секции, как у всех блоков;
+  //  - «полоса прилипла»: низ заголовочного блока ушёл за кромку — на
+  //    экране полоса и этапы, огрызок заголовка не болтается под хедером
+  //    (довод сюда работает как во всех прочих блоках);
+  //  - финал: низ секции у низа экрана — шестой этап целиком под полосой.
   let snapPoints: number[] = [];
   const rebuildSnaps = () => {
-    snapPoints = collectSnapPoints();
+    snapPoints = [];
+    for (const el of document.querySelectorAll<HTMLElement>(
+      'main section:not([data-hero]), footer.closer',
+    )) {
+      snapPoints.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
+    }
+    const rail = document.querySelector<HTMLElement>('[data-program] .program__rail');
+    if (rail) snapPoints.push(Math.round(rail.getBoundingClientRect().bottom + window.scrollY));
+    const prog = document.querySelector<HTMLElement>('[data-program]');
+    if (prog) {
+      const exit = Math.round(prog.getBoundingClientRect().bottom + window.scrollY - window.innerHeight);
+      snapPoints.push(exit);
+    }
   };
   rebuildSnaps();
 
