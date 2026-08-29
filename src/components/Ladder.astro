@@ -30,7 +30,10 @@ const fmt = new Intl.NumberFormat(c.locale);
             style={`--w:${point.weight.toFixed(3)}`}
             tabindex="0"
           >
-            <div class="col__story" role="note">
+            {/* data-reveal-mobile: на ≤560 история — обычная карточка в
+                потоке и появляется мотором вместе с контентом; на десктопе
+                она всплывает по ховеру, общий reveal ей противопоказан. */}
+            <div class="col__story" role="note" data-reveal-mobile="up">
               <p>{point.story}</p>
             </div>
 

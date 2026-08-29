@@ -801,6 +801,12 @@ function initSectionEntrances(): void {
     const bars = section.querySelectorAll<HTMLElement>('[data-reveal="bar"]');
     const rules = section.querySelectorAll<HTMLElement>('[data-reveal="rule"]');
     const counters = section.querySelectorAll<HTMLElement>('[data-count-to]');
+    // Элементы, которые входят с контентом ТОЛЬКО на телефоне: истории
+    // лестницы на десктопе всплывают по ховеру, и общий reveal затёр бы
+    // их скрытое состояние инлайн-стилями.
+    const mobRises = window.matchMedia('(max-width: 560px)').matches
+      ? section.querySelectorAll<HTMLElement>('[data-reveal-mobile="up"]')
+      : null;
 
     if (!words.length && !blurWords.length && !rises.length && !bars.length && !rules.length && !counters.length) {
       continue;
@@ -856,6 +862,22 @@ function initSectionEntrances(): void {
     }
     if (rises.length) {
       tl.fromTo(rises, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.06 }, 0.22);
+    }
+    if (mobRises?.length) {
+      // После входа инлайн-стили снимаются: при повороте в десктоп
+      // управление возвращается CSS (там история скрыта до ховера).
+      tl.fromTo(
+        mobRises,
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.06,
+          onComplete: () => gsap.set(mobRises, { clearProps: 'opacity,transform' }),
+        },
+        0.26,
+      );
     }
     if (bars.length) {
       tl.fromTo(bars, { scaleY: 0 }, { scaleY: 1, duration: 0.8, stagger: 0.075 }, 0.3);

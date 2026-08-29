@@ -242,16 +242,19 @@ const total = i;
     .hero__lead { max-width: none; font-size: var(--fs-body); }
     .hero__q { font-size: clamp(1.75rem, 1.1rem + 3.4vw, 2.4rem); }
 
-    /* Кнопки в ряд: столбик из двух съедал ~120px высоты фазы. */
+    /* Кнопки в ряд: столбик из двух съедал ~120px высоты фазы.
+       Стрелки на этой ширине не помещаются вместе с полными лейблами —
+       левая кнопка распиралась текстом до краёв; без них обе кнопки
+       ровные, текст по центру. */
     .hero__actions { gap: var(--space-2); flex-wrap: nowrap; }
     .hero__actions .btn {
-      flex: 1 1 0;
+      flex: 1 1 auto;
       min-width: 0;
-      justify-content: space-between;
-      gap: var(--space-2);
-      padding: 0.8rem 0.85rem;
+      justify-content: center;
+      padding: 0.8rem 0.6rem;
       font-size: var(--fs-small);
     }
     .hero__actions .btn > span { white-space: nowrap; }
+    .hero__actions .btn :global(.btn__arrow) { display: none; }
   }
 </style>
