@@ -226,12 +226,13 @@ const alt = otherLang(Astro.currentLocale);
   :global(html:not(.motion)) .nav,
   :global(html:not(.motion)) .veil { --nav-t: 1; }
 
-  /* На таче вуали нет. Две причины (DESIGN.md §14, М4): masked
-     backdrop-filter белит тёмные секции, пока в них играют entrance-твины
-     (Chromium теряет секцию из бэкдропа и блюрит фон html), и мажет
-     заголовки, которые на телефоне стоят почти сразу под хедером.
+  /* На таче И на узких окнах вуали нет. Две причины (DESIGN.md §14, М4):
+     masked backdrop-filter белит тёмные секции, пока в них играют
+     entrance-твины (Chromium теряет секцию из бэкдропа и блюрит фон html),
+     и мажет заголовки, которые в мобильной вёрстке стоят почти сразу под
+     хедером — узкое десктоп-окно с мышью ловит ровно ту же грязь.
      Difference-хедер читается на любом фоне и без подложки. */
-  @media (hover: none), (pointer: coarse) {
+  @media (hover: none), (pointer: coarse), (max-width: 900px) {
     .veil { display: none; }
   }
 
