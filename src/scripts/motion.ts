@@ -490,7 +490,33 @@ function initProgram(): void {
       }),
     );
 
-    return () => triggers.forEach((t) => t.kill());
+    /*
+     * Пин шапки (заголовок + полоса): держится, пока крутятся этапы, и
+     * отпускается РОВНО на кадре «низ секции у низа экрана» — в этот
+     * момент шестой этап стоит целиком под шапкой, и дальше вся страница
+     * едет единым куском. pinSpacing: false — спейсер держит исходное
+     * место шапки, этапы не прыгают; добавочной высоты пин не даёт.
+     */
+    const lead = root.querySelector<HTMLElement>('.program__lead');
+    let leadPin: ScrollTrigger | null = null;
+    if (lead) {
+      leadPin = ScrollTrigger.create({
+        trigger: lead,
+        start: 'top top',
+        endTrigger: root,
+        end: 'bottom bottom',
+        pin: true,
+        pinSpacing: false,
+        // Градиент-шлейф под шапкой живёт только в запиненном состоянии.
+        onToggle: (self) => lead.classList.toggle('is-pinned', self.isActive),
+      });
+    }
+
+    return () => {
+      triggers.forEach((t) => t.kill());
+      leadPin?.kill();
+      lead?.classList.remove('is-pinned');
+    };
   });
 }
 
