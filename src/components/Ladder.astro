@@ -47,7 +47,10 @@ const fmt = new Intl.NumberFormat(c.locale);
               </span>
             </span>
 
-            <span class="col__stage">
+            {/* На телефоне подпись этапа входит с контентом (тот же
+                mobile-канал, что истории); на десктопе она под столбиком
+                и живёт статично — бары растут сами. */}
+            <span class="col__stage" data-reveal-mobile="up">
               <Icon name={point.icon} class="col__stage-icon" aria-hidden="true" />
               {point.stage}
             </span>
