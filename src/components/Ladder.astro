@@ -52,6 +52,14 @@ const fmt = new Intl.NumberFormat(c.locale);
         ))
       }
     </ol>
+
+    <!-- Ось времени: весь путь на графике прожит за два года. Стрелка
+         по ходу чтения, старт слева, оффер к концу 2025-го. -->
+    <div class="ladder__time">
+      <span class="ladder__time-cap">{c.ladder.timeStart}</span>
+      <span class="ladder__time-line" data-reveal="rule"></span>
+      <span class="ladder__time-cap ladder__time-cap--end">{c.ladder.timeEnd}</span>
+    </div>
     </div>
   </div>
 </section>
@@ -173,7 +181,45 @@ const fmt = new Intl.NumberFormat(c.locale);
   .col--peak .col__stage { color: var(--fg); font-weight: var(--fw-strong); }
   .col--peak .col__stage-icon { color: var(--stamp); }
 
+  /* Ось времени под графиком: подписи в манере полосы маршрута Программы
+     (моно-микро, финальный год оранжевый), линия прочерчивается мотором
+     слева направо — по ходу времени. Пока только десктоп. */
+  .ladder__time {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: var(--space-4);
+    margin-top: clamp(1.4rem, 1rem + 1.4vw, 2.2rem);
+  }
+  .ladder__time-cap {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-medium);
+    letter-spacing: var(--tr-mono);
+    color: var(--fg-mute);
+  }
+  .ladder__time-cap--end { color: var(--stamp); }
+  .ladder__time-line {
+    position: relative;
+    height: var(--hair);
+    background: var(--line-strong);
+    transform-origin: left center;
+  }
+  /* Наконечник: шеврон в толщину хэйрлайна, без заливок. */
+  .ladder__time-line::after {
+    content: "";
+    position: absolute;
+    right: 1px;
+    top: 50%;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-top: var(--hair) solid var(--fg-mute);
+    border-right: var(--hair) solid var(--fg-mute);
+    transform: translateY(-50%) rotate(45deg);
+  }
+
   @media (max-width: 900px) {
+    .ladder__time { display: none; }
     .ladder__title, .ladder__body { grid-column: 1 / -1; }
     .cols { --field: clamp(8rem, 3rem + 15vw, 12rem); column-gap: 0.7rem; }
     .col__bar { width: 100%; padding-inline: 0.45rem; }

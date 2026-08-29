@@ -96,7 +96,8 @@ export const en = {
     ],
     paragraphs: [
       "I'm Evgeny, a backend engineer. I went through the entire grind of the " +
-        'tech industry and reached the international market on my own.',
+        'tech industry and reached the international market on my own: I started ' +
+        'at 19, and by 21 I was already working remotely for a foreign company.',
       'You work with me, not with a team of coordinators: your CV, applications, ' +
         'interview debriefs and offer negotiation all go through me personally. ' +
         'No group chats, no recorded lessons.',
@@ -113,6 +114,8 @@ export const en = {
       'lost and what interviews actually ask about.',
     panelTag: 'income by stage',
     chartLabel: 'Income growth across career stages',
+    timeStart: '2024',
+    timeEnd: '2025',
     points: [
       {
         value: 0,
