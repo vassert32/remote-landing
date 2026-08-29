@@ -601,21 +601,17 @@ function initSnapDesktop(lenis: Lenis): void {
 }
 
 /**
- * Мобильная вёрстка (≤900): правила заказчика.
- *  1. Доводка только В НАПРАВЛЕНИИ последней прокрутки: вниз — только
- *     вниз, вверх — только вверх. Проскочил границу — назад не тащит.
- *  2. «20/60/20»: доводит только последние ≤20% экрана до границы блока;
- *     остановка в средних 60% — осознанная позиция, её не трогаем.
+ * Мобильная вёрстка (≤900): доводчик с пониженным порогом — тянет к
+ * ближайшей границе блока в пределах 20% экрана, в обе стороны (правило
+ * направления откатано заказчиком: «просто порог понизили и норм»).
+ * Остановка дальше порога — осознанная позиция читателя, её не трогаем.
  */
 function initSnapMobile(lenis: Lenis): void {
   // Точек hero здесь нет: за сцену отвечает отдельный сторож в initHeroScene.
   //
-  // У Программы точек три — по её мобильному флоу:
-  //  - вход: верх секции, как у всех блоков;
-  //  - «полоса прилипла»: низ заголовочного блока ушёл за кромку — на
-  //    экране полоса и этапы, огрызок заголовка не болтается под хедером
-  //    (довод сюда работает как во всех прочих блоках);
-  //  - финал: низ секции у низа экрана — шестой этап целиком под полосой.
+  // У Программы точки две: вход (верх секции, как у всех блоков — шапка
+  // с заголовком и полосой сразу запинена) и финал (низ секции у низа
+  // экрана — шестой этап целиком под шапкой).
   let snapPoints: number[] = [];
   const rebuildSnaps = () => {
     snapPoints = [];
@@ -624,8 +620,6 @@ function initSnapMobile(lenis: Lenis): void {
     )) {
       snapPoints.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
     }
-    const rail = document.querySelector<HTMLElement>('[data-program] .program__rail');
-    if (rail) snapPoints.push(Math.round(rail.getBoundingClientRect().bottom + window.scrollY));
     const prog = document.querySelector<HTMLElement>('[data-program]');
     if (prog) {
       const exit = Math.round(prog.getBoundingClientRect().bottom + window.scrollY - window.innerHeight);
@@ -633,18 +627,6 @@ function initSnapMobile(lenis: Lenis): void {
     }
   };
   rebuildSnaps();
-
-  // Направление держим по фактическому движению, а не по последнему событию
-  // ввода: инерция колеса продолжает везти страницу после отпускания.
-  let dirDown = true;
-  let lastY = lenis.scroll;
-  lenis.on('scroll', () => {
-    const y = lenis.scroll;
-    if (Math.abs(y - lastY) > 0.5) {
-      dirDown = y > lastY;
-      lastY = y;
-    }
-  });
 
   /*
    * Остановку ловим по неподвижности: два тика подряд на одном месте и
@@ -661,12 +643,12 @@ function initSnapMobile(lenis: Lenis): void {
     prevY = y;
     if (!still || Math.abs(lenis.velocity) > 0.05) return;
 
-    // Ближайшая граница строго по направлению и не дальше 20% экрана.
+    // Ближайшая граница в обе стороны, не дальше 20% экрана.
     const reach = window.innerHeight * 0.2;
     let best = -1;
     let bestDist = Infinity;
     for (const p of snapPoints) {
-      const d = dirDown ? p - y : y - p;
+      const d = Math.abs(p - y);
       if (d < 2 || d > reach) continue;
       if (d < bestDist) {
         best = p;

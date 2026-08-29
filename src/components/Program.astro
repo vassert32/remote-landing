@@ -8,33 +8,38 @@ const roadmap = c.program.steps;
 <section class="section program" id="programma" data-band="dark" data-program>
   <!-- Пин-зона: на десктопе с мотором этапы едут горизонтально -->
   <div class="program__pin" data-program-pin>
-    <div class="shell program__rail">
-      <div class="program__head">
-        <h2 class="h2" data-split>{c.program.title}</h2>
-        <p class="body" data-reveal="blur">{c.program.body}</p>
-      </div>
+    <!-- Шапка секции. На десктопе обёртка прозрачна (display: contents),
+         на мобиле — единый sticky-блок: хедер → заголовок → полоса, и
+         этапы крутятся под ним до конца секции. -->
+    <div class="program__lead">
+      <div class="shell program__rail">
+        <div class="program__head">
+          <h2 class="h2" data-split>{c.program.title}</h2>
+          <p class="body" data-reveal="blur">{c.program.body}</p>
+        </div>
 
-      <div class="program__counter num-font" aria-hidden="true">
-        <span class="program__digits">
-          <span class="program__reel" data-program-digits>
-            {roadmap.map((step) => <span class="program__digit">{step.num}</span>)}
+        <div class="program__counter num-font" aria-hidden="true">
+          <span class="program__digits">
+            <span class="program__reel" data-program-digits>
+              {roadmap.map((step) => <span class="program__digit">{step.num}</span>)}
+            </span>
           </span>
-        </span>
-        <span class="program__total">/ {roadmap[roadmap.length - 1]!.num}</span>
+          <span class="program__total">/ {roadmap[roadmap.length - 1]!.num}</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Маршрутная полоса: шесть равных сегментов от старта до оффера.
-         Пропорции условные, поэтому сроков внутри сегментов нет — только
-         общая длительность, уже заявленная на странице. -->
-    <div class="shell program__route">
-      <span class="program__route-cap">{c.program.routeFrom}</span>
-      <span class="program__route-line">
-        {roadmap.map((step) => <span class="program__route-seg" data-route-seg data-num={step.num}></span>)}
-        <span class="program__progress" data-program-progress></span>
-      </span>
-      <span class="program__route-cap program__route-cap--end">{c.program.routeTo}</span>
-      <span class="program__route-span">{c.program.routeSpan}</span>
+      <!-- Маршрутная полоса: шесть равных сегментов от старта до оффера.
+           Пропорции условные, поэтому сроков внутри сегментов нет — только
+           общая длительность, уже заявленная на странице. -->
+      <div class="shell program__route">
+        <span class="program__route-cap">{c.program.routeFrom}</span>
+        <span class="program__route-line">
+          {roadmap.map((step) => <span class="program__route-seg" data-route-seg data-num={step.num}></span>)}
+          <span class="program__progress" data-program-progress></span>
+        </span>
+        <span class="program__route-cap program__route-cap--end">{c.program.routeTo}</span>
+        <span class="program__route-span">{c.program.routeSpan}</span>
+      </div>
     </div>
 
     <div class="program__viewport">
@@ -56,6 +61,10 @@ const roadmap = c.program.steps;
 </section>
 
 <style>
+  /* Шапка: на десктопе обёртка невидима для лейаута — rail и route
+     остаются прямыми детьми пин-флекса, как и были. */
+  .program__lead { display: contents; }
+
   /* Рейка: слева заголовок с вводкой, справа скромный счётчик. */
   .program__rail {
     display: flex;
@@ -200,28 +209,30 @@ const roadmap = c.program.steps;
     .program__step:hover .program__num { color: var(--stamp); }
   }
 
-  /* --- Телефон и планшет: этапы укатываются под прилипшую полосу -------- */
+  /* --- Телефон и планшет: этапы крутятся под запиненной шапкой ---------- */
   @media (max-width: 900px) {
-    .program__rail { flex-direction: column; align-items: flex-start; margin-bottom: var(--space-6); }
+    /* Шапка секции — единый sticky-блок: заголовок «Сопровождение всего
+       маршрута» + полоса маршрута. Запинен под хедером ДО КОНЦА прокрутки
+       всех этапов: порядок на экране всегда хедер → заголовок → полоса →
+       этапы. Фон непрозрачный — этапы ныряют под шапку и исчезают.
+       Паддинг-верх ставит заголовок НИЖЕ зоны вуали (~98px), иначе блюр
+       мылит верхнюю строку цветными каёмками. z-index поднят над этапами:
+       их entrance-транзформы создают stacking contexts на том же уровне. */
+    .program__lead {
+      display: block;
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: var(--bg);
+      padding-block: calc(var(--nav-h) + var(--space-8)) var(--space-3);
+    }
+
+    .program__rail { flex-direction: column; align-items: flex-start; margin-bottom: var(--space-4); }
     .program__counter { display: none; }
     /* Интро на телефоне не несёт нового: полоса и этапы говорят сами. */
     .program__head > :global(.body) { display: none; }
     .program__route-span { display: none; }
-
-    /* Полоса маршрута прилипает под хедером и висит до конца секции:
-       этапы уходят ПОД неё, а выше — остаются видны и тают в вуали
-       хедера (решение заказчика: текст не обрубать, текст читаем до
-       последнего). z-index поднят над этапами — их entrance-транзформы
-       создают stacking contexts на том же уровне. */
-    .program__route {
-      grid-template-columns: auto 1fr auto;
-      position: sticky;
-      top: calc(var(--nav-h) + var(--space-2));
-      z-index: 3;
-      background: var(--bg);
-      padding-block: var(--space-2) var(--space-3);
-      margin-bottom: var(--space-6);
-    }
+    .program__route { grid-template-columns: auto 1fr auto; }
 
     /* Цифре — свой столбик: впритык к заголовку она читалась приклеенной. */
     .program__num { min-width: 1.9rem; }
@@ -232,10 +243,10 @@ const roadmap = c.program.steps;
     .program__progress { display: none; }
 
     /* Хвост секции: в финальном кадре шестой этап стоит ЦЕЛИКОМ видимым
-       сразу под полосой (под полосу не ныряет — решение заказчика), и
-       только дальше начинает заезжать светлый блок вопросов. Слагаемые:
-       100svh минус (низ полосы ~7rem + этап ~12rem); выверено на 375×812. */
-    .program__pin { padding-bottom: calc(100svh - 19rem); }
+       сразу под шапкой (под неё не ныряет — решение заказчика), и только
+       дальше прокручивается вся страница до бумаги. Слагаемые: 100svh
+       минус (низ шапки ~14.5rem + этап ~12rem); проверяется на 375×812. */
+    .program__pin { padding-bottom: calc(100svh - 27rem); }
   }
 
   /* --- Горизонтальная сцена: только десктоп с мотором ------------------- */
