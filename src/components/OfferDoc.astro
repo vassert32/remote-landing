@@ -131,18 +131,24 @@ const { hidden = false } = Astro.props;
     color: #d9531e;
   }
 
-  /* Телефон: поля бланка ужимаются, строки становятся в одну колонку. */
+  /* Телефон: бланк компактный — в герое фаза ответа живёт под пином и
+     обязана влезать в svh-экран вместе с текстом и кнопками (DESIGN.md
+     §14, М1б). Кегли на ступень ниже, поля туже; иерархия строк та же. */
   @media (max-width: 780px) {
     .offer { --offer-pad: 1.1rem; }
-    .offer__head { padding-block: 1rem 0.8rem; }
-    .offer__body { padding-block: 0.2rem 0.5rem; }
-    .offer__row { padding-block: 0.55rem; }
-    .offer__sign { padding-block: 0.9rem 1.1rem; }
+    .offer__head { padding-block: 0.7rem 0.55rem; }
+    .offer__title { font-size: var(--fs-micro); }
+    .offer__body { padding-block: 0.15rem 0.4rem; }
+    .offer__row { padding-block: 0.42rem; }
+    .offer__val { font-size: var(--fs-small); }
+    .offer__sign { padding-block: 0.7rem 0.8rem; }
+    .offer__sign-line { height: 1.2em; width: min(11rem, 100%); }
+    .offer__stamp { font-size: var(--fs-micro); padding: 0.4rem 0.75rem; }
   }
 
   @media (max-width: 560px) {
-    .offer__row { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
-    .offer__sign { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
-    .offer__stamp { align-self: flex-end; margin-top: -2.4rem; }
+    .offer__row { grid-template-columns: minmax(0, 1fr); gap: 0.1rem; }
+    .offer__sign { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+    .offer__stamp { align-self: flex-end; margin-top: -2.1rem; }
   }
 </style>

@@ -95,7 +95,8 @@ const total = i;
   .hero__stage { position: relative; }
 
   .hero__phase {
-    min-height: 100dvh;
+    /* svh: стабильная высота на iOS, пин не прыгает от адресной строки. */
+    min-height: 100svh;
     display: flex;
     align-items: center;
   }
@@ -229,21 +230,28 @@ const total = i;
     .hero__aside { grid-column: 1 / -1; max-width: 30rem; }
   }
 
-  /* Телефон: лист и текст ужимаются, чтобы первый экран ответа помещался
-     целиком — иначе кнопка подписи уезжает за нижнюю кромку. */
+  /* Телефон: фаза ответа обязана влезать в svh-экран ЦЕЛИКОМ — пин держит
+     вьюпорт, и всё, что ниже кромки, зритель не увидит вовсе (лист резался
+     на «Подписи», печать била за кадром — DESIGN.md §14, М1). Решение
+     заказчика: ужать всё в один экран. Отсюда тугие гэпы, кнопки в ряд
+     и компактный бланк (своя ужимка в OfferDoc). */
   @media (max-width: 780px) {
-    .hero__grid { row-gap: var(--space-8); }
+    .hero__grid { row-gap: var(--space-4); }
     .hero__main { gap: var(--space-4); }
-    .hero__answer { padding-block: calc(var(--nav-h) + var(--space-4)) var(--space-6); }
+    .hero__answer { padding-block: calc(var(--nav-h) + var(--space-2)) var(--space-4); }
     .hero__lead { max-width: none; font-size: var(--fs-body); }
     .hero__q { font-size: clamp(1.75rem, 1.1rem + 3.4vw, 2.4rem); }
-  }
 
-  @media (max-width: 560px) {
-    .hero__actions .btn { padding-block: 0.85rem; }
-  }
-
-  @media (max-width: 560px) {
-    .hero__actions .btn { flex: 1 1 100%; justify-content: space-between; }
+    /* Кнопки в ряд: столбик из двух съедал ~120px высоты фазы. */
+    .hero__actions { gap: var(--space-2); flex-wrap: nowrap; }
+    .hero__actions .btn {
+      flex: 1 1 0;
+      min-width: 0;
+      justify-content: space-between;
+      gap: var(--space-2);
+      padding: 0.8rem 0.85rem;
+      font-size: var(--fs-small);
+    }
+    .hero__actions .btn > span { white-space: nowrap; }
   }
 </style>

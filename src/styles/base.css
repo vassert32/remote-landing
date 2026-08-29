@@ -103,7 +103,9 @@ a { color: inherit; text-decoration: none; }
    ВАЖНО: у секции с пином (Программа) flex-родитель ломает пин-спейсер
    ScrollTrigger — она остаётся обычным блоком, центрует её сам пин. */
 main > .section:not([data-program]) {
-  min-height: 100dvh;
+  /* svh, не dvh: dvh меняется на iOS прямо во время скролла (адресная
+     строка), и высоты секций плыли бы под пальцем. */
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: center;

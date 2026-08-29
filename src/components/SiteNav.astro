@@ -222,6 +222,15 @@ const alt = otherLang(Astro.currentLocale);
   :global(html:not(.motion)) .nav,
   :global(html:not(.motion)) .veil { --nav-t: 1; }
 
+  /* На таче вуали нет. Две причины (DESIGN.md §14, М4): masked
+     backdrop-filter белит тёмные секции, пока в них играют entrance-твины
+     (Chromium теряет секцию из бэкдропа и блюрит фон html), и мажет
+     заголовки, которые на телефоне стоят почти сразу под хедером.
+     Difference-хедер читается на любом фоне и без подложки. */
+  @media (hover: none), (pointer: coarse) {
+    .veil { display: none; }
+  }
+
   /* Тач: переключатель языка был 36x17, марка 107x30 — обе меньше 44px.
      Растим только высоту касания, вид не трогаем. */
   @media (hover: none) {

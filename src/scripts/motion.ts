@@ -147,7 +147,15 @@ function initHeroScene(): void {
   // Лид проявляется словами с размытием — тем же приёмом, что абзацы Ментора.
   // Хинт will-change здесь постоянный законно: слова ездят по скрабу
   // в обе стороны всё время, пока герой запинен.
-  gsap.set(leadWords, { opacity: 0, y: 12, filter: 'blur(9px)', willChange: 'transform, filter, opacity' });
+  // На таче blur-канала нет: десятки спанов с filter на DPR-3 телефоне —
+  // это отдельный GPU-слой на слово, память улетает (DESIGN.md §14, М6).
+  const useBlur = finePointer.matches;
+  gsap.set(
+    leadWords,
+    useBlur
+      ? { opacity: 0, y: 12, filter: 'blur(9px)', willChange: 'transform, filter, opacity' }
+      : { opacity: 0, y: 12, willChange: 'transform, opacity' },
+  );
   // Накладка маркера: не прочерчена. CSS держит противоположное — залито
   // целиком — на случай, когда мотор не доехал.
   gsap.set(marksHl, { clipPath: 'inset(0 100% 0 0)' });
@@ -262,7 +270,9 @@ function initHeroScene(): void {
   // скрабе стагтер растягивается по всей длине сцены, а не по секундам.
   tl.to(
     leadWords,
-    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.12, ease: 'power2.out', stagger: 0.005 },
+    useBlur
+      ? { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.12, ease: 'power2.out', stagger: 0.005 }
+      : { opacity: 1, y: 0, duration: 0.12, ease: 'power2.out', stagger: 0.005 },
     0.55,
   );
   tl.to(rises, { opacity: 1, y: 0, duration: 0.16, ease: 'power2.out', stagger: 0.04 }, 0.62);
@@ -291,55 +301,65 @@ function initHeroScene(): void {
    * ровно два: вопрос и ответ. Зоны не пересекаются с общим снапом: тот
    * отвечает за секции от Ментора и ниже.
    *
+   * Только колесо/десктоп: на таче скроллит нативная инерция, и дотяг после
+   * остановки пальца дёргает страницу (DESIGN.md §14, М3). Палец, вставший
+   * в полусвете, — осознанная пауза, читатель двинет дальше сам.
+   *
    * Остановку ловим по НЕПОДВИЖНОСТИ позиции: Lenis шлёт события скролла
    * каждый кадр даже на стоящей странице, поэтому дебаунс на событиях не
    * срабатывает никогда, а порог скорости не ловит момент.
+   *
+   * Края сцены берутся из самого триггера (st.end живёт через refresh):
+   * отдельная формула от innerHeight разъезжалась бы с фактическим пином,
+   * как только iOS сменит высоту вьюпорта.
    */
-  const sceneEnd = () => Math.round(window.innerHeight * 1.7);
-  let heroSnapping = false;
-  let lastInput = 0;
-  for (const evt of ['wheel', 'touchstart', 'touchmove', 'keydown'] as const) {
-    window.addEventListener(evt, () => {
-      lastInput = performance.now();
-    }, { passive: true });
-  }
-
-  const TICK = 120;
-  let lastPos = -1;
-  let stillFor = 0;
-
-  window.setInterval(() => {
-    if (heroSnapping || !lenisRef) return;
-
-    const end = sceneEnd();
-    const y = lenisRef.actualScroll;
-    // Только строго внутри сцены: на краях и ниже сторож молчит.
-    if (y <= 6 || y >= end - 6) {
-      lastPos = y;
-      stillFor = 0;
-      return;
+  const st = tl.scrollTrigger!;
+  if (finePointer.matches) {
+    let heroSnapping = false;
+    let lastInput = 0;
+    for (const evt of ['wheel', 'touchstart', 'touchmove', 'keydown'] as const) {
+      window.addEventListener(evt, () => {
+        lastInput = performance.now();
+      }, { passive: true });
     }
 
-    stillFor = Math.abs(y - lastPos) < 1.5 ? stillFor + TICK : 0;
-    lastPos = y;
-    if (stillFor < 240) return;
-    if (performance.now() - lastInput < 200) return;
+    const TICK = 120;
+    let lastPos = -1;
+    let stillFor = 0;
 
-    // Куда ближе, туда и садимся: без рывков против направления чтения.
-    const target = y > end * 0.42 ? end : 0;
-    stillFor = 0;
-    heroSnapping = true;
-    lenisRef.scrollTo(target, {
-      duration: 0.75,
-      easing: (t: number) => 1 - Math.pow(1 - t, 4),
-      onComplete: () => {
+    window.setInterval(() => {
+      if (heroSnapping || !lenisRef) return;
+
+      const end = st.end;
+      const y = lenisRef.actualScroll;
+      // Только строго внутри сцены: на краях и ниже сторож молчит.
+      if (y <= 6 || y >= end - 6) {
+        lastPos = y;
+        stillFor = 0;
+        return;
+      }
+
+      stillFor = Math.abs(y - lastPos) < 1.5 ? stillFor + TICK : 0;
+      lastPos = y;
+      if (stillFor < 240) return;
+      if (performance.now() - lastInput < 200) return;
+
+      // Куда ближе, туда и садимся: без рывков против направления чтения.
+      const target = y > end * 0.42 ? end : 0;
+      stillFor = 0;
+      heroSnapping = true;
+      lenisRef.scrollTo(target, {
+        duration: 0.75,
+        easing: (t: number) => 1 - Math.pow(1 - t, 4),
+        onComplete: () => {
+          heroSnapping = false;
+        },
+      });
+      window.setTimeout(() => {
         heroSnapping = false;
-      },
-    });
-    window.setTimeout(() => {
-      heroSnapping = false;
-    }, 1200);
-  }, TICK);
+      }, 1200);
+    }, TICK);
+  }
 
   // Автопрокрутка: когда вопрос допечатан, сцена сама везёт к ответу.
   // Любое действие пользователя (колесо, тач, клавиши) отменяет автопилот.
@@ -357,7 +377,7 @@ function initHeroScene(): void {
     const y = lenisRef?.actualScroll ?? window.scrollY;
     // Порог щедрый: важно лишь, что пользователь ещё не уехал сам.
     if (userTook || y > window.innerHeight * 0.25) return;
-    lenisRef?.scrollTo(Math.round(window.innerHeight * 1.7), {
+    lenisRef?.scrollTo(st.end, {
       duration: 2.6,
       easing: (t: number) => 1 - Math.pow(1 - t, 3),
     });
@@ -710,20 +730,38 @@ function initSectionEntrances(): void {
     if (blurWords.length) {
       // will-change живёт только на время анимации: постоянный хинт на всех
       // словах страницы держал бы им слои растровыми без всякой пользы.
-      tl.fromTo(
-        blurWords,
-        { opacity: 0, y: 12, filter: 'blur(9px)', willChange: 'transform, filter, opacity' },
-        {
-          opacity: 1,
-          y: 0,
-          filter: 'blur(0px)',
-          duration: 0.5,
-          ease: 'power2.out',
-          stagger: 0.018,
-          onComplete: () => gsap.set(blurWords, { clearProps: 'will-change,filter' }),
-        },
-        0.16,
-      );
+      // На таче — без blur-канала: слой на каждый спан при DPR 3 сжирает
+      // память GPU (DESIGN.md §14, М6); opacity+y на телефоне неотличимы.
+      if (finePointer.matches) {
+        tl.fromTo(
+          blurWords,
+          { opacity: 0, y: 12, filter: 'blur(9px)', willChange: 'transform, filter, opacity' },
+          {
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: 0.5,
+            ease: 'power2.out',
+            stagger: 0.018,
+            onComplete: () => gsap.set(blurWords, { clearProps: 'will-change,filter' }),
+          },
+          0.16,
+        );
+      } else {
+        tl.fromTo(
+          blurWords,
+          { opacity: 0, y: 12, willChange: 'transform, opacity' },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: 'power2.out',
+            stagger: 0.018,
+            onComplete: () => gsap.set(blurWords, { clearProps: 'will-change' }),
+          },
+          0.16,
+        );
+      }
     }
     if (rises.length) {
       tl.fromTo(rises, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.06 }, 0.22);
@@ -826,6 +864,9 @@ function boot(): void {
   navEl = document.querySelector<HTMLElement>('[data-nav]');
   veilEl = document.querySelector<HTMLElement>('[data-nav-veil]');
   gsap.registerPlugin(ScrollTrigger);
+  // iOS сворачивает адресную строку прямо во время скролла; без этого флага
+  // каждый такой ресайз зовёт refresh, и пины прыгают под пальцем.
+  ScrollTrigger.config({ ignoreMobileResize: true });
 
   if (reduce.matches) {
     // Без движения хедер виден всегда; страховочный data-away снимаем.
@@ -846,8 +887,11 @@ function boot(): void {
   ScrollTrigger.refresh();
   syncLenisHeight();
   ScrollTrigger.addEventListener('refresh', syncLenisHeight);
-  initSnap(lenis);
+  // Снап и доводчик — только там, где скроллят колесом. На таче страницей
+  // движет нативная инерция, и любой «дотяг» после неё читается рывком,
+  // который никто не заказывал (см. DESIGN.md §14, М3).
   if (finePointer.matches) {
+    initSnap(lenis);
     initCursor();
     initMagnetic();
   }

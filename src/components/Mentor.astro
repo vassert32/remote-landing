@@ -54,7 +54,7 @@ const c = t(Astro.currentLocale);
     /* Кадр не выше экрана: на ноутбуках колонка широкая, а вьюпорт низкий,
        и полный аспект выталкивал секцию за 100dvh. Обрезка по вертикали
        безопасна: композиция кадра центральная, cover режет поля. */
-    max-height: calc(100dvh - 2 * var(--section-y) - 6rem);
+    max-height: calc(100svh - 2 * var(--section-y) - 6rem);
     object-fit: cover;
   }
 
