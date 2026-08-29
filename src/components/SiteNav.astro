@@ -53,7 +53,8 @@ const alt = otherLang(Astro.currentLocale);
       </ul>
 
       <a class="btn nav__cta" href={links.telegram} target="_blank" rel="noopener" data-magnetic>
-        <span>{c.cta.label}</span>
+        <span class="nav__cta-full">{c.cta.label}</span>
+        <span class="nav__cta-short">{c.cta.short}</span>
         <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
       </a>
     </div>
@@ -218,6 +219,9 @@ const alt = otherLang(Astro.currentLocale);
   .nav__cta::before { display: none; }
   .nav__cta:hover, .nav__cta:focus-visible { color: #000; }
 
+  /* Короткий лейбл живёт только на телефоне. */
+  .nav__cta-short { display: none; }
+
   /* Без мотора: хедер виден и сразу компактный, подложка активна. */
   :global(html:not(.motion)) .nav,
   :global(html:not(.motion)) .veil { --nav-t: 1; }
@@ -255,8 +259,12 @@ const alt = otherLang(Astro.currentLocale);
     .nav__left { gap: var(--space-6); }
   }
 
-  @media (max-width: 480px) {
-    .nav__cta { padding-inline: 0.8rem; gap: var(--space-2); }
+  /* Кнопка-компакт: полный «Записаться на разбор» на телефоне спорил
+     шириной с именем и выглядел несуразно. Остаются глагол и стрелка. */
+  @media (max-width: 780px) {
+    .nav__cta-full { display: none; }
+    .nav__cta-short { display: inline; }
+    .nav__cta { padding: 0.55rem 0.8rem; gap: var(--space-2); }
   }
   @media (max-width: 420px) {
     .nav__given { display: none; }

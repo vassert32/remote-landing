@@ -22,7 +22,7 @@ export const en = {
       'interviews in English, offer negotiation. Nothing upfront, you pay after you start the job.',
   },
 
-  cta: { label: 'Book a review call' },
+  cta: { label: 'Book a review call', short: 'Book a call' },
 
   nav: [
     { label: 'Path', href: '#put' },

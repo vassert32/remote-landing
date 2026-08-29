@@ -489,7 +489,33 @@ function initProgram(): void {
         onToggle: (self) => self.isActive && setActive(n),
       }),
     );
-    return () => triggers.forEach((t) => t.kill());
+
+    // Штора прилипшей полосы (см. Program.astro): непрозрачный фон до
+    // верха экрана можно включать только когда полоса реально прилипла —
+    // в потоке он срезал бы низ заголовка. Прилипание ловит сентинел:
+    // ушёл за линию прилипания — полоса стоит.
+    const route = root.querySelector<HTMLElement>('.program__route');
+    let io: IntersectionObserver | null = null;
+    let sentinel: HTMLElement | null = null;
+    if (route) {
+      sentinel = document.createElement('span');
+      sentinel.setAttribute('aria-hidden', 'true');
+      sentinel.style.cssText = 'display:block;height:1px;margin-bottom:-1px;';
+      route.before(sentinel);
+      const stickyTop = Math.round(parseFloat(getComputedStyle(route).top)) || 0;
+      io = new IntersectionObserver(
+        ([entry]) => route.classList.toggle('is-stuck', !entry!.isIntersecting),
+        { rootMargin: `${-(stickyTop + 2)}px 0px 0px 0px` },
+      );
+      io.observe(sentinel);
+    }
+
+    return () => {
+      triggers.forEach((t) => t.kill());
+      io?.disconnect();
+      sentinel?.remove();
+      route?.classList.remove('is-stuck');
+    };
   });
 }
 

@@ -200,11 +200,54 @@ const roadmap = c.program.steps;
     .program__step:hover .program__num { color: var(--stamp); }
   }
 
+  /* --- Телефон и планшет: этапы укатываются под прилипшую полосу -------- */
   @media (max-width: 900px) {
-    .program__rail { flex-direction: column; align-items: flex-start; }
+    .program__rail { flex-direction: column; align-items: flex-start; margin-bottom: var(--space-6); }
     .program__counter { display: none; }
-    .program__route { grid-template-columns: auto 1fr auto; }
+    /* Интро на телефоне не несёт нового: полоса и этапы говорят сами. */
+    .program__head > :global(.body) { display: none; }
     .program__route-span { display: none; }
+
+    /* Полоса маршрута прилипает под хедером и висит до конца секции:
+       этапы укатываются ПОД неё. z-index поднят над этапами — их
+       entrance-транзформы создают stacking contexts на том же уровне. */
+    .program__route {
+      grid-template-columns: auto 1fr auto;
+      position: sticky;
+      top: calc(var(--nav-h) + var(--space-2));
+      z-index: 3;
+      background: var(--bg);
+      padding-block: var(--space-2) var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+
+    /* Штора от полосы до верха экрана: без неё этапы просвечивали бы в
+       щели между полосой и difference-хедером. Непрозрачной она обязана
+       быть ТОЛЬКО в прилипшем состоянии — в потоке такой же козырёк
+       срезал бы низ заголовка секции. Класс ставит мотор (IO-сентинел);
+       без мотора шторы нет — этапы просто проезжают под хедером. */
+    .program__route::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 100%;
+      height: calc(var(--nav-h) + var(--space-2) + 2px);
+      background: var(--bg);
+      opacity: 0;
+      transition: opacity var(--dur-fast) var(--ease-out);
+      pointer-events: none;
+    }
+    .program__route.is-stuck::before { opacity: 1; }
+
+    /* Цифре — свой столбик: впритык к заголовку она читалась приклеенной. */
+    .program__num { min-width: 1.9rem; }
+
+    /* Хвост секции: шестой этап должен успеть подняться под полосу, и
+       только потом чёрный отпускает экран и начинается светлый блок
+       вопросов. Слагаемые: 100svh минус (полоса ~6rem + этап ~13rem);
+       выверено на 375×812 — см. DESIGN.md §14. */
+    .program__pin { padding-bottom: calc(100svh - 16rem); }
   }
 
   /* --- Горизонтальная сцена: только десктоп с мотором ------------------- */
