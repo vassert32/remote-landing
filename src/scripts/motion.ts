@@ -8,6 +8,7 @@
  *  - при prefers-reduced-motion не запускается ничего, кроме темы хедера.
  */
 import Lenis from 'lenis';
+import Snap from 'lenis/snap';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -494,43 +495,123 @@ function initProgram(): void {
 }
 
 /* ==========================================================================
-   Доводчик позиций — правила заказчика: «по направлению и 20/60/20».
-   Аддон lenis/snap выброшен: его proximity тянул в обе стороны и спорил
-   с чтением. Здесь один сторож с двумя правилами:
-    1. Доводка работает только В НАПРАВЛЕНИИ последней прокрутки: крутил
-       вниз — страница может доехать только вниз, вверх — только вверх.
-       Проскочил границу — назад никто не тащит.
-    2. Дальность — последние 20% экрана до границы блока. Остановка в
-       средних 60% — осознанная позиция читателя, её не трогаем.
+   Доводчик позиций. ДВЕ ветки по ширине вёрстки:
+    - десктоп (>900): lenis/snap proximity + микро-доводчик — как было;
+    - мобильная вёрстка (≤900): правила заказчика «по направлению и
+      20/60/20» — см. initSnapMobile. Работают и на таче: сторож ждёт
+      полной остановки и с нативной инерцией не дерётся.
    ========================================================================== */
 
-function initSnap(lenis: Lenis): void {
-  // Точек hero здесь нет: за сцену отвечает отдельный сторож в initHeroScene.
-  //
-  // Точки — числовые и пересчитываются только в спокойный момент после
-  // refresh: обмер элементов «на лету» (ResizeObserver, транзишны, пины)
-  // давал сдвинутые значения — FAQ парковался на 40px ниже начала.
-  //
-  // Программа — исключение по составу точек: её пин везёт горизонтальную
-  // сцену со своим ритмом, изнутри проезда к началу секции не тянем.
-  // У неё только вход и выход пина.
-  let snapPoints: number[] = [];
-
-  const rebuildSnaps = () => {
-    snapPoints = [];
-    for (const el of document.querySelectorAll<HTMLElement>(
-      'main section:not([data-hero]):not([data-program]), footer.closer',
-    )) {
-      snapPoints.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
-    }
-
-    const pin = document.querySelector<HTMLElement>('[data-program-pin]');
-    const host = pin?.closest<HTMLElement>('.pin-spacer') ?? pin;
-    if (!host) return;
+/** Общие точки доводки: начала секций + вход и выход пина Программы. */
+function collectSnapPoints(): number[] {
+  const pts: number[] = [];
+  for (const el of document.querySelectorAll<HTMLElement>(
+    'main section:not([data-hero]):not([data-program]), footer.closer',
+  )) {
+    pts.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
+  }
+  const pin = document.querySelector<HTMLElement>('[data-program-pin]');
+  const host = pin?.closest<HTMLElement>('.pin-spacer') ?? pin;
+  if (host) {
     const top = Math.round(host.getBoundingClientRect().top + window.scrollY);
     const exit = Math.round(top + host.offsetHeight - window.innerHeight);
-    snapPoints.push(top);
-    if (exit > top) snapPoints.push(exit);
+    pts.push(top);
+    if (exit > top) pts.push(exit);
+  }
+  return pts;
+}
+
+/**
+ * Десктоп: родной аддон Lenis (живёт внутри его физики скролла) плюс
+ * микро-доводчик мелких недолётов. Точки — числовые, addElement не
+ * использовать: его ResizeObserver обмеряет в произвольные моменты и
+ * получает сдвинутые значения (FAQ парковался на 40px ниже начала).
+ */
+function initSnapDesktop(lenis: Lenis): void {
+  const snap = new Snap(lenis, {
+    type: 'proximity',
+    // Тянет, когда граница в пределах 40% экрана. Дальше — не трогает:
+    // быстрый пролёт через несколько секций остаётся свободным.
+    distanceThreshold: '40%',
+    duration: 0.9,
+    easing: (t: number) => 1 - Math.pow(1 - t, 3),
+    debounce: 260,
+  });
+
+  let snapPoints: number[] = [];
+  const rebuildSnaps = () => {
+    // У аддона нет remove: чистим его реестр напрямую.
+    (snap as unknown as { snaps: Map<number, unknown> }).snaps.clear();
+    snapPoints = collectSnapPoints();
+    for (const p of snapPoints) snap.add(p);
+  };
+  rebuildSnaps();
+
+  /*
+   * Микро-доводчик: родной снап не трогает мелкие недолёты — колесо,
+   * вставшее в 40px от начала секции, оставляло снизу полосу соседней.
+   * Ждёт полной остановки и дожимает; дальше 64px не лезет.
+   */
+  let prevY = -1;
+  let nudged = -1;
+  window.setInterval(() => {
+    if (snap.isStopped) return;
+    const y = Math.round(lenis.scroll);
+    const still = y === prevY;
+    prevY = y;
+    if (!still || Math.abs(lenis.velocity) > 0.05) return;
+    let best = -1;
+    for (const p of snapPoints) if (best === -1 || Math.abs(p - y) < Math.abs(best - y)) best = p;
+    if (best === -1) return;
+    const dist = Math.abs(best - y);
+    if (dist < 2 || dist > 64) {
+      if (dist > 96) nudged = -1; // ушли далеко: сторож снова заряжен
+      return;
+    }
+    if (nudged === best) return; // уже доводили сюда: не зацикливаемся
+    nudged = best;
+    lenis.scrollTo(best, { duration: 0.45, easing: (t: number) => 1 - Math.pow(1 - t, 3) });
+  }, 160);
+
+  // Пины меняют геометрию документа: после пересчёта собираем точки заново.
+  ScrollTrigger.addEventListener('refresh', () => {
+    snap.resize();
+    rebuildSnaps();
+  });
+
+  /*
+   * Аккордеон FAQ (и любой ресайз контента по месту) дёргает ResizeObserver
+   * Lenis, снап принимает это за скролл и «доводит» мимо. На время
+   * транзишна глушимся, после — пересчёт точек в покое.
+   */
+  let reflowTimer = 0;
+  document.addEventListener('ui:reflow', () => {
+    snap.stop();
+    window.clearTimeout(reflowTimer);
+    reflowTimer = window.setTimeout(() => {
+      snap.resize();
+      rebuildSnaps();
+      snap.start();
+    }, 550);
+  });
+
+  if (import.meta.env.DEV) {
+    (window as unknown as { __snap: Snap }).__snap = snap;
+  }
+}
+
+/**
+ * Мобильная вёрстка (≤900): правила заказчика.
+ *  1. Доводка только В НАПРАВЛЕНИИ последней прокрутки: вниз — только
+ *     вниз, вверх — только вверх. Проскочил границу — назад не тащит.
+ *  2. «20/60/20»: доводит только последние ≤20% экрана до границы блока;
+ *     остановка в средних 60% — осознанная позиция, её не трогаем.
+ */
+function initSnapMobile(lenis: Lenis): void {
+  // Точек hero здесь нет: за сцену отвечает отдельный сторож в initHeroScene.
+  let snapPoints: number[] = [];
+  const rebuildSnaps = () => {
+    snapPoints = collectSnapPoints();
   };
   rebuildSnaps();
 
@@ -870,11 +951,15 @@ function boot(): void {
   ScrollTrigger.refresh();
   syncLenisHeight();
   ScrollTrigger.addEventListener('refresh', syncLenisHeight);
-  // Снап и доводчик — только там, где скроллят колесом. На таче страницей
-  // движет нативная инерция, и любой «дотяг» после неё читается рывком,
-  // который никто не заказывал (см. DESIGN.md §14, М3).
+  // Доводка блоков: мобильная вёрстка (≤900) — правила заказчика 20/60/20,
+  // безопасные и на таче (сторож ждёт полной остановки и с нативной
+  // инерцией не дерётся); десктоп — прежний lenis/snap, только для колеса.
+  if (window.matchMedia('(max-width: 900px)').matches) {
+    initSnapMobile(lenis);
+  } else if (finePointer.matches) {
+    initSnapDesktop(lenis);
+  }
   if (finePointer.matches) {
-    initSnap(lenis);
     initCursor();
     initMagnetic();
   }
