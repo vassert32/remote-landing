@@ -120,6 +120,13 @@ main > .section[data-program] { padding-block: 0; }
   main > .section[data-program] {
     padding-top: max(var(--section-y), calc(var(--nav-h) + var(--space-4)));
   }
+
+  /* Выдох после контента: у секций выше экрана текст заканчивался, и
+     следующий блок начинался встык — дочитываешь в притирку к границе.
+     Программа не в счёт: у неё свой рассчитанный хвост. */
+  main > .section:not([data-program]) {
+    padding-bottom: calc(var(--section-y) + var(--space-8));
+  }
 }
 
 /* ==========================================================================

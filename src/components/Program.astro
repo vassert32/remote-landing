@@ -209,8 +209,10 @@ const roadmap = c.program.steps;
     .program__route-span { display: none; }
 
     /* Полоса маршрута прилипает под хедером и висит до конца секции:
-       этапы укатываются ПОД неё. z-index поднят над этапами — их
-       entrance-транзформы создают stacking contexts на том же уровне. */
+       этапы уходят ПОД неё, а выше — остаются видны и тают в вуали
+       хедера (решение заказчика: текст не обрубать, текст читаем до
+       последнего). z-index поднят над этапами — их entrance-транзформы
+       создают stacking contexts на том же уровне. */
     .program__route {
       grid-template-columns: auto 1fr auto;
       position: sticky;
@@ -220,25 +222,6 @@ const roadmap = c.program.steps;
       padding-block: var(--space-2) var(--space-3);
       margin-bottom: var(--space-6);
     }
-
-    /* Штора от полосы до верха экрана: без неё этапы просвечивали бы в
-       щели между полосой и difference-хедером. Непрозрачной она обязана
-       быть ТОЛЬКО в прилипшем состоянии — в потоке такой же козырёк
-       срезал бы низ заголовка секции. Класс ставит мотор (IO-сентинел);
-       без мотора шторы нет — этапы просто проезжают под хедером. */
-    .program__route::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 100%;
-      height: calc(var(--nav-h) + var(--space-2) + 2px);
-      background: var(--bg);
-      opacity: 0;
-      transition: opacity var(--dur-fast) var(--ease-out);
-      pointer-events: none;
-    }
-    .program__route.is-stuck::before { opacity: 1; }
 
     /* Цифре — свой столбик: впритык к заголовку она читалась приклеенной. */
     .program__num { min-width: 1.9rem; }

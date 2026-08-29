@@ -8,7 +8,6 @@
  *  - при prefers-reduced-motion не запускается ничего, кроме темы хедера.
  */
 import Lenis from 'lenis';
-import Snap from 'lenis/snap';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -490,87 +489,39 @@ function initProgram(): void {
       }),
     );
 
-    // Штора прилипшей полосы (см. Program.astro): непрозрачный фон до
-    // верха экрана можно включать только когда полоса реально прилипла —
-    // в потоке он срезал бы низ заголовка. Прилипание ловит сентинел:
-    // ушёл за линию прилипания — полоса стоит.
-    const route = root.querySelector<HTMLElement>('.program__route');
-    let io: IntersectionObserver | null = null;
-    let sentinel: HTMLElement | null = null;
-    if (route) {
-      sentinel = document.createElement('span');
-      sentinel.setAttribute('aria-hidden', 'true');
-      sentinel.style.cssText = 'display:block;height:1px;margin-bottom:-1px;';
-      route.before(sentinel);
-      const stickyTop = Math.round(parseFloat(getComputedStyle(route).top)) || 0;
-      io = new IntersectionObserver(
-        ([entry]) => route.classList.toggle('is-stuck', !entry!.isIntersecting),
-        { rootMargin: `${-(stickyTop + 2)}px 0px 0px 0px` },
-      );
-      io.observe(sentinel);
-    }
-
-    return () => {
-      triggers.forEach((t) => t.kill());
-      io?.disconnect();
-      sentinel?.remove();
-      route?.classList.remove('is-stuck');
-    };
+    return () => triggers.forEach((t) => t.kill());
   });
 }
 
 /* ==========================================================================
-   Снап позиций
-   Каждая секция ростом с экран, поэтому остановка «между» показывает
-   полоску соседней и читается поломкой. Лечим родным аддоном Lenis:
-   он живёт ВНУТРИ его физики скролла, а не догоняет страницу отдельной
-   анимацией после остановки — именно это раздражало в самодельных
-   версиях. Тип proximity: тянет только когда граница уже рядом, при
-   быстром пролистывании молчит.
+   Доводчик позиций — правила заказчика: «по направлению и 20/60/20».
+   Аддон lenis/snap выброшен: его proximity тянул в обе стороны и спорил
+   с чтением. Здесь один сторож с двумя правилами:
+    1. Доводка работает только В НАПРАВЛЕНИИ последней прокрутки: крутил
+       вниз — страница может доехать только вниз, вверх — только вверх.
+       Проскочил границу — назад никто не тащит.
+    2. Дальность — последние 20% экрана до границы блока. Остановка в
+       средних 60% — осознанная позиция читателя, её не трогаем.
    ========================================================================== */
 
 function initSnap(lenis: Lenis): void {
-  const snap = new Snap(lenis, {
-    type: 'proximity',
-    // Тянет, когда граница в пределах 40% экрана. Дальше — не трогает:
-    // быстрый пролёт через несколько секций остаётся свободным.
-    distanceThreshold: '40%',
-    duration: 0.9,
-    easing: (t: number) => 1 - Math.pow(1 - t, 3),
-    debounce: 260,
-  });
-
-  // Точек hero здесь нет: за сцену отвечает отдельный сторож ниже.
-  // Общий снап работает от Ментора и дальше.
-
-  /*
-   * ВСЕ точки — числовые, через snap.add. addElement НЕ использовать:
-   * аддон обмеряет элементы собственным ResizeObserver'ом в произвольные
-   * моменты (инерция, транзишны, пересчёт пинов) и получает сдвинутые
-   * значения — FAQ, например, стабильно парковался на 40px ниже начала,
-   * и снизу подглядывал чёрный сосед. Числовые точки пересчитываются
-   * только здесь, в заведомо спокойный момент после refresh.
-   *
-   * Программа — исключение по составу точек: её пин длиной в несколько
-   * экранов везёт горизонтальную сцену со своим ритмом, и притягивать к
-   * началу секции изнутри проезда нельзя. У неё только вход и выход пина.
-   */
+  // Точек hero здесь нет: за сцену отвечает отдельный сторож в initHeroScene.
+  //
+  // Точки — числовые и пересчитываются только в спокойный момент после
+  // refresh: обмер элементов «на лету» (ResizeObserver, транзишны, пины)
+  // давал сдвинутые значения — FAQ парковался на 40px ниже начала.
+  //
+  // Программа — исключение по составу точек: её пин везёт горизонтальную
+  // сцену со своим ритмом, изнутри проезда к началу секции не тянем.
+  // У неё только вход и выход пина.
   let snapPoints: number[] = [];
 
   const rebuildSnaps = () => {
-    // У аддона нет remove: чистим его реестр напрямую.
-    (snap as unknown as { snaps: Map<number, unknown> }).snaps.clear();
     snapPoints = [];
-
-    const push = (v: number) => {
-      snap.add(v);
-      snapPoints.push(v);
-    };
-
     for (const el of document.querySelectorAll<HTMLElement>(
       'main section:not([data-hero]):not([data-program]), footer.closer',
     )) {
-      push(Math.round(el.getBoundingClientRect().top + window.scrollY));
+      snapPoints.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
     }
 
     const pin = document.querySelector<HTMLElement>('[data-program-pin]');
@@ -578,74 +529,80 @@ function initSnap(lenis: Lenis): void {
     if (!host) return;
     const top = Math.round(host.getBoundingClientRect().top + window.scrollY);
     const exit = Math.round(top + host.offsetHeight - window.innerHeight);
-    push(top);
-    if (exit > top) push(exit);
+    snapPoints.push(top);
+    if (exit > top) snapPoints.push(exit);
   };
   rebuildSnaps();
 
+  // Направление держим по фактическому движению, а не по последнему событию
+  // ввода: инерция колеса продолжает везти страницу после отпускания.
+  let dirDown = true;
+  let lastY = lenis.scroll;
+  lenis.on('scroll', () => {
+    const y = lenis.scroll;
+    if (Math.abs(y - lastY) > 0.5) {
+      dirDown = y > lastY;
+      lastY = y;
+    }
+  });
+
   /*
-   * Микро-доводчик. Родной снап не трогает мелкие недолёты: колесо,
-   * остановившееся в 40px от начала секции, так и оставляло снизу полосу
-   * соседней полосы. Сторож ждёт полной остановки (два тика подряд на
-   * одном месте, нулевая скорость) и дожимает последние пиксели сам.
-   * Дальше 64px не лезет — это уже осознанная позиция читателя.
+   * Остановку ловим по неподвижности: два тика подряд на одном месте и
+   * нулевая скорость (Lenis шлёт события каждый кадр даже на стоящей
+   * странице, дебаунс на событиях не срабатывает никогда).
    */
+  let paused = false;
   let prevY = -1;
   let nudged = -1;
   window.setInterval(() => {
-    if (snap.isStopped) return;
+    if (paused) return;
     const y = Math.round(lenis.scroll);
     const still = y === prevY;
     prevY = y;
     if (!still || Math.abs(lenis.velocity) > 0.05) return;
+
+    // Ближайшая граница строго по направлению и не дальше 20% экрана.
+    const reach = window.innerHeight * 0.2;
     let best = -1;
-    for (const p of snapPoints) if (best === -1 || Math.abs(p - y) < Math.abs(best - y)) best = p;
-    if (best === -1) return;
-    const dist = Math.abs(best - y);
-    if (dist < 2 || dist > 64) {
-      if (dist > 96) nudged = -1; // ушли далеко: сторож снова заряжен
+    let bestDist = Infinity;
+    for (const p of snapPoints) {
+      const d = dirDown ? p - y : y - p;
+      if (d < 2 || d > reach) continue;
+      if (d < bestDist) {
+        best = p;
+        bestDist = d;
+      }
+    }
+    if (best === -1) {
+      nudged = -1; // цели нет — сторож заряжен на следующую границу
       return;
     }
-    if (nudged === best) return; // уже доводили сюда: не зацикливаемся
+    if (nudged === best) return; // сюда уже доводили: не зацикливаемся
     nudged = best;
-    lenis.scrollTo(best, { duration: 0.45, easing: (t: number) => 1 - Math.pow(1 - t, 3) });
+    lenis.scrollTo(best, { duration: 0.55, easing: (t: number) => 1 - Math.pow(1 - t, 3) });
   }, 160);
 
   // Пины меняют геометрию документа: после пересчёта собираем точки заново.
-  ScrollTrigger.addEventListener('refresh', () => {
-    snap.resize();
-    rebuildSnaps();
-  });
+  ScrollTrigger.addEventListener('refresh', rebuildSnaps);
 
   /*
-   * Аккордеон FAQ (и любой другой ресайз контента по месту) дёргает
-   * ResizeObserver Lenis'а, снап принимает это за скролл-активность и после
-   * своего дебаунса «доводит» страницу к точке — при клике по вопросу
-   * страница уезжала на десятки пикселей, снизу вылезал чёрный сосед.
-   * Хуже того, точка могла быть посчитана во время инерции, когда сглаженный
-   * скролл расходится с фактическим, — и довод целился мимо начала секции.
-   *
-   * Поэтому на время локального ресайза снап глушится, а после — пересчёт
-   * точек в покое и только затем включение.
+   * Аккордеон FAQ (и любой ресайз контента по месту) двигает границы под
+   * ногами, а промежуточный скролл в транзишне не совпадает с финальным.
+   * На время локального ресайза довод глушится, после — пересчёт в покое.
    */
-  if (import.meta.env.DEV) {
-    (window as unknown as { __snap: Snap }).__snap = snap;
-  }
-
-  if (import.meta.env.DEV) {
-    (window as unknown as { __snap: Snap }).__snap = snap;
-  }
-
   let reflowTimer = 0;
   document.addEventListener('ui:reflow', () => {
-    snap.stop();
+    paused = true;
     window.clearTimeout(reflowTimer);
     reflowTimer = window.setTimeout(() => {
-      snap.resize();
       rebuildSnaps();
-      snap.start();
+      paused = false;
     }, 550);
   });
+
+  if (import.meta.env.DEV) {
+    (window as unknown as { __snapPoints: () => number[] }).__snapPoints = () => snapPoints;
+  }
 }
 
 /* ==========================================================================
