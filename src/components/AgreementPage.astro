@@ -1,0 +1,86 @@
+---
+import { Icon } from 'astro-icon/components';
+import Base from '../layouts/Base.astro';
+import BusinessDetails from './BusinessDetails.astro';
+import { business, docHref, otherLang, path, t } from '../i18n';
+
+const lang = Astro.currentLocale;
+const c = t(lang);
+---
+
+<Base title={`${c.legal.agreementTitle} (${c.legal.draft}). ${c.site.name}`} description={c.legal.agreementAbout} document="dogovor">
+  <main id="main" class="agreement">
+    <div class="shell agreement__inner">
+      <nav class="agreement__nav" aria-label={c.legal.navLabel}>
+        <a class="agreement__back" href={path(lang, '/')}>
+          <Icon name="ph:arrow-left-bold" aria-hidden="true" />
+          <span>{c.ui.back}</span>
+        </a>
+        <a href={docHref(otherLang(lang), 'dogovor')} hreflang={otherLang(lang)} aria-label={c.switchLabel}>{c.switchTo}</a>
+      </nav>
+
+      <header class="agreement__header">
+        <span class="agreement__status">{c.legal.draft}</span>
+        <h1 class="h2">{c.legal.agreementTitle}</h1>
+        <p class="lead">{c.legal.agreementAbout}</p>
+      </header>
+
+      <p class="agreement__notice">{c.legal.draftNote}</p>
+
+      <section class="agreement__file" aria-labelledby="file-title">
+        <div>
+          <h2 id="file-title" class="h3">{c.legal.fileTitle}</h2>
+          <p class="agreement__meta">{c.legal.fileMeta}</p>
+        </div>
+        <div class="agreement__actions">
+          <a class="btn btn--ink" href={business.agreementPdf} target="_blank" rel="noopener">
+            <span>{c.legal.openPdf}</span>
+            <Icon name="ph:arrow-up-right-bold" class="btn__arrow" aria-hidden="true" />
+          </a>
+          <a class="agreement__download" href={business.agreementPdf} download>
+            <Icon name="ph:download-simple" aria-hidden="true" />
+            <span>{c.legal.downloadPdf}</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="agreement__provider" aria-labelledby="provider-title">
+        <div>
+          <h2 id="provider-title" class="h3">{c.legal.providerTitle}</h2>
+          <p class="agreement__contact-note body">{c.legal.contactNote}</p>
+        </div>
+        <BusinessDetails showTax />
+      </section>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .agreement { min-height: 100svh; padding-block: clamp(2rem, 1rem + 3vw, 4rem) clamp(3rem, 2rem + 5vw, 7rem); }
+  .agreement__inner { max-width: 76rem; }
+  .agreement__nav { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); margin-bottom: clamp(3rem, 2rem + 4vw, 6rem); font-family: var(--font-mono); font-size: var(--fs-small); color: var(--fg-mute); }
+  .agreement__nav a:hover, .agreement__nav a:focus-visible { color: var(--stamp-deep); }
+  .agreement__back { display: inline-flex; align-items: center; gap: var(--space-3); }
+  .agreement__back svg, .agreement__download svg { width: 1em; height: 1em; flex: none; }
+  .agreement__header { display: grid; justify-items: start; gap: var(--space-6); max-width: 52rem; }
+  .agreement__status { padding: 0.25rem 0.65rem; border: var(--hair) solid var(--line-strong); font-family: var(--font-mono); font-size: var(--fs-small); color: var(--fg-soft); }
+  .agreement__header .lead { max-width: 48ch; }
+  .agreement__notice { max-width: 68ch; margin-block: var(--space-8) var(--space-12); padding-left: var(--space-6); border-left: 2px solid var(--stamp-deep); font-size: var(--fs-small); color: var(--fg-soft); }
+  .agreement__file { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-8); padding: clamp(1.25rem, 0.75rem + 2vw, 2.5rem); border: var(--hair) solid var(--line-strong); background: var(--bg-band); }
+  .agreement__meta { margin-top: var(--space-3); font-family: var(--font-mono); font-size: var(--fs-small); color: var(--fg-soft); }
+  .agreement__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6); }
+  .agreement__download { display: inline-flex; align-items: center; gap: var(--space-3); min-height: 44px; font-size: var(--fs-small); text-decoration: underline; text-underline-offset: 0.2em; }
+  .agreement__download:hover, .agreement__download:focus-visible { color: var(--stamp-deep); }
+  .agreement__provider { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-8); margin-top: var(--space-12); padding-top: var(--space-8); border-top: var(--hair) solid var(--line-strong); }
+  .agreement__contact-note { margin-top: var(--space-4); font-size: var(--fs-small); max-width: 36ch; }
+  @media (max-width: 780px) {
+    .agreement__provider { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .agreement__actions { width: 100%; }
+    .agreement__actions .btn { width: 100%; justify-content: space-between; }
+  }
+  @media (hover: none) {
+    .agreement__nav a { display: inline-flex; align-items: center; min-height: 44px; }
+  }
+</style>

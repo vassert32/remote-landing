@@ -11,7 +11,7 @@ export const en = {
 
   site: {
     name: 'Evgeny Gerkulesov',
-    // TODO(client): full sole-trader details for the footer.
+    // Short signature for legacy pages; full provider details are in legal and business.
     legal: 'E. Gerkulesov',
     given: 'Evgeny ',
     family: 'Gerkulesov',
@@ -274,18 +274,39 @@ export const en = {
       'After that I tell you honestly whether it makes sense to work together.',
   },
 
+  legal: {
+    name: 'Individual entrepreneur Gerkulesov Evgeny Olegovich',
+    address: 'Vologda, Russia',
+    innLabel: 'INN (tax ID)',
+    ogrnipLabel: 'OGRNIP',
+    emailLabel: 'Email',
+    telegramLabel: 'Telegram',
+    taxLabel: 'Tax regimes',
+    taxSystem: 'USN, PSN (Russia)',
+    navLabel: 'Documents and contact',
+    agreementLink: 'Service agreement',
+    draft: 'Draft',
+    agreementTitle: 'Service agreement',
+    agreementAbout: 'Individual consulting and information services to help prepare for a job search in tech.',
+    draftNote: 'Draft for review. The scope, timeline, price and payment schedule are agreed individually before the agreement and its appendices are signed. Viewing or downloading the file does not enter you into an agreement.',
+    fileTitle: 'Agreement and appendices',
+    fileMeta: 'PDF · 14 pages · in Russian',
+    openPdf: 'Open PDF',
+    downloadPdf: 'Download file',
+    providerTitle: 'Service provider and contact',
+    contactNote: 'For questions about the agreement or services, contact me by email or Telegram.',
+  },
+
   docs: {
     oferta: {
-      title: 'Terms of service',
+      title: 'Draft service agreement',
       about:
-        'How the mentorship works: the format, the pay-after-results arrangement, ' +
-        'and what each side commits to.',
+        'Draft individual agreement for consulting and information services.',
     },
     dogovor: {
-      title: 'Mentorship agreement',
+      title: 'Service agreement',
       about:
-        'The agreement we sign before starting: the stages, guidance up to the offer, ' +
-        'and the payment of half your first paycheck.',
+        'Draft agreement and appendices. Scope, timeline, price and payment are agreed before signing.',
     },
     privacy: {
       title: 'Privacy policy',

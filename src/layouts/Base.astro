@@ -2,7 +2,7 @@
 import '../styles/tokens.css';
 import '../styles/fonts.css';
 import '../styles/base.css';
-import { t, links, LANGS, path } from '../i18n';
+import { t, links, LANGS, path, docHref, docPaths } from '../i18n';
 // Шрифты первого экрана импортом: preload получает тот же хэшированный
 // адрес (с учётом base), что и @font-face в собранном CSS.
 import onestCyrillicUrl from '../assets/fonts/onest-cyrillic-wght-normal.woff2';
@@ -11,11 +11,12 @@ import onestLatinUrl from '../assets/fonts/onest-latin-wght-normal.woff2';
 interface Props {
   title?: string;
   description?: string;
+  document?: keyof typeof docPaths.ru;
 }
 
 const c = t(Astro.currentLocale);
 const lang = Astro.currentLocale ?? 'ru';
-const { title = c.site.title, description = c.site.description } = Astro.props;
+const { title = c.site.title, description = c.site.description, document: documentKey } = Astro.props;
 
 /* Подпапка деплоя (GitHub Pages). На своём домене пустая строка. */
 const basePrefix = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -33,7 +34,7 @@ const bare =
 const pathWithoutLang = bare.replace(/^\/en(?=\/|$)/, '') || '/';
 const alternates = LANGS.map((l) => ({
   lang: l,
-  href: new URL(path(l, pathWithoutLang), Astro.site).href,
+  href: new URL(documentKey ? docHref(l, documentKey) : path(l, pathWithoutLang), Astro.site).href,
 }));
 
 const jsonLd = {
@@ -69,7 +70,7 @@ const jsonLd = {
     <link rel="canonical" href={canonical} />
 
     {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
-    <link rel="alternate" hreflang="x-default" href={new URL(path('ru', pathWithoutLang), Astro.site).href} />
+    <link rel="alternate" hreflang="x-default" href={alternates[0].href} />
 
     <link rel="icon" href={`${basePrefix}/favicon.svg`} type="image/svg+xml" />
     <meta name="theme-color" content="#f2f1ed" />

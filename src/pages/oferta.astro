@@ -1,5 +1,4 @@
 ---
-import DocPage from '../components/DocPage.astro';
+// Пока опубликован проект индивидуального договора, этот адрес ведёт к нему.
+return Astro.redirect(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/dogovor`, 301);
 ---
-
-<DocPage doc="oferta" />

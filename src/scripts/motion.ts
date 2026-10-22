@@ -544,6 +544,8 @@ function collectSnapPoints(): number[] {
     pts.push(top);
     if (exit > top) pts.push(exit);
   }
+  // Подвал с реквизитами бывает выше экрана: его низ тоже точка остановки.
+  pts.push(Math.max(0, Math.round(document.documentElement.scrollHeight - window.innerHeight)));
   return pts;
 }
 
@@ -651,6 +653,7 @@ function initSnapMobile(lenis: Lenis): void {
       const exit = Math.round(prog.getBoundingClientRect().bottom + window.scrollY - window.innerHeight);
       snapPoints.push(exit);
     }
+    snapPoints.push(Math.max(0, Math.round(document.documentElement.scrollHeight - window.innerHeight)));
   };
   rebuildSnaps();
 
@@ -675,13 +678,14 @@ function initSnapMobile(lenis: Lenis): void {
     let bestDist = Infinity;
     for (const p of snapPoints) {
       const d = Math.abs(p - y);
-      if (d < 2 || d > reach) continue;
       if (d < bestDist) {
         best = p;
         bestDist = d;
       }
     }
-    if (best === -1) {
+    // Сначала выбираем ближайшую точку, затем проверяем порог: стоя на
+    // конце документа, нельзя перепрыгивать к соседней точке начала футера.
+    if (best === -1 || bestDist < 2 || bestDist > reach) {
       nudged = -1; // цели нет — сторож заряжен на следующую границу
       return;
     }

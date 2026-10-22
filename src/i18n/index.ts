@@ -15,9 +15,10 @@ export function t(lang: string | undefined): typeof ru {
 }
 
 /** Постоянные ссылки, одинаковые для обоих языков. */
+const CONTACT_EMAIL = 'gerkulesov35@yandex.ru';
 export const links = {
   telegram: 'https://t.me/gerkulesov35',
-  email: 'mailto:akbjenya@gmail.com',
+  email: `mailto:${CONTACT_EMAIL}`,
   instagram: 'https://www.instagram.com/hercules_eugene/',
 };
 
@@ -32,6 +33,14 @@ export function socialHref(key: string): string {
  * с него. Значение приходит из base в astro.config.
  */
 const SITE_BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+/** Публичные реквизиты и исходный проект договора, одинаковые для обоих языков. */
+export const business = {
+  inn: '352527993654',
+  ogrnip: '326350000031219',
+  email: CONTACT_EMAIL,
+  agreementPdf: `${SITE_BASE}/documents/mentorship-agreement-draft.pdf`,
+};
 
 /** Префикс языка: русский в корне, английский под /en. */
 export function base(lang: string | undefined): string {

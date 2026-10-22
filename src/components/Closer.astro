@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { t, links } from '../i18n';
+import { t, links, docHref } from '../i18n';
+import BusinessDetails from './BusinessDetails.astro';
 
 const c = t(Astro.currentLocale);
 const year = new Date().getFullYear();
@@ -32,10 +33,16 @@ const year = new Date().getFullYear();
       </a>
     </div>
 
-    <!-- Разделы, связь и документы убраны по просьбе заказчика: пока
-         страница-визитка, футер несёт только имя и год. -->
     <div class="closer__foot">
-      <span class="closer__legal">{c.site.legal} · <span class="num">{year}</span></span>
+      <nav class="closer__documents" aria-label={c.legal.navLabel}>
+        <a href={links.telegram} target="_blank" rel="noopener">{c.legal.telegramLabel}</a>
+        <a href={docHref(Astro.currentLocale, 'dogovor')}>
+          <span>{c.legal.agreementLink}</span>
+          <span class="closer__draft">{c.legal.draft}</span>
+        </a>
+      </nav>
+      <BusinessDetails />
+      <span class="closer__copyright">© <span class="num">{year}</span></span>
     </div>
   </div>
 </footer>
@@ -123,8 +130,10 @@ const year = new Date().getFullYear();
 
   .closer__foot {
     width: 100%;
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--col-gap);
+    row-gap: var(--space-8);
     margin-top: auto;
     padding-block: clamp(2rem, 1.5rem + 2vw, 3rem) var(--space-8);
     border-top: var(--hair) solid var(--line);
@@ -132,8 +141,18 @@ const year = new Date().getFullYear();
     color: var(--fg-mute);
   }
 
+  .closer__documents { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); }
+  .closer__documents a { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); color: var(--fg-soft); }
+  .closer__documents a:hover, .closer__documents a:focus-visible { color: var(--stamp); }
+  .closer__draft { font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--fg-mute); }
+  .closer__copyright { grid-column: 1 / -1; font-family: var(--font-mono); font-size: var(--fs-micro); }
+
+  @media (max-width: 780px) {
+    .closer__foot { grid-template-columns: minmax(0, 1fr); }
+  }
+
   @media (hover: none) {
-    .closer__tg {
+    .closer__tg, .closer__documents a {
       display: inline-flex;
       align-items: center;
       min-height: 44px;
