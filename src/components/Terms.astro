@@ -1,113 +1,89 @@
 ---
-import { t } from '../i18n';
+import { Icon } from 'astro-icon/components';
+import { t, links } from '../i18n';
+import { pricingPlans } from '../data/pricing';
 
 const c = t(Astro.currentLocale);
+const amount = new Intl.NumberFormat(c.locale, { maximumFractionDigits: 0 });
 ---
 
 <section class="section section--band terms" id="usloviya">
-  <div class="shell grid terms__grid">
+  <div class="shell terms__inner">
     <header class="terms__head">
       <h2 class="h2 terms__title" data-split>{c.terms.title}</h2>
       <p class="body terms__body" data-reveal="blur">{c.terms.body}</p>
     </header>
 
-    <div class="panel bill-panel" data-reveal="up">
+    <div class="panel terms__plans" data-reveal="up">
       <span class="panel__tag">{c.terms.panelTag}</span>
-    <dl class="bill">
-      {
-        c.terms.rows.map((row) => (
-          <div class="bill__row" data-reveal="up">
-            <dt class="bill__key">{row.key}</dt>
-            <dd class="bill__val num-font">{row.value}</dd>
-          </div>
-        ))
-      }
-      <div class="bill__row bill__row--final" data-reveal="up">
-        <dt class="bill__key bill__key--final">{c.terms.final.key}</dt>
-        <dd class="bill__final">
-          <span class="bill__val bill__val--final num-font">{c.terms.final.value}</span>
-          <span class="bill__note">{c.terms.final.note}</span>
-        </dd>
-      </div>
-    </dl>
+      {pricingPlans.map((plan) => (
+        <article class="tariff" aria-labelledby={'tariff-' + plan.id}>
+          <h3 class="tariff__name" id={'tariff-' + plan.id}>
+            {c.terms.planLabel} <span>{plan.id}</span>
+          </h3>
+          <dl class="tariff__bill">
+            <div class="tariff__row">
+              <dt>{c.terms.upfrontLabel}</dt>
+              <dd class="tariff__upfront num-font">
+                {amount.format(plan.upfrontRub)}<span class="tariff__currency"> ₽</span>
+              </dd>
+            </div>
+            <div class="tariff__row tariff__row--postpay">
+              <dt>{c.terms.postpayLabel}</dt>
+              <dd>
+                <span class="tariff__postpay num-font">{plan.postpayPercent ? plan.postpayPercent + '%' : '0 ₽'}</span>
+                <span class="tariff__note">{plan.postpayPercent ? c.terms.postpayNote : c.terms.noPostpayNote}</span>
+              </dd>
+            </div>
+          </dl>
+          <a class="btn btn--ghost tariff__cta" href={links.telegram} target="_blank" rel="noopener" aria-label={c.terms.discuss + ': ' + c.terms.planLabel + ' ' + plan.id}>
+            <span>{c.terms.discuss}</span>
+            <Icon class="btn__arrow" name="ph:arrow-up-right-bold" aria-hidden="true" />
+          </a>
+        </article>
+      ))}
     </div>
+
+    <p class="terms__agreement">{c.terms.agreementNote}</p>
   </div>
 </section>
 
 <style>
-  /* Двухколонник: слева заголовок и вводка, справа компактный расчёт.
-     Плотно, по центру секции, без сквозной пустоты. */
-  .terms__grid { align-items: center; row-gap: var(--space-8); }
-  .terms__head {
-    grid-column: 1 / 6;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-6);
-  }
-  .terms__title { max-width: 14ch; }
-  .terms__body { max-width: 40ch; }
+  .terms__inner { display: grid; gap: var(--space-8); }
+  .terms__head { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: var(--col-gap); }
+  .terms__title { max-width: 17ch; }
+  .terms__body { max-width: 44ch; }
 
-  .bill-panel { grid-column: 7 / 13; padding-block: 0.4rem; background: var(--bg); }
-  .bill { margin: 0; }
-
-  .bill__row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-6);
-    padding-block: clamp(0.9rem, 0.5rem + 1.2vw, 1.4rem);
-    border-top: var(--hair) solid var(--line-strong);
-  }
-  .bill__row:last-child { border-bottom: 0; }
-  .bill__row:first-child { border-top: 0; }
-
-  .bill__key {
-    font-family: var(--font-mono);
-    font-size: var(--fs-small);
-    font-weight: var(--fw-medium);
-    letter-spacing: var(--tr-mono);
-    color: var(--fg-soft);
-    text-wrap: balance;
-  }
-
-  .bill__val {
-    flex: none;
-    font-size: clamp(1.35rem, 0.7rem + 2.2vw, 2.4rem);
-    font-weight: var(--fw-num);
-    line-height: 1;
-    color: var(--fg-soft);
-    margin: 0;
-  }
-
-  /* Итог с пояснением: без него «50%» читается как доля от всего дохода. */
-  .bill__final {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.3rem;
-    margin: 0;
-  }
-  .bill__note {
-    font-family: var(--font-mono);
-    font-size: var(--fs-micro);
-    letter-spacing: var(--tr-mono);
-    color: var(--fg-mute);
-    text-align: right;
-    max-width: 22ch;
-    text-wrap: pretty;
-  }
-
-  /* Итоговая строка: единственная сумма, которая реально появится. */
-  .bill__row--final { border-top-width: 2px; border-top-color: var(--fg); }
-  .bill__key--final { color: var(--fg); font-weight: var(--fw-strong); }
-  .bill__val--final {
-    color: var(--stamp);
-    font-size: clamp(2rem, 0.8rem + 4vw, 4rem);
-  }
+  /* Один бланк с тремя колонками: все варианты сравниваются по одним строкам. */
+  .terms__plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0; background: var(--bg); }
+  .terms__plans > .panel__tag { background: var(--bg); }
+  .tariff { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-8); min-width: 0; padding: clamp(1.25rem, 0.7rem + 1.8vw, 2.25rem); }
+  .tariff + .tariff { border-left: var(--hair) solid var(--line-strong); }
+  .tariff__name { display: flex; justify-content: space-between; gap: var(--space-4); width: 100%; font-family: var(--font-mono); font-size: var(--fs-small); font-weight: var(--fw-medium); color: var(--fg-soft); }
+  .tariff__bill { display: grid; gap: var(--space-6); width: 100%; }
+  .tariff__row { display: grid; gap: var(--space-4); }
+  .tariff__row dt { font-size: var(--fs-small); color: var(--fg-soft); }
+  .tariff__upfront { font-size: clamp(1.65rem, 0.8rem + 2.1vw, 2.8rem); font-weight: var(--fw-num); line-height: 1.15; white-space: nowrap; }
+  .tariff__currency { font-size: 0.6em; color: var(--fg-soft); }
+  .tariff__row--postpay { padding-top: var(--space-6); border-top: var(--hair) solid var(--line-strong); }
+  .tariff__row--postpay dd { display: grid; gap: var(--space-3); }
+  .tariff__postpay { color: var(--stamp); font-size: clamp(2rem, 1.2rem + 1.4vw, 2.75rem); font-weight: var(--fw-num); line-height: 1.1; }
+  .tariff__note { font-size: var(--fs-small); color: var(--fg-soft); max-width: 28ch; text-wrap: pretty; }
+  .tariff__cta { margin-top: auto; }
+  .terms__agreement { font-size: var(--fs-small); color: var(--fg-soft); max-width: 64ch; }
 
   @media (max-width: 900px) {
-    .terms__head { grid-column: 1 / -1; }
-    .bill-panel { grid-column: 1 / -1; }
-    .bill__row { gap: var(--space-4); }
+    .terms__head { grid-template-columns: 1fr; gap: var(--space-6); }
+    .terms__plans { grid-template-columns: 1fr; }
+    .tariff { gap: var(--space-6); }
+    .tariff + .tariff { border-left: 0; border-top: var(--hair) solid var(--line-strong); }
+    .tariff__bill { grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+    .tariff__row--postpay { padding-top: 0; border-top: 0; }
+    .tariff__upfront { font-size: clamp(1.65rem, 1rem + 2.5vw, 2.8rem); }
+  }
+  @media (max-width: 560px) {
+    .tariff__bill { grid-template-columns: 1fr; gap: var(--space-6); }
+    .tariff__row--postpay { padding-top: var(--space-6); border-top: var(--hair) solid var(--line-strong); }
+    .tariff__cta { width: 100%; justify-content: space-between; }
   }
 </style>

@@ -3,6 +3,7 @@ import '../styles/tokens.css';
 import '../styles/fonts.css';
 import '../styles/base.css';
 import { t, links, LANGS, path, docHref, docPaths } from '../i18n';
+import { pricingPlans } from '../data/pricing';
 // Шрифты первого экрана импортом: preload получает тот же хэшированный
 // адрес (с учётом base), что и @font-face в собранном CSS.
 import onestCyrillicUrl from '../assets/fonts/onest-cyrillic-wght-normal.woff2';
@@ -51,12 +52,14 @@ const jsonLd = {
     jobTitle: 'Senior Backend Engineer',
     sameAs: [links.telegram, links.instagram],
   },
-  offers: {
+  offers: pricingPlans.map((plan) => ({
     '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'RUB',
-    description: c.terms.body,
-  },
+    name: `${c.terms.planLabel} ${plan.id}`,
+    description: `${c.terms.upfrontLabel}: ${plan.upfrontRub} RUB. ${plan.postpayPercent ? `${plan.postpayPercent}% ${c.terms.postpayNote}` : c.terms.noPostpayNote}`,
+    // Фиксированная полная цена есть только у тарифа без постоплаты.
+    ...(plan.postpayPercent === 0 ? { price: plan.upfrontRub, priceCurrency: 'RUB' } : {}),
+    url: new URL(`${path(lang, '/')}#usloviya`, Astro.site).href,
+  })),
 };
 ---
 

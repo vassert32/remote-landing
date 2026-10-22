@@ -4,7 +4,7 @@
  * Рисуется тем же шрифтом, что и страница. resvg не умеет woff2 и не знает
  * псевдонимов fontsource, поэтому подмножества распаковываются в ttf, а в
  * font-family уходит настоящее имя семейства из таблицы name: Onest,
- * JetBrains Mono.
+ * IBM Plex Mono.
  *
  * Результат коммитится в репозиторий: в CI пересобирать превью незачем.
  * Запуск: npm run og
@@ -15,30 +15,30 @@ import { decompress } from 'wawoff2';
 import sharp from 'sharp';
 
 const SUBSETS = [
-  'onest-cyrillic',
-  'onest-latin',
-  'onest-latin-ext',
-  'jetbrains-mono-cyrillic',
-  'jetbrains-mono-latin',
-  'jetbrains-mono-latin-ext',
+  'onest-cyrillic-wght-normal',
+  'onest-latin-wght-normal',
+  'onest-latin-ext-wght-normal',
+  'ibm-plex-mono-cyrillic-600-normal',
+  'ibm-plex-mono-latin-600-normal',
+  'ibm-plex-mono-latin-ext-600-normal',
 ];
 
-const CACHE = '.cache/fonts';
+const CACHE = '.cache/fonts/og';
 mkdirSync(CACHE, { recursive: true });
 
 for (const name of SUBSETS) {
-  const ttf = await decompress(readFileSync(`public/fonts/${name}-wght-normal.woff2`));
+  const ttf = await decompress(readFileSync(`src/assets/fonts/${name}.woff2`));
   writeFileSync(`${CACHE}/${name}.ttf`, Buffer.from(ttf));
 }
 
 const PAPER = '#f2f1ed';
 const INK = '#12120f';
 const MUTE = '#6a6a62';
-const STAMP = '#1f31d6';
+const STAMP = '#d9531e';
 const RULE = 'rgba(18,18,15,0.32)';
 
 const micro = (x, y, text, fill = MUTE, anchor = 'start') =>
-  `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="JetBrains Mono" font-size="15" ` +
+  `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="IBM Plex Mono" font-size="15" ` +
   `font-weight="600" letter-spacing="1.4" fill="${fill}">${text}</text>`;
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
@@ -65,14 +65,14 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
   <!-- Печать -->
   <g transform="translate(1010 268) rotate(-6)">
     <rect x="-96" y="-27" width="192" height="54" fill="none" stroke="${STAMP}" stroke-width="3"/>
-    <text x="0" y="8" text-anchor="middle" font-family="JetBrains Mono" font-size="19"
+    <text x="0" y="8" text-anchor="middle" font-family="IBM Plex Mono" font-size="19"
           font-weight="700" letter-spacing="2.2" fill="${STAMP}">ПОДТВЕРЖДЁН</text>
   </g>
 
   <!-- Подвал документа -->
   <rect x="80" y="524" width="1040" height="1" fill="${RULE}"/>
-  ${micro(80, 566, '0 ₽ НА СТАРТЕ', INK)}
-  ${micro(480, 566, '50% С ПЕРВОЙ ЗАРПЛАТЫ', INK)}
+  ${micro(80, 566, 'ПРЕДОПЛАТА ОТ 50 000 ₽', INK)}
+  ${micro(480, 566, '3 ТАРИФА МЕНТОРСТВА', INK)}
   ${micro(1120, 566, 'REMOTE UK / ЕВРОПА', INK, 'end')}
 </svg>`;
 

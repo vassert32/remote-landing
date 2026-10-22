@@ -19,7 +19,7 @@ export const en = {
     title: 'Evgeny Gerkulesov. Mentorship to a remote offer in hard currency',
     description:
       'One-on-one mentorship for experienced engineers: CV and LinkedIn built for the remote market, ' +
-      'interviews in English, offer negotiation. Nothing upfront, you pay after you start the job.',
+      'interviews in English, offer negotiation. Three payment plans: upfront plus salary-based payments, or full payment upfront.',
   },
 
   cta: { label: 'Book a review call', short: 'Book a call' },
@@ -100,8 +100,8 @@ export const en = {
       'With me, not a team of coordinators, we go through your CV, applications, ' +
         'interviews and offer negotiation. All of it personally — no group chats, ' +
         'no recorded lessons.',
-      'Why you can trust this: I am not selling access to materials. My income is tied ' +
-        'to your offer. Until you start the job, I earn exactly nothing.',
+      'The work follows your actual job search: we review real vacancies, ' +
+        'prepare for specific interviews and discuss the terms of your offer.',
     ],
   },
 
@@ -166,16 +166,18 @@ export const en = {
   },
 
   terms: {
-    title: 'Zero upfront. I bill on results',
+    title: 'Three ways to pay',
     body:
-      'All preparation and guidance up to the offer is free. My invoice arrives once, ' +
-      'and it is half of your first paycheck after you start the job. No offer, no invoice.',
-    panelTag: 'invoice',
-    rows: [
-      { key: 'First review call', value: '₽0' },
-      { key: 'Preparation and guidance up to the offer', value: '₽0' },
-    ],
-    final: { key: 'After your first paycheck', value: '50%', note: 'once, from your first paycheck, nothing after that' },
+      'Choose your balance between an upfront payment and a share of your first two salaries. ' +
+      'Or pay the full amount upfront, with no further payments.',
+    panelTag: 'mentorship plans',
+    planLabel: 'Plan',
+    upfrontLabel: 'Upfront payment',
+    postpayLabel: 'After you start the job',
+    postpayNote: 'of each of your first two salaries',
+    noPostpayNote: 'No further payments: the full price is paid upfront.',
+    discuss: 'Discuss this plan',
+    agreementNote: 'We agree on the plan and payment schedule in the contract before starting.',
   },
 
   fit: {
@@ -254,8 +256,8 @@ export const en = {
         a: 'Three months and up. The exact timeline depends on your level, your English, and how many hours you put in.',
       },
       {
-        q: 'Why do you get paid only on results?',
-        a: 'Because then my income depends on your offer, not on how many people signed up. No offer, no invoice.',
+        q: 'How does payment work?',
+        a: 'Two plans combine an upfront payment with a percentage of each of your first two salaries. A third plan is paid in full upfront, with no further payments. We agree on the terms in the contract before starting.',
       },
       {
         q: 'What if I fail every interview?',
@@ -267,7 +269,7 @@ export const en = {
   closer: {
     kicker: 'The first call is free',
     bigNum: '$0',
-    bigNote: 'the start',
+    bigNote: 'first review call',
     title: 'The next offer could be yours',
     note:
       'We get on a call and look at your experience, your English and your goal. ' +
