@@ -3,9 +3,10 @@ import { business, links, t } from '../i18n';
 
 interface Props {
   showTax?: boolean;
+  showContacts?: boolean;
 }
 
-const { showTax = false } = Astro.props;
+const { showTax = false, showContacts = true } = Astro.props;
 const c = t(Astro.currentLocale);
 ---
 
@@ -16,8 +17,10 @@ const c = t(Astro.currentLocale);
     <div><dt>{c.legal.innLabel}:</dt><dd class="num">{business.inn}</dd></div>
     <div><dt>{c.legal.ogrnipLabel}:</dt><dd class="num">{business.ogrnip}</dd></div>
   </dl>
-  <p>{c.legal.emailLabel}: <a href={links.email}>{business.email}</a></p>
-  <p>{c.legal.telegramLabel}: <a href={links.telegram} target="_blank" rel="noopener">{c.site.telegramHandle}</a></p>
+  {showContacts && <>
+    <p>{c.legal.emailLabel}: <a href={links.email}>{business.email}</a></p>
+    <p>{c.legal.telegramLabel}: <a href={links.telegram} target="_blank" rel="noopener">{c.site.telegramHandle}</a></p>
+  </>}
   {showTax && <p>{c.legal.taxLabel}: {c.legal.taxSystem}</p>}
 </address>
 

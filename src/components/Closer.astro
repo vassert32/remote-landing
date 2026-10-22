@@ -1,6 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { t, links, docHref } from '../i18n';
+import { t, links, docHref, business } from '../i18n';
 import BusinessDetails from './BusinessDetails.astro';
 
 const c = t(Astro.currentLocale);
@@ -36,12 +36,13 @@ const year = new Date().getFullYear();
     <div class="closer__foot">
       <nav class="closer__documents" aria-label={c.legal.navLabel}>
         <a href={links.telegram} target="_blank" rel="noopener">{c.legal.telegramLabel}</a>
+        <a href={links.email}>{business.email}</a>
         <a href={docHref(Astro.currentLocale, 'dogovor')}>
           <span>{c.legal.agreementLink}</span>
           <span class="closer__draft">{c.legal.draft}</span>
         </a>
       </nav>
-      <BusinessDetails />
+      <BusinessDetails showContacts={false} />
       <span class="closer__copyright">© <span class="num">{year}</span></span>
     </div>
   </div>
