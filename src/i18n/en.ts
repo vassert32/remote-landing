@@ -120,7 +120,6 @@ export const en = {
         stage: 'Start',
         weight: 0.02,
         icon: 'ph:flag',
-        story: 'Lectures, side projects and commits nobody saw. Zero income, but finally a goal.',
       },
       {
         value: 40000,
@@ -129,7 +128,6 @@ export const en = {
         stage: 'Yandex School',
         weight: 0.06,
         icon: 'ph:graduation-cap',
-        story: 'Six months of algorithms after work. That is where the internship offer came from.',
       },
       {
         value: 80000,
@@ -138,7 +136,6 @@ export const en = {
         stage: 'Internship',
         weight: 0.12,
         icon: 'ph:flask',
-        story: 'Three months at full production pace next to seniors, then a staff contract.',
       },
       {
         value: 240000,
@@ -147,7 +144,6 @@ export const en = {
         stage: 'Yandex staff',
         weight: 0.35,
         icon: 'ph:buildings',
-        story: 'Production services, incidents, growing into features I owned end to end.',
       },
       {
         value: 8500,
@@ -156,7 +152,6 @@ export const en = {
         stage: 'Remote offer',
         weight: 1,
         icon: 'ph:globe-hemisphere-west',
-        story: 'Interviews in English, a negotiation over the rate, and a contract with a UK company.',
       },
     ],
   },

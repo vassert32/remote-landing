@@ -805,9 +805,8 @@ function initSectionEntrances(): void {
     const bars = section.querySelectorAll<HTMLElement>('[data-reveal="bar"]');
     const rules = section.querySelectorAll<HTMLElement>('[data-reveal="rule"]');
     const counters = section.querySelectorAll<HTMLElement>('[data-count-to]');
-    // Элементы, которые входят с контентом ТОЛЬКО на телефоне: истории
-    // лестницы на десктопе всплывают по ховеру, и общий reveal затёр бы
-    // их скрытое состояние инлайн-стилями.
+    // Подписи этапов входят с контентом только на телефоне;
+    // на десктопе остаются статичными под растущими столбцами.
     const mobRises = window.matchMedia('(max-width: 560px)').matches
       ? section.querySelectorAll<HTMLElement>('[data-reveal-mobile="up"]')
       : null;
@@ -868,8 +867,8 @@ function initSectionEntrances(): void {
       tl.fromTo(rises, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.06 }, 0.22);
     }
     if (mobRises?.length) {
-      // После входа инлайн-стили снимаются: при повороте в десктоп
-      // управление возвращается CSS (там история скрыта до ховера).
+      // После входа инлайн-стили снимаются, чтобы при повороте экрана
+      // управление раскладкой возвращалось CSS.
       tl.fromTo(
         mobRises,
         { opacity: 0, y: 24 },
