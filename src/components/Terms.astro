@@ -71,7 +71,7 @@ const referenceUsdRub = offerExample.rubPerMonth / offerExample.usdPerMonth;
   .terms__title { max-width: 17ch; }
   .terms__body { max-width: 44ch; }
 
-  /* Один бланк с тремя колонками: все варианты сравниваются по одним строкам. */
+  /* На десктопе один бланк с тремя колонками, в вертикальном списке — отдельные карточки. */
   .terms__plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0; border: var(--hair) solid var(--line-strong); background: var(--bg); }
   .tariff { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-6); min-width: 0; padding: clamp(1.25rem, 0.7rem + 1.8vw, 2.25rem); }
   .tariff + .tariff { border-left: var(--hair) solid var(--line-strong); }
@@ -95,9 +95,8 @@ const referenceUsdRub = offerExample.rubPerMonth / offerExample.usdPerMonth;
 
   @media (max-width: 900px) {
     .terms__head { grid-template-columns: 1fr; gap: var(--space-6); }
-    .terms__plans { grid-template-columns: 1fr; }
-    .tariff { gap: var(--space-6); }
-    .tariff + .tariff { border-left: 0; border-top: var(--hair) solid var(--line-strong); }
+    .terms__plans { grid-template-columns: 1fr; gap: var(--space-8); border: 0; background: transparent; }
+    .tariff { gap: var(--space-6); border: var(--hair) solid var(--line-strong); background: var(--bg); }
     .tariff__bill { grid-template-columns: 1fr 1fr; gap: var(--space-8); }
     .tariff__row--postpay { padding-top: 0; border-top: 0; }
     .tariff__upfront { font-size: clamp(1.65rem, 1rem + 2.5vw, 2.8rem); }
