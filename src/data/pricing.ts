@@ -12,5 +12,5 @@ export const postpaySalaryCount = 2;
 export function calculatePlan(plan: (typeof pricingPlans)[number]) {
   const postpayRub = offerExample.rubPerMonth * plan.postpayPercent / 100 * postpaySalaryCount;
   const totalRub = plan.upfrontRub + postpayRub;
-  return { postpayRub, totalRub, remainingRub: offerExample.rubPerMonth - totalRub };
+  return { postpayRub, totalRub };
 }
