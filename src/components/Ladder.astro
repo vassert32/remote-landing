@@ -229,39 +229,40 @@ const fmt = new Intl.NumberFormat(c.locale);
     .col__stage { font-size: var(--fs-micro); }
   }
 
-  /* Ниже 560px пять колонн нечитаемы: этапы и суммы идут вертикальным списком. */
+  /* На телефоне каждый этап — отдельная карточка с крупной суммой. */
   @media (max-width: 560px) {
     .cols {
       grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-3);
       --field: 100%;
     }
     .col {
       display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      column-gap: var(--space-4);
-      padding-block: var(--space-3);
-      border-top: var(--hair) solid var(--line);
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+      padding: var(--space-6);
+      border: var(--hair) solid var(--line-strong);
+      border-top: 2px solid var(--stamp);
+      background: var(--bg-band);
     }
-    /* Столбца нет — сумма остаётся, превращаясь в шильдик справа от этапа.
-       Раньше она пряталась вместе со столбцом, потому что живёт внутри него. */
-    .col__bar {
-      grid-column: 2;
-      grid-row: 1;
+    .col--peak { background: color-mix(in srgb, var(--stamp) 12%, var(--bg)); }
+    /* На телефоне сумма входит в карточку без отдельной плашки. */
+    .col__bar,
+    .col--peak .col__bar {
+      grid-column: 1;
+      grid-row: 2;
       width: auto;
       height: auto;
-      justify-self: end;
-      padding: 0.3rem 0.55rem;
-      box-shadow: inset 0 2px 0 var(--stamp);
+      justify-self: start;
+      padding: 0;
+      background: none;
+      box-shadow: none;
     }
-    /* В шильдике сумма возвращается в поток: absolute тут не про что. */
-    .col--low .col__bar { padding: 0.3rem 0.55rem; }
     .col--low .col__num { position: static; }
-    .col__num { font-size: var(--fs-small); }
-    .col__stage { grid-column: 1; grid-row: 1; margin-top: 0; font-size: var(--fs-small); }
+    .col__num { font-size: clamp(1.25rem, 0.9rem + 1.5vw, 1.5rem); }
+    .col__stage { grid-column: 1; grid-row: 1; margin-top: 0; font-size: var(--fs-body); }
     .ladder__head { margin-bottom: var(--space-4); }
-    .ladder__panel { padding: 1.4rem 1rem 1rem; }
-    /* Паддинг панели здесь уже: шильдик следует за ним. */
-    .ladder__panel > :global(.panel__tag) { left: 1rem; }
+    .ladder__panel { padding: 1.4rem 0 0; }
+    .ladder__panel > :global(.panel__tag) { left: 0; }
   }
 </style>
