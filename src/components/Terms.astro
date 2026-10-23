@@ -1,10 +1,11 @@
 ---
-import { Icon } from 'astro-icon/components';
-import { t, links } from '../i18n';
-import { pricingPlans } from '../data/pricing';
+import { t } from '../i18n';
+import { pricingPlans, offerExample, calculatePlan } from '../data/pricing';
 
 const c = t(Astro.currentLocale);
 const amount = new Intl.NumberFormat(c.locale, { maximumFractionDigits: 0 });
+const plans = pricingPlans.map((plan) => ({ ...plan, ...calculatePlan(plan) }));
+const allCovered = plans.every((plan) => plan.remainingRub >= 0);
 ---
 
 <section class="section section--band terms" id="usloviya">
@@ -14,12 +15,23 @@ const amount = new Intl.NumberFormat(c.locale, { maximumFractionDigits: 0 });
       <p class="body terms__body" data-reveal="blur">{c.terms.body}</p>
     </header>
 
-    <div class="panel terms__plans" data-reveal="up">
-      <span class="panel__tag">{c.terms.panelTag}</span>
-      {pricingPlans.map((plan) => (
+    <div class="terms__example" data-reveal="up">
+      <div>
+        <p class="terms__offer-label">{c.terms.offerLabel}</p>
+        <p class="terms__offer num-font">
+          <span>${amount.format(offerExample.usdPerMonth)}</span>
+          <span class="terms__approx">≈</span>
+          <span>{amount.format(offerExample.rubPerMonth)} ₽</span>
+        </p>
+      </div>
+      <p class="terms__summary">{allCovered ? c.terms.exampleSummary : c.terms.exampleNeutral}</p>
+    </div>
+
+    <div class="terms__plans" data-reveal="up">
+      {plans.map((plan) => (
         <article class="tariff" aria-labelledby={'tariff-' + plan.id}>
-          <h3 class="tariff__name" id={'tariff-' + plan.id}>
-            {c.terms.planLabel} <span>{plan.id}</span>
+          <h3 class="sr-only" id={'tariff-' + plan.id}>
+            {c.terms.upfrontLabel}: {amount.format(plan.upfrontRub)} ₽
           </h3>
           <dl class="tariff__bill">
             <div class="tariff__row">
@@ -36,15 +48,28 @@ const amount = new Intl.NumberFormat(c.locale, { maximumFractionDigits: 0 });
               </dd>
             </div>
           </dl>
-          <a class="btn btn--ghost tariff__cta" href={links.telegram} target="_blank" rel="noopener" aria-label={c.terms.discuss + ': ' + c.terms.planLabel + ' ' + plan.id}>
-            <span>{c.terms.discuss}</span>
-            <Icon class="btn__arrow" name="ph:arrow-up-right-bold" aria-hidden="true" />
-          </a>
+          <dl class="tariff__calculation">
+            <div class="tariff__sum">
+              <dt>{c.terms.postpayTotalLabel}</dt>
+              <dd class="num">{amount.format(plan.postpayRub)} ₽</dd>
+            </div>
+            <div class="tariff__sum tariff__sum--total">
+              <dt>{c.terms.totalLabel}</dt>
+              <dd class="num">{amount.format(plan.totalRub)} ₽</dd>
+            </div>
+            <div class="tariff__balance">
+              <dt>{plan.remainingRub >= 0 ? c.terms.remainingLabel : c.terms.shortfallLabel}</dt>
+              <dd class="num-font">≈ {amount.format(Math.abs(plan.remainingRub))} ₽</dd>
+            </div>
+          </dl>
         </article>
       ))}
     </div>
 
-    <p class="terms__agreement">{c.terms.agreementNote}</p>
+    <div class="terms__notes">
+      <p>{c.terms.exampleNote}</p>
+      <p>{c.terms.agreementNote}</p>
+    </div>
   </div>
 </section>
 
@@ -55,11 +80,15 @@ const amount = new Intl.NumberFormat(c.locale, { maximumFractionDigits: 0 });
   .terms__body { max-width: 44ch; }
 
   /* Один бланк с тремя колонками: все варианты сравниваются по одним строкам. */
-  .terms__plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0; background: var(--bg); }
-  .terms__plans > .panel__tag { background: var(--bg); }
-  .tariff { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-8); min-width: 0; padding: clamp(1.25rem, 0.7rem + 1.8vw, 2.25rem); }
+  .terms__example { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-6); }
+  .terms__offer-label { margin-bottom: var(--space-3); font-size: var(--fs-small); color: var(--fg-soft); }
+  .terms__offer { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5em; font-size: clamp(1.2rem, 0.8rem + 1.2vw, 1.85rem); font-weight: var(--fw-num); line-height: 1.2; }
+  .terms__offer > span { white-space: nowrap; }
+  .terms__approx { font-family: var(--font-sans); font-weight: var(--fw-medium); color: var(--fg-soft); }
+  .terms__summary { max-width: 32ch; font-size: var(--fs-body); font-weight: var(--fw-medium); color: var(--fg-soft); }
+  .terms__plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0; border: var(--hair) solid var(--line-strong); background: var(--bg); }
+  .tariff { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-6); min-width: 0; padding: clamp(1.25rem, 0.7rem + 1.8vw, 2.25rem); }
   .tariff + .tariff { border-left: var(--hair) solid var(--line-strong); }
-  .tariff__name { display: flex; justify-content: space-between; gap: var(--space-4); width: 100%; font-family: var(--font-mono); font-size: var(--fs-small); font-weight: var(--fw-medium); color: var(--fg-soft); }
   .tariff__bill { display: grid; gap: var(--space-6); width: 100%; }
   .tariff__row { display: grid; gap: var(--space-4); }
   .tariff__row dt { font-size: var(--fs-small); color: var(--fg-soft); }
@@ -69,8 +98,14 @@ const amount = new Intl.NumberFormat(c.locale, { maximumFractionDigits: 0 });
   .tariff__row--postpay dd { display: grid; gap: var(--space-3); }
   .tariff__postpay { color: var(--stamp); font-size: clamp(2rem, 1.2rem + 1.4vw, 2.75rem); font-weight: var(--fw-num); line-height: 1.1; }
   .tariff__note { font-size: var(--fs-small); color: var(--fg-soft); max-width: 28ch; text-wrap: pretty; }
-  .tariff__cta { margin-top: auto; }
-  .terms__agreement { font-size: var(--fs-small); color: var(--fg-soft); max-width: 64ch; }
+  .tariff__calculation { display: grid; gap: var(--space-4); width: 100%; margin-top: auto; padding-top: var(--space-6); border-top: 2px solid var(--fg); }
+  .tariff__sum { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: var(--space-4); font-size: var(--fs-small); color: var(--fg-soft); }
+  .tariff__sum dd { white-space: nowrap; }
+  .tariff__sum--total { font-weight: var(--fw-strong); color: var(--fg); }
+  .tariff__balance { display: grid; gap: var(--space-3); padding-top: var(--space-4); border-top: var(--hair) solid var(--line-strong); }
+  .tariff__balance dt { font-size: var(--fs-small); color: var(--fg-soft); }
+  .tariff__balance dd { font-size: clamp(1.5rem, 1rem + 1.2vw, 2.1rem); font-weight: var(--fw-num); line-height: 1.2; white-space: nowrap; }
+  .terms__notes { display: grid; gap: var(--space-3); font-size: var(--fs-small); color: var(--fg-soft); max-width: 80ch; }
 
   @media (max-width: 900px) {
     .terms__head { grid-template-columns: 1fr; gap: var(--space-6); }
@@ -84,6 +119,5 @@ const amount = new Intl.NumberFormat(c.locale, { maximumFractionDigits: 0 });
   @media (max-width: 560px) {
     .tariff__bill { grid-template-columns: 1fr; gap: var(--space-6); }
     .tariff__row--postpay { padding-top: var(--space-6); border-top: var(--hair) solid var(--line-strong); }
-    .tariff__cta { width: 100%; justify-content: space-between; }
   }
 </style>

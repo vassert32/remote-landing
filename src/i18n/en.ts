@@ -170,13 +170,19 @@ export const en = {
     body:
       'Choose your balance between an upfront payment and a share of your first two salaries. ' +
       'Or pay the full amount upfront, with no further payments.',
-    panelTag: 'mentorship plans',
     planLabel: 'Plan',
     upfrontLabel: 'Upfront payment',
     postpayLabel: 'After you start the job',
     postpayNote: 'of each of your first two salaries',
     noPostpayNote: 'No further payments: the full price is paid upfront.',
-    discuss: 'Discuss this plan',
+    offerLabel: 'Monthly offer',
+    exampleSummary: 'One monthly salary covers the full cost of any plan.',
+    exampleNeutral: 'Compare the full plan cost with your first monthly salary.',
+    postpayTotalLabel: 'Payments from both salaries',
+    totalLabel: 'Full plan cost',
+    remainingLabel: 'Left from your first salary',
+    shortfallLabel: 'Not covered by your first salary',
+    exampleNote: 'Example using a rounded exchange rate and two equal monthly salaries. The balance deducts the upfront payment and both salary-based payments, before taxes and fees.',
     agreementNote: 'We agree on the plan and payment schedule in the contract before starting.',
   },
 
