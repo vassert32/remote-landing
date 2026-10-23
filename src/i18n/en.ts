@@ -183,15 +183,15 @@ export const en = {
     yesTitle: 'Good fit',
     noTitle: 'Not a fit',
     yes: [
-      'You work in tech, study at a technical university or have a strong project background',
+      'You already work in tech, or you study at a technical university or have a strong project background',
       'Your English is enough to explain your thinking. Fluency is not required',
       'You can put in ten hours a week or more',
       'You want the whole route, not a one-off CV tip',
     ],
     no: [
-      'You have no tech experience, are not studying at a technical university and have no strong projects',
-      'You are looking for a course with video lessons and a group chat',
+      'You have no tech experience at all, even from projects',
       'You are not ready to speak English, mistakes and all',
+      'You are looking for a course with video lessons and a group chat',
       'You expect someone else to find the jobs and send the applications',
     ],
   },
