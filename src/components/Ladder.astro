@@ -10,7 +10,6 @@ const fmt = new Intl.NumberFormat(c.locale);
   <div class="shell">
     <header class="ladder__head grid">
       <h2 class="h2 ladder__title" data-split>{c.ladder.title}</h2>
-      <p class="body ladder__body" data-reveal="blur">{c.ladder.body}</p>
     </header>
 
     <div class="panel ladder__panel">
@@ -74,9 +73,8 @@ const fmt = new Intl.NumberFormat(c.locale);
 
 <style>
   .ladder { padding-block: clamp(3rem, 2rem + 3vw, 5rem); }
-  .ladder__head { row-gap: var(--space-4); margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+  .ladder__head { margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
   .ladder__title { grid-column: 1 / 9; }
-  .ladder__body { grid-column: 1 / 8; }
 
   .cols {
     display: grid;
@@ -266,7 +264,7 @@ const fmt = new Intl.NumberFormat(c.locale);
 
   @media (max-width: 900px) {
     .ladder__time { display: none; }
-    .ladder__title, .ladder__body { grid-column: 1 / -1; }
+    .ladder__title { grid-column: 1 / -1; }
     .cols { --field: clamp(8rem, 3rem + 15vw, 12rem); column-gap: 0.7rem; }
     .col__bar { width: 100%; padding-inline: 0.45rem; }
     .col__num { font-size: clamp(0.62rem, 0.4rem + 0.7vw, 0.8rem); }

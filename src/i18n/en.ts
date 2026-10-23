@@ -107,10 +107,6 @@ export const en = {
 
   ladder: {
     title: 'My path. Your goal.',
-    body:
-      'I climbed every step on this chart myself, from the start to a contract ' +
-      'in hard currency. I know this route from the inside: where the months get ' +
-      'lost and what interviews actually ask about.',
     panelTag: 'income by stage',
     chartLabel: 'Income growth across career stages',
     timeStart: '2024',
