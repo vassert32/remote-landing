@@ -94,14 +94,14 @@ export const en = {
       { key: 'Format', value: 'One on one' },
     ],
     paragraphs: [
-      "I'm Evgeny, a backend engineer. I went through the entire grind of the " +
-        'tech industry and reached the international market on my own: I started ' +
-        'at 19, and by 21 I was already working remotely for a foreign company.',
-      'With me, not a team of coordinators, we go through your CV, applications, ' +
-        'interviews and offer negotiation. All of it personally — no group chats, ' +
-        'no recorded lessons.',
-      'The work follows your actual job search: we review real vacancies, ' +
-        'prepare for specific interviews and discuss the terms of your offer.',
+      "I'm Evgeny, a backend engineer. I reached the international market on my own: " +
+        'I started at 19, and by 20 I had received several offers for Senior Developer ' +
+        'positions at foreign companies.',
+      'All mentoring is with me personally, not a team of coordinators. ' +
+        'We work through your CV, LinkedIn, interviews and offer negotiation.',
+      'The work is built around your experience: we shape your individual career story, ' +
+        'choose the best job search channels for your skills ' +
+        'and prepare for specific interviews.',
     ],
   },
 
