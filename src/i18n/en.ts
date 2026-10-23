@@ -208,17 +208,17 @@ export const en = {
       {
         num: '1',
         title: 'Packaging your experience',
-        text: 'We rebuild your CV and LinkedIn so a recruiter sees on the first screen what you solved and on which stack.',
+        text: 'We rebuild your CV and career story to pass ATS screening and make it immediately clear to recruiters which problems you solve and which stack you use.',
       },
       {
         num: '2',
         title: 'Search and pipeline',
-        text: 'Where to look, who to message directly, how to track applications and stop burning weeks on ones that go nowhere.',
+        text: 'We set up and maintain your LinkedIn profile, search for jobs across different platforms, contact recruiters directly and avoid wasting weeks on applications that go nowhere.',
       },
       {
         num: '3',
         title: 'Interviews in English',
-        text: 'Self-presentation, the standard questions, telling your story. We drill it on calls until it stops being scary.',
+        text: 'Self-presentation, talking about your experience and technical questions. We practise in mock interviews until it stops feeling scary.',
       },
       {
         num: '4',
