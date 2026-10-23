@@ -183,13 +183,13 @@ export const en = {
     yesTitle: 'Good fit',
     noTitle: 'Not a fit',
     yes: [
-      'You have worked in tech: engineering, QA, DevOps, analytics, design',
+      'You work in tech, study at a technical university or have a strong project background',
       'Your English is enough to explain your thinking. Fluency is not required',
       'You can put in ten hours a week or more',
       'You want the whole route, not a one-off CV tip',
     ],
     no: [
-      'You are entering tech from scratch with no experience yet',
+      'You have no tech experience, are not studying at a technical university and have no strong projects',
       'You are looking for a course with video lessons and a group chat',
       'You are not ready to speak English, mistakes and all',
       'You expect someone else to find the jobs and send the applications',
@@ -243,7 +243,7 @@ export const en = {
     items: [
       {
         q: 'Can I join without tech experience?',
-        a: 'No. I only work with people who already have commercial experience. Entering the profession from scratch needs a completely different format.',
+        a: 'Yes, but only if you are studying at a technical university or have a strong project background. If you are unsure, you can always ask me.',
       },
       {
         q: 'Can I combine this with a full-time job?',
@@ -251,7 +251,7 @@ export const en = {
       },
       {
         q: 'How long does it take?',
-        a: 'Three months and up. The exact timeline depends on your level, your English, and how many hours you put in.',
+        a: 'The exact timeline depends on your technical skills, your English and how many hours a week you put in. Some mentees start applying within the first few weeks and successfully pass interviews.',
       },
       {
         q: 'How does payment work?',
@@ -259,7 +259,7 @@ export const en = {
       },
       {
         q: 'What if I fail every interview?',
-        a: 'We debrief every attempt: what they asked, where you fell short, what to rewrite for the next one.',
+        a: 'We debrief every attempt: what they asked, where you fell short and what to rewrite for next time. Hundreds of new vacancies appear every day. With enough effort, you can always find another interview and try again.',
       },
     ],
   },
