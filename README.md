@@ -31,7 +31,7 @@ npm run dev
 | `npm run check` | проверка типов и разметки Astro |
 | `npm run fonts:sync` | копирует подмножества шрифтов из `node_modules` в `public/fonts` |
 | `npm run photos` | пересобирает `src/assets/mentor.jpg` из исходника в `assets-source/` |
-| `npm run og` | пересобирает превью для соцсетей `public/og.jpg` |
+| `npm run og` | пересобирает превью `public/og.jpg` и версию его адреса `src/data/og.json` |
 
 `fonts:sync`, `photos` и `og` запускаются вручную: их результат закоммичен, в CI они не нужны.
 

@@ -6,10 +6,12 @@
  * font-family уходит настоящее имя семейства из таблицы name: Onest,
  * IBM Plex Mono.
  *
- * Результат коммитится в репозиторий: в CI пересобирать превью незачем.
+ * Картинка и её версия (src/data/og.json) коммитятся в репозиторий:
+ * в CI пересобирать превью незачем.
  * Запуск: npm run og
  */
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { Resvg } from '@resvg/resvg-js';
 import { decompress } from 'wawoff2';
 import sharp from 'sharp';
@@ -69,11 +71,6 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
           font-weight="700" letter-spacing="2.2" fill="${STAMP}">ПОДТВЕРЖДЁН</text>
   </g>
 
-  <!-- Подвал документа -->
-  <rect x="80" y="524" width="1040" height="1" fill="${RULE}"/>
-  ${micro(80, 566, 'ПРЕДОПЛАТА ОТ 50 000 ₽', INK)}
-  ${micro(480, 566, '3 ТАРИФА МЕНТОРСТВА', INK)}
-  ${micro(1120, 566, 'REMOTE UK / ЕВРОПА', INK, 'end')}
 </svg>`;
 
 const png = new Resvg(svg, {
@@ -86,4 +83,6 @@ const png = new Resvg(svg, {
   .asPng();
 
 const info = await sharp(png).jpeg({ quality: 88, chromaSubsampling: '4:4:4' }).toFile('public/og.jpg');
+const revision = createHash('sha256').update(readFileSync('public/og.jpg')).digest('hex').slice(0, 12);
+writeFileSync('src/data/og.json', JSON.stringify({ revision }, null, 2) + '\n');
 console.log(`public/og.jpg ${info.width}x${info.height} ${(info.size / 1024).toFixed(0)}KB`);
