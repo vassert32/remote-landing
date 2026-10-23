@@ -37,13 +37,10 @@ const referenceUsdRub = offerExample.rubPerMonth / offerExample.usdPerMonth;
             </div>
           </dl>
           <div class="tariff__calculation">
-            <div class="tariff__example">
-              <p class="tariff__offer">
-                {c.terms.offerLabel} <span class="nowrap">${amount.format(offerExample.usdPerMonth)}</span> {c.terms.offerPeriod}
-                <span class="nowrap">≈ {amount.format(offerExample.rubPerMonth)} ₽</span>
-              </p>
-              <p class="tariff__summary">{plan.totalRub <= offerExample.rubPerMonth ? c.terms.exampleSummary : c.terms.exampleNeutral}</p>
-            </div>
+            <p class="tariff__example">
+              {c.terms.offerLabel} <span class="nowrap">${amount.format(offerExample.usdPerMonth)}</span> {c.terms.offerPeriod}
+              {plan.totalRub <= offerExample.rubPerMonth ? c.terms.exampleSummary : c.terms.exampleNeutral}
+            </p>
             <div class="tariff__details">
               <p class="tariff__total">{c.terms.totalLabel} <span class="nowrap">{amount.format(plan.totalRub)} ₽</span></p>
               <p class="tariff__formula num">
@@ -88,7 +85,7 @@ const referenceUsdRub = offerExample.rubPerMonth / offerExample.usdPerMonth;
   .tariff__postpay { color: var(--stamp); font-size: clamp(2rem, 1.2rem + 1.4vw, 2.75rem); font-weight: var(--fw-num); line-height: 1.1; }
   .tariff__note { font-size: var(--fs-small); color: var(--fg-soft); max-width: 28ch; text-wrap: pretty; }
   .tariff__calculation { display: grid; gap: var(--space-4); width: 100%; margin-top: auto; padding-top: var(--space-6); border-top: 2px solid var(--fg); font-size: var(--fs-small); color: var(--fg-soft); }
-  .tariff__example { display: grid; gap: var(--space-2); color: var(--fg); font-size: clamp(1.25rem, 1rem + 0.65vw, 1.6rem); font-weight: var(--fw-strong); line-height: 1.25; text-wrap: balance; }
+  .tariff__example { color: var(--fg); font-size: clamp(1.25rem, 1rem + 0.65vw, 1.6rem); font-weight: var(--fw-strong); line-height: 1.25; text-wrap: balance; }
   .tariff__details { display: grid; gap: var(--space-2); padding-top: var(--space-4); border-top: var(--hair) solid var(--line-strong); }
   .tariff__total { line-height: var(--lh-text); }
   .tariff__formula { display: flex; flex-wrap: wrap; column-gap: 0.5em; line-height: 1.6; }
