@@ -217,8 +217,8 @@ const fmt = new Intl.NumberFormat(c.locale);
     transform: rotate(45deg);
   }
 
-  /* Шильдик панели — по левому краю первого столбика, не по рамке. */
-  .ladder__panel > :global(.panel__tag) { left: clamp(1.4rem, 1rem + 2vw, 2.5rem); }
+  /* Подпись панели остаётся только над мобильными карточками. */
+  .ladder__panel > :global(.panel__tag) { display: none; }
 
   @media (max-width: 900px) {
     .ladder__time { display: none; }
@@ -263,6 +263,6 @@ const fmt = new Intl.NumberFormat(c.locale);
     .col__stage { grid-column: 1; grid-row: 1; margin-top: 0; font-size: var(--fs-body); }
     .ladder__head { margin-bottom: var(--space-4); }
     .ladder__panel { padding: 1.4rem 0 0; }
-    .ladder__panel > :global(.panel__tag) { left: 0; }
+    .ladder__panel > :global(.panel__tag) { display: block; left: 0; }
   }
 </style>
