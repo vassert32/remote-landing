@@ -1,6 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { t, links, docHref, business } from '../i18n';
+import { t, links, docHref } from '../i18n';
 import BusinessDetails from './BusinessDetails.astro';
 
 const c = t(Astro.currentLocale);
@@ -27,22 +27,16 @@ const year = new Date().getFullYear();
         <span>{c.cta.label}</span>
         <Icon class="btn__arrow" name="ph:arrow-up-right-bold" />
       </a>
-      <a class="closer__tg" href={links.telegram} target="_blank" rel="noopener">
-        <Icon name="ph:telegram-logo" class="closer__tg-icon" aria-hidden="true" />
-        <span>{c.site.telegramHandle}</span>
-      </a>
     </div>
 
     <div class="closer__foot">
-      <nav class="closer__documents" aria-label={c.legal.navLabel}>
-        <a href={links.telegram} target="_blank" rel="noopener">{c.legal.telegramLabel}</a>
-        <a href={links.email}>{business.email}</a>
+      <BusinessDetails showContacts={false} />
+      <nav class="closer__documents" aria-label={c.legal.agreementLink}>
         <a href={docHref(Astro.currentLocale, 'dogovor')}>
           <span>{c.legal.agreementLink}</span>
           <span class="closer__draft">{c.legal.draft}</span>
         </a>
       </nav>
-      <BusinessDetails showContacts={false} />
       <span class="closer__copyright">© <span class="num">{year}</span></span>
     </div>
   </div>
@@ -117,23 +111,10 @@ const year = new Date().getFullYear();
     margin-top: var(--space-4);
   }
 
-  .closer__tg {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--font-mono);
-    font-size: var(--fs-small);
-    color: var(--fg-soft);
-    transition: color var(--dur-fast) var(--ease-out);
-  }
-  .closer__tg:hover, .closer__tg:focus-visible { color: var(--fg); }
-  .closer__tg-icon { width: 1.1rem; height: 1.1rem; }
-
   .closer__foot {
     width: 100%;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: var(--col-gap);
+    grid-template-columns: minmax(0, 1fr);
     row-gap: var(--space-8);
     margin-top: auto;
     padding-block: clamp(2rem, 1.5rem + 2vw, 3rem) var(--space-8);
@@ -146,14 +127,10 @@ const year = new Date().getFullYear();
   .closer__documents a { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); color: var(--fg-soft); }
   .closer__documents a:hover, .closer__documents a:focus-visible { color: var(--stamp); }
   .closer__draft { font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--fg-mute); }
-  .closer__copyright { grid-column: 1 / -1; font-family: var(--font-mono); font-size: var(--fs-micro); }
-
-  @media (max-width: 780px) {
-    .closer__foot { grid-template-columns: minmax(0, 1fr); }
-  }
+  .closer__copyright { font-family: var(--font-mono); font-size: var(--fs-micro); }
 
   @media (hover: none) {
-    .closer__tg, .closer__documents a {
+    .closer__documents a {
       display: inline-flex;
       align-items: center;
       min-height: 44px;
@@ -161,6 +138,7 @@ const year = new Date().getFullYear();
   }
 
   @media (max-width: 560px) {
+    .closer__actions { width: 100%; }
     .closer__actions :global(.btn) { width: 100%; justify-content: space-between; }
   }
 </style>
