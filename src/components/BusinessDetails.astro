@@ -4,13 +4,14 @@ import { business, links, t } from '../i18n';
 interface Props {
   showTax?: boolean;
   showContacts?: boolean;
+  inline?: boolean;
 }
 
-const { showTax = false, showContacts = true } = Astro.props;
+const { showTax = false, showContacts = true, inline = false } = Astro.props;
 const c = t(Astro.currentLocale);
 ---
 
-<address class="business">
+<address class:list={['business', { 'business--inline': inline }]}>
   <p class="business__name">{c.legal.name}</p>
   <p>{c.legal.address}</p>
   <dl class="business__details">
@@ -46,6 +47,20 @@ const c = t(Astro.currentLocale);
     transition: color var(--dur-fast) var(--ease-out);
   }
   .business a:hover, .business a:focus-visible { color: var(--stamp); }
+  @media (min-width: 901px) {
+    .business--inline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-2) var(--space-6);
+    }
+    .business--inline .business__details {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-2) var(--space-6);
+    }
+  }
   @media (hover: none) {
     .business a { display: inline-block; padding-block: 0.5rem; }
   }

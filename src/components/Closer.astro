@@ -30,13 +30,13 @@ const year = new Date().getFullYear();
     </div>
 
     <div class="closer__foot">
-      <BusinessDetails showContacts={false} />
       <nav class="closer__documents" aria-label={c.legal.agreementLink}>
         <a href={docHref(Astro.currentLocale, 'dogovor')}>
           <span>{c.legal.agreementLink}</span>
           <span class="closer__draft">{c.legal.draft}</span>
         </a>
       </nav>
+      <BusinessDetails showContacts={false} inline />
       <span class="closer__copyright">© <span class="num">{year}</span></span>
     </div>
   </div>
@@ -128,6 +128,10 @@ const year = new Date().getFullYear();
   .closer__documents a:hover, .closer__documents a:focus-visible { color: var(--stamp); }
   .closer__draft { font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--fg-mute); }
   .closer__copyright { font-family: var(--font-mono); font-size: var(--fs-micro); }
+
+  @media (min-width: 901px) {
+    .closer__foot { row-gap: var(--space-4); }
+  }
 
   @media (hover: none) {
     .closer__documents a {
