@@ -1,0 +1,33 @@
+---
+import { t } from '../i18n';
+
+const c = t(Astro.currentLocale);
+const amount = new Intl.NumberFormat(c.locale);
+---
+
+<div class="mentor-income" role="figure" aria-label={c.ladder.chartLabel}>
+  <p class="mentor-income__label">{c.ladder.panelTag}</p>
+  <ol class="mentor-income__columns">
+    {c.ladder.points.map((point, i) => (
+      <li class:list={['mentor-income__item', { 'mentor-income__item--peak': i === c.ladder.points.length - 1 }]}
+        style={`--income-weight:${point.weight}`}>
+        <div class="mentor-income__plot">
+          <span class="mentor-income__bar" data-reveal="bar">
+            <span class="mentor-income__value num num-font">
+              <span data-count-to={point.value} data-count-prefix={point.prefix} data-count-suffix={point.suffix}>
+                {point.prefix}{amount.format(point.value)}{point.suffix}
+              </span>
+            </span>
+          </span>
+        </div>
+        <span class="mentor-income__stage">{point.stage}</span>
+      </li>
+    ))}
+  </ol>
+  <div class="mentor-income__years">
+    <span class="mentor-income__line" data-reveal="rule" aria-hidden="true"></span>
+    <span>{c.ladder.timeStart}</span>
+    <span>{c.ladder.timeMid}</span>
+    <span class="mentor-income__year-end">{c.ladder.timeEnd}</span>
+  </div>
+</div>

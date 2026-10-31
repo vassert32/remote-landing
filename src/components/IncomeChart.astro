@@ -1,0 +1,255 @@
+---
+import { Icon } from 'astro-icon/components';
+import { t } from '../i18n';
+
+const c = t(Astro.currentLocale);
+const fmt = new Intl.NumberFormat(c.locale);
+---
+
+    <div class="panel ladder__panel">
+      <span class="panel__tag" data-reveal="up">{c.ladder.panelTag}</span>
+    <ol class="cols" aria-label={c.ladder.chartLabel}>
+      {
+        c.ladder.points.map((point, i) => (
+          <li
+            class:list={[
+              'col',
+              {
+                'col--peak': i === c.ladder.points.length - 1,
+                /* Низкий столбик: сумма не влезает внутрь и встаёт над гранью. */
+                'col--low': point.weight < 0.18,
+              },
+            ]}
+            style={`--w:${point.weight.toFixed(3)}`}
+          >
+            <span class="col__bar" data-reveal="bar">
+              <span class="col__num num num-font">
+                <span
+                  data-count-to={point.value}
+                  data-count-prefix={point.prefix}
+                  data-count-suffix={point.suffix}
+                >{point.prefix}{fmt.format(point.value)}{point.suffix}</span>
+              </span>
+            </span>
+
+            {/* На телефоне подпись этапа входит с контентом; на десктопе
+                она под столбиком и живёт статично — бары растут сами. */}
+            <span class="col__stage" data-reveal-mobile="up">
+              <Icon name={point.icon} class="col__stage-icon" aria-hidden="true" />
+              {point.stage}
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+
+    <!-- Ось времени: 2024 по левому краю первого столбика, 2025 ровно под
+         «Стажировкой», оранжевый 2026 за стрелкой — по правому краю
+         последнего бара. Линия единая, метки вырезают её своим фоном. -->
+    <div class="ladder__time">
+      <span class="ladder__time-line" data-reveal="rule" aria-hidden="true"></span>
+      <span class="ladder__time-cap ladder__time-cap--start">{c.ladder.timeStart}</span>
+      <span class="ladder__time-cap ladder__time-cap--mid">{c.ladder.timeMid}</span>
+      <span class="ladder__time-cap ladder__time-cap--end">{c.ladder.timeEnd}</span>
+    </div>
+    </div>
+
+<style>
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: end;
+    column-gap: var(--col-gap);
+    /* Поле высокое: столбец должен быть выше своей ширины, иначе
+       читается прямоугольником, а не столбцом. */
+    --field: clamp(11rem, 5rem + 15vw, 21rem);
+  }
+
+  .col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
+  .col__stage-icon {
+    width: 0.95em;
+    height: 0.95em;
+    flex: none;
+    color: var(--fg-mute);
+  }
+
+  /* Столбец: узкий и высокий, сумма напечатана внутри у основания.
+     Масштаб ЛИНЕЙНЫЙ по рублёвому эквиваленту — просьба заказчика: разрыв
+     между штатом и валютным оффером должен бить в глаза по-настоящему.
+     Пол высоты — только чтобы грань нуля не исчезла совсем. */
+  .col__bar {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    width: clamp(4.5rem, 2.5rem + 4.5vw, 8.5rem);
+    height: max(calc(var(--field) * var(--w)), 0.4rem);
+    padding: 0.55rem 0.7rem;
+    background: color-mix(in srgb, var(--paper) 9%, var(--bg));
+    box-shadow: inset 0 2px 0 var(--stamp);
+    transform-origin: bottom center;
+  }
+
+  /* Сумма низкого столбика живёт над гранью: внутрь ей уже не влезть. */
+  .col--low .col__bar { padding: 0; }
+  .col--low .col__num {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.45rem);
+  }
+
+  .ladder__panel { padding-top: clamp(1.8rem, 1.4rem + 1.6vw, 2.6rem); }
+
+  .col__num {
+    font-weight: var(--fw-num);
+    font-size: clamp(0.7rem, 0.45rem + 0.8vw, 0.95rem);
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+
+  /* Подпись этапа под столбцом: крупнее прежнего, это несущий текст. */
+  .col__stage {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: 0.9rem;
+    font-size: var(--fs-small);
+    line-height: 1.35;
+    color: var(--fg-soft);
+  }
+
+  .col--peak .col__bar {
+    background: color-mix(in srgb, var(--stamp) 34%, var(--bg));
+    box-shadow: inset 0 2px 0 var(--stamp);
+  }
+  .col--peak .col__num { color: var(--stamp); }
+  .col--peak .col__stage { color: var(--fg); font-weight: var(--fw-strong); }
+  .col--peak .col__stage-icon { color: var(--stamp); }
+
+  /* Ось времени под графиком — на ТОЙ ЖЕ пятиколоночной сетке, что и
+     столбики: метки ложатся на колонки 1 / 3 / 5 и совпадают с барами
+     по краям сами собой. Пока только десктоп. */
+  .ladder__time {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    align-items: center;
+    margin-top: clamp(1.4rem, 1rem + 1.4vw, 2.2rem);
+  }
+
+  /* Единая линия: от левого края первого столбика до правого края
+     последнего бара (правый хвост пятой колонки съедает calc). Мотор
+     прочерчивает её слева направо одним движением: левая половина
+     доходит до 2025, затем правая — до стрелки. */
+  .ladder__time-line {
+    position: absolute;
+    left: 0;
+    right: calc((100% - 4 * var(--col-gap)) / 5 - clamp(4.5rem, 2.5rem + 4.5vw, 8.5rem));
+    top: 50%;
+    height: var(--hair);
+    background: var(--fg-faint);
+    transform-origin: left center;
+  }
+
+  /* Метки сидят ПОВЕРХ линии и вырезают её своим фоном — тот же приём,
+     что шильдик панели на рамке. */
+  .ladder__time-cap {
+    position: relative;
+    justify-self: start;
+    padding-inline: 0.55em;
+    background: var(--bg);
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-medium);
+    letter-spacing: var(--tr-mono);
+    color: var(--fg-mute);
+  }
+  .ladder__time-cap--start { grid-column: 1; padding-left: 0; }
+  /* 2025 — ровно в СЕРЕДИНЕ линии, чтобы левая и правая половины были
+     равными: середина колонки №3 не совпадает с серединой линии, потому
+     что линия кончается на правом крае бара, а не колонки. */
+  .ladder__time-cap--mid {
+    position: absolute;
+    top: 50%;
+    left: calc(50% - ((100% - 4 * var(--col-gap)) / 5 - clamp(4.5rem, 2.5rem + 4.5vw, 8.5rem)) / 2);
+    transform: translate(-50%, -50%);
+  }
+  /* 2026 прижат к правому краю ПОСЛЕДНЕГО БАРА: ячейка шире бара, хвост
+     съедает margin (проценты здесь — от ширины ячейки). Шеврон-наконечник
+     линии стоит перед годом. */
+  .ladder__time-cap--end {
+    grid-column: 5;
+    justify-self: end;
+    margin-right: calc(100% - clamp(4.5rem, 2.5rem + 4.5vw, 8.5rem));
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding-right: 0;
+    color: var(--stamp);
+  }
+  .ladder__time-cap--end::before {
+    content: "";
+    flex: none;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-top: var(--hair) solid var(--fg-mute);
+    border-right: var(--hair) solid var(--fg-mute);
+    transform: rotate(45deg);
+  }
+
+  /* Подпись панели остаётся только над мобильными карточками. */
+  .ladder__panel > :global(.panel__tag) { display: none; }
+
+  @media (max-width: 900px) {
+    .ladder__time { display: none; }
+    .cols { --field: clamp(8rem, 3rem + 15vw, 12rem); column-gap: 0.7rem; }
+    .col__bar { width: 100%; padding-inline: 0.45rem; }
+    .col__num { font-size: clamp(0.62rem, 0.4rem + 0.7vw, 0.8rem); }
+    .col__stage { font-size: var(--fs-micro); }
+  }
+
+  /* На телефоне каждый этап — отдельная карточка с крупной суммой. */
+  @media (max-width: 560px) {
+    .cols {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-3);
+      --field: 100%;
+    }
+    .col {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+      padding: var(--space-6);
+      border: var(--hair) solid var(--line-strong);
+      border-top: 2px solid var(--stamp);
+      background: var(--bg-band);
+    }
+    .col--peak { background: color-mix(in srgb, var(--stamp) 12%, var(--bg)); }
+    /* На телефоне сумма входит в карточку без отдельной плашки. */
+    .col__bar,
+    .col--peak .col__bar {
+      grid-column: 1;
+      grid-row: 2;
+      width: auto;
+      height: auto;
+      justify-self: start;
+      padding: 0;
+      background: none;
+      box-shadow: none;
+    }
+    .col--low .col__num { position: static; }
+    .col__num { font-size: clamp(1.25rem, 0.9rem + 1.5vw, 1.5rem); }
+    .col__stage { grid-column: 1; grid-row: 1; margin-top: 0; font-size: var(--fs-body); }
+    .ladder__panel { padding: 1.4rem 0 0; }
+    .ladder__panel > :global(.panel__tag) { display: block; left: 0; }
+  }
+</style>

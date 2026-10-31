@@ -534,6 +534,8 @@ function collectSnapPoints(): number[] {
   for (const el of document.querySelectorAll<HTMLElement>(
     'main section:not([data-hero]):not([data-program]), footer.closer',
   )) {
+    // Отдельный Путь скрыт на десктопе: его график входит в секцию ментора.
+    if (!el.getClientRects().length) continue;
     pts.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
   }
   const pin = document.querySelector<HTMLElement>('[data-program-pin]');
@@ -790,6 +792,15 @@ function wrapWordsInPlace(node: Node): void {
 const numFmt = new Intl.NumberFormat('ru-RU');
 
 function initSectionEntrances(): void {
+  // При смене раскладки пересоздаём входы: у ментора и графика разные
+  // видимые элементы на десктопе и телефоне. GSAP снимает прежние стили.
+  const mm = gsap.matchMedia();
+  mm.add({ desktop: '(min-width: 901px)', mobile: '(max-width: 900px)' }, () => {
+    animateSectionEntrances();
+  });
+}
+
+function animateSectionEntrances(): void {
   const blocks = document.querySelectorAll<HTMLElement>('main section, footer.closer');
 
   for (const section of blocks) {
@@ -797,18 +808,20 @@ function initSectionEntrances(): void {
     // цикл проскакивал его сам; со словами лида — подхватил бы, и два
     // таймлайна начали бы драться за одни и те же слова: вход показывал их
     // ещё на нулевом скролле, а скраб сцены тут же утаскивал обратно.
-    if (section.matches('[data-hero]')) continue;
+    if (section.matches('[data-hero]') || !section.getClientRects().length) continue;
 
-    const words = section.querySelectorAll<HTMLElement>('.split-word');
-    const blurWords = section.querySelectorAll<HTMLElement>('.bw');
-    const rises = section.querySelectorAll<HTMLElement>('[data-reveal="up"], [data-reveal="doc"]');
-    const bars = section.querySelectorAll<HTMLElement>('[data-reveal="bar"]');
-    const rules = section.querySelectorAll<HTMLElement>('[data-reveal="rule"]');
-    const counters = section.querySelectorAll<HTMLElement>('[data-count-to]');
+    const visible = (selector: string) =>
+      [...section.querySelectorAll<HTMLElement>(selector)].filter((el) => el.getClientRects().length);
+    const words = visible('.split-word');
+    const blurWords = visible('.bw');
+    const rises = visible('[data-reveal="up"], [data-reveal="doc"]');
+    const bars = visible('[data-reveal="bar"]');
+    const rules = visible('[data-reveal="rule"]');
+    const counters = visible('[data-count-to]');
     // Подписи этапов входят с контентом только на телефоне;
     // на десктопе остаются статичными под растущими столбцами.
     const mobRises = window.matchMedia('(max-width: 560px)').matches
-      ? section.querySelectorAll<HTMLElement>('[data-reveal-mobile="up"]')
+      ? visible('[data-reveal-mobile="up"]')
       : null;
 
     if (!words.length && !blurWords.length && !rises.length && !bars.length && !rules.length && !counters.length) {

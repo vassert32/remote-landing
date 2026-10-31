@@ -25,7 +25,7 @@ export const en = {
   cta: { label: 'Book a review call', short: 'Book a call' },
 
   nav: [
-    { label: 'Path', href: '#put' },
+    { label: 'Path', href: '#mentor' },
     { label: 'Program', href: '#programma' },
     { label: 'Terms', href: '#usloviya' },
     { label: 'FAQ', href: '#voprosy' },
@@ -92,6 +92,14 @@ export const en = {
       { key: 'Name', value: 'Evgeny Gerkulesov' },
       { key: 'Role', value: 'Senior Backend Engineer' },
       { key: 'Format', value: 'One on one' },
+    ],
+    desktopParagraphs: [
+      "I'm Evgeny, a backend engineer. I reached the international market on my own: " +
+        'I started at 19, and by 20 I had received several offers for Senior Developer ' +
+        'positions at foreign companies.',
+      'All mentoring is with me personally, not a team of coordinators. ' +
+        'We will work through your CV and LinkedIn, shape your individual career story, ' +
+        'choose the best job search channels and help you get an offer.',
     ],
     paragraphs: [
       "I'm Evgeny, a backend engineer. I reached the international market on my own: " +

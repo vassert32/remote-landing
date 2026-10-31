@@ -1,13 +1,15 @@
 ---
 import { Image } from 'astro:assets';
 import mentor from '../assets/mentor.jpg';
+import MentorIncomeChart from './MentorIncomeChart.astro';
 import { t } from '../i18n';
+import '../styles/mentor.css';
 
 const c = t(Astro.currentLocale);
 ---
 
-<section class="section mentor">
-  <div class="shell grid mentor__grid">
+<section class="section mentor" id="mentor">
+  <div class="shell mentor__grid">
     <figure class="mentor__figure" data-reveal="up">
       <Image
         src={mentor}
@@ -32,64 +34,15 @@ const c = t(Astro.currentLocale);
 
     <div class="mentor__text">
       <h2 class="h2" data-split>{c.mentor.title}</h2>
-      {c.mentor.paragraphs.map((p) => <p class="body" data-reveal="blur">{p}</p>)}
+      <div class="mentor__copy mentor__copy--desktop">
+        {c.mentor.desktopParagraphs.map((p) => <p class="body" data-reveal="blur">{p}</p>)}
+      </div>
+      <div class="mentor__copy mentor__copy--mobile">
+        {c.mentor.paragraphs.map((p) => <p class="body" data-reveal="blur">{p}</p>)}
+      </div>
+      <div class="mentor__chart">
+        <MentorIncomeChart />
+      </div>
     </div>
   </div>
 </section>
-
-<style>
-  .mentor__grid { row-gap: var(--space-12); align-items: center; }
-
-  .mentor__figure {
-    position: relative;
-    grid-column: 1 / 6;
-    margin: 0;
-    border: var(--hair) solid var(--fg);
-    overflow: hidden; /* параллакс двигает кадр внутри рамки */
-  }
-  .mentor__figure :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 59 / 78;
-    /* Кадр не выше экрана: на ноутбуках колонка широкая, а вьюпорт низкий,
-       и полный аспект выталкивал секцию за 100dvh. Обрезка по вертикали
-       безопасна: композиция кадра центральная, cover режет поля. */
-    max-height: calc(100svh - 2 * var(--section-y) - 6rem);
-    object-fit: cover;
-  }
-
-  /* Табличка поверх нижней части кадра. */
-  .mentor__plate {
-    position: absolute;
-    inset: auto 0 0 0;
-    padding: 0.35rem 1rem 0.55rem;
-    background: color-mix(in srgb, var(--bg) 92%, transparent);
-    backdrop-filter: blur(6px);
-    border-top: var(--hair) solid var(--fg);
-  }
-
-  .mentor__text {
-    grid-column: 7 / 13;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-6);
-  }
-
-  @media (max-width: 900px) {
-    .mentor__figure { grid-column: 1 / 4; }
-    .mentor__text { grid-column: 4 / 7; }
-  }
-
-  /* Телефон: кадр ниже, текст плотнее — иначе секция вдвое выше экрана. */
-  @media (max-width: 780px) {
-    .mentor__grid { row-gap: var(--space-6); }
-    .mentor__text { gap: var(--space-4); }
-    .mentor__figure :global(img) { aspect-ratio: 4 / 3; }
-    .mentor__plate { padding: 0.2rem 0.8rem 0.35rem; }
-    .mentor__plate .doc__row { padding-block: 0.4rem; }
-  }
-
-  @media (max-width: 560px) {
-    .mentor__figure { max-width: none; }
-  }
-</style>
