@@ -39,6 +39,7 @@ export const en = {
     soonAria: (name: string) => `${name}: link coming soon`,
     back: 'Back to home',
     learnMore: 'Learn more',
+    revealAnswer: 'See the answer',
   },
 
   /** 404 page: kept inside the document metaphor. */

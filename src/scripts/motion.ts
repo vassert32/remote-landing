@@ -373,6 +373,20 @@ function initHeroScene(): void {
   window.addEventListener('touchstart', takeOver, { once: true, passive: true });
   window.addEventListener('keydown', takeOver, { once: true });
 
+  // В запиненной сцене ответ находится в том же стейдже: переход ведёт
+  // к концу её таймлайна, а не к геометрическому положению якоря.
+  question.addEventListener('click', (event) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    // Lenis обрабатывает якоря на window даже после preventDefault.
+    event.stopPropagation();
+    takeOver();
+    lenisRef?.scrollTo(st.end, {
+      duration: 1.1,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+    });
+  });
+
   window.setTimeout(() => {
     const y = lenisRef?.actualScroll ?? window.scrollY;
     // Порог щедрый: важно лишь, что пользователь ещё не уехал сам.

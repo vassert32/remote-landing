@@ -27,14 +27,14 @@ const total = i;
 <section class="hero" id="top" data-hero data-band="dark">
   <div class="hero__stage">
     <!-- Фаза 1: вопрос на чёрном -->
-    <div class="hero__phase hero__question" data-hero-question>
+    <a class="hero__phase hero__question" href="#hero-answer" aria-label={c.ui.revealAnswer} data-hero-question>
       <h1 class="hero__q display" style={`--n:${total}`} aria-label={c.hero.question}>
         <span aria-hidden="true" class="hero__q-letters"><Fragment set:html={qHtml} /><span class="hero__caret" aria-hidden="true"></span></span>
       </h1>
-    </div>
+    </a>
 
     <!-- Фаза 2: ответ на бумаге -->
-    <div class="hero__phase hero__answer" data-hero-answer>
+    <div class="hero__phase hero__answer" id="hero-answer" data-hero-answer>
       <div class="shell grid hero__grid">
         <div class="hero__main">
           <h2 class="display hero__title">
@@ -222,6 +222,7 @@ const total = i;
   :global(.motion) [data-hero-question] {
     position: absolute;
     inset: 0;
+    z-index: 1;
   }
   :global(.motion) [data-hero-answer] { position: relative; }
 
