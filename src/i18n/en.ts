@@ -19,7 +19,7 @@ export const en = {
     title: 'Evgeny Gerkulesov. Mentorship to a remote offer in hard currency',
     description:
       'One-on-one mentorship for experienced engineers: CV and LinkedIn built for the remote market, ' +
-      'interviews in English, offer negotiation. Three payment plans: upfront plus salary-based payments, or full payment upfront.',
+      'interviews in English, offer negotiation. Three payment plans: upfront plus salary-based payments, or full payment upfront',
   },
 
   cta: { label: 'Book a review call', short: 'Book a call' },
@@ -45,7 +45,7 @@ export const en = {
     code: '404',
     stamp: 'Not found',
     title: 'No such document',
-    text: 'The address has a typo, or the page is gone. Everything there is lives on the home page.',
+    text: 'The address has a typo, or the page is gone. Everything there is lives on the home page',
   },
 
   socials: [
@@ -63,7 +63,7 @@ export const en = {
       { t: 'one-on-one mentorship', mark: true },
       { t: ' for experienced engineers: from rebuilding your CV to a signed ' },
       { t: 'offer', mark: true },
-      { t: ' in dollars, euros or pounds.' },
+      { t: ' in dollars, euros or pounds' },
     ] as ReadonlyArray<{ t: string; mark?: boolean }>,
   },
 
@@ -95,20 +95,20 @@ export const en = {
     desktopParagraphs: [
       "I'm Evgeny, a backend engineer. I reached the international market on my own: " +
         'I started at 19, and by 20 I had received several offers for Senior Developer ' +
-        'positions at foreign companies.',
+        'positions at foreign companies',
       'All mentoring is with me personally, not a team of coordinators. ' +
         'We will work through your CV and LinkedIn, shape your individual career story, ' +
-        'choose the best job search channels and help you get an offer.',
+        'choose the best job search channels and help you get an offer',
     ],
     paragraphs: [
       "I'm Evgeny, a backend engineer. I reached the international market on my own: " +
         'I started at 19, and by 20 I had received several offers for Senior Developer ' +
-        'positions at foreign companies.',
+        'positions at foreign companies',
       'All mentoring is with me personally, not a team of coordinators. ' +
-        'We work through your CV, LinkedIn, interviews and offer negotiation.',
+        'We work through your CV, LinkedIn, interviews and offer negotiation',
       'The work is built around your experience: we shape your individual career story, ' +
         'choose the best job search channels for your skills ' +
-        'and prepare for specific interviews.',
+        'and prepare for specific interviews',
     ],
   },
 
@@ -167,13 +167,13 @@ export const en = {
     title: 'Three ways to pay',
     body:
       'Choose your balance between an upfront payment and a share of your first two salaries. ' +
-      'Or pay the full amount upfront, with no further payments.',
+      'Or pay the full amount upfront, with no further payments',
     planLabel: 'Plan',
     upfrontLabel: 'Upfront payment',
     postpayLabel: 'After you start the job',
     postpayNote: 'of each of your first two salaries',
-    noPostpayNote: 'No further payments: the full price is paid upfront.',
-    agreementNote: 'We agree on the plan and payment schedule in the contract before starting.',
+    noPostpayNote: 'No further payments: the full price is paid upfront',
+    agreementNote: 'We agree on the plan and payment schedule in the contract before starting',
   },
 
   fit: {
@@ -198,39 +198,39 @@ export const en = {
     title: 'Guidance across the whole route',
     body:
       'Six consecutive stages: from rebuilding your CV to your first weeks ' +
-      'in the new job.',
+      'in the new job',
     routeFrom: 'start',
     routeTo: 'offer',
     steps: [
       {
         num: '1',
         title: 'Packaging your experience',
-        text: 'We rebuild your CV and career story to pass ATS screening and make it immediately clear to recruiters which problems you solve and which stack you use.',
+        text: 'We rebuild your CV and career story to pass ATS screening and make it immediately clear to recruiters which problems you solve and which stack you use',
       },
       {
         num: '2',
         title: 'Search and pipeline',
-        text: 'We set up and maintain your LinkedIn profile, search for jobs across different platforms, contact recruiters directly and avoid wasting weeks on applications that go nowhere.',
+        text: 'We set up and maintain your LinkedIn profile, search for jobs across different platforms, contact recruiters directly and avoid wasting weeks on applications that go nowhere',
       },
       {
         num: '3',
         title: 'Interviews in English',
-        text: 'Self-presentation, talking about your experience and technical questions. We practise in mock interviews until it stops feeling scary.',
+        text: 'Self-presentation, talking about your experience and technical questions. We practise in mock interviews until it stops feeling scary',
       },
       {
         num: '4',
         title: 'Offer and negotiation',
-        text: 'We go through the rate, the contract type and the conditions. I show where there is still room to push and where there is not.',
+        text: 'We go through the rate, the contract type and the conditions. I show where there is still room to push and where there is not',
       },
       {
         num: '5',
         title: 'Money and paperwork',
-        text: 'How to receive payments from abroad, what to do about registration, banks and taxes, so none of it becomes a panic later.',
+        text: 'How to receive payments from abroad, what to do about registration, banks and taxes, so none of it becomes a panic later',
       },
       {
         num: '6',
         title: 'The first weeks',
-        text: 'How to get through probation: what to clarify, how to communicate in an English-speaking team, where newcomers usually stumble.',
+        text: 'How to get through probation: what to clarify, how to communicate in an English-speaking team, where newcomers usually stumble',
       },
     ],
   },
@@ -240,23 +240,23 @@ export const en = {
     items: [
       {
         q: 'Can I join without tech experience?',
-        a: 'Yes, but only if you are studying at a technical university or have a strong project background. If you are unsure, you can always ask me.',
+        a: 'Yes, but only if you are studying at a technical university or have a strong project background. If you are unsure, you can always ask me',
       },
       {
         q: 'Can I combine this with a full-time job?',
-        a: 'Yes, most people do. You need ten hours a week or more. We build the schedule around your actual workload.',
+        a: 'Yes, most people do. You need ten hours a week or more. We build the schedule around your actual workload',
       },
       {
         q: 'How long does it take?',
-        a: 'The exact timeline depends on your technical skills, your English and how many hours a week you put in. I received my first offer less than 3 months after starting my job search. Some mentees start applying within the first few weeks and successfully pass interviews.',
+        a: 'The exact timeline depends on your technical skills, your English and how many hours a week you put in. I received my first offer less than 3 months after starting my job search. Some mentees start applying within the first few weeks and successfully pass interviews',
       },
       {
         q: 'Is there a job placement guarantee?',
-        a: 'No. The outcome depends on your experience, your English and how much effort you put into preparation and your job search. On plans with salary-based payments, I have a financial incentive to help you get an offer: if you do not get a job, I will not receive most of my fee.',
+        a: 'No. The outcome depends on your experience, your English and how much effort you put into preparation and your job search. On plans with salary-based payments, I have a financial incentive to help you get an offer: if you do not get a job, I will not receive most of my fee',
       },
       {
         q: 'What if I fail every interview?',
-        a: 'We debrief every attempt: what they asked, where you fell short and what to rewrite for next time. Hundreds of new vacancies appear every day. With enough effort, you can always find another interview and try again.',
+        a: 'We debrief every attempt: what they asked, where you fell short and what to rewrite for next time. Hundreds of new vacancies appear every day. With enough effort, you can always find another interview and try again',
       },
     ],
   },
@@ -268,7 +268,7 @@ export const en = {
     title: 'The next offer could be yours',
     note:
       'We get on a call and look at your experience, your English and your goal. ' +
-      'After that I tell you honestly whether it makes sense to work together.',
+      'After that I tell you honestly whether it makes sense to work together',
   },
 
   legal: {
@@ -284,37 +284,37 @@ export const en = {
     agreementLink: 'Service agreement',
     draft: 'Draft',
     agreementTitle: 'Service agreement',
-    agreementAbout: 'Individual consulting and information services to help prepare for a job search in tech.',
-    draftNote: 'Draft for review. The scope, timeline, price and payment schedule are agreed individually before the agreement and its appendices are signed. Viewing or downloading the file does not enter you into an agreement.',
+    agreementAbout: 'Individual consulting and information services to help prepare for a job search in tech',
+    draftNote: 'Draft for review. The scope, timeline, price and payment schedule are agreed individually before the agreement and its appendices are signed. Viewing or downloading the file does not enter you into an agreement',
     fileTitle: 'Agreement and appendices',
     fileMeta: 'PDF · 14 pages · in Russian',
     openPdf: 'Open PDF',
     downloadPdf: 'Download file',
     providerTitle: 'Service provider and contact',
-    contactNote: 'For questions about the agreement or services, contact me by email or Telegram.',
+    contactNote: 'For questions about the agreement or services, contact me by email or Telegram',
   },
 
   docs: {
     oferta: {
       title: 'Draft service agreement',
       about:
-        'Draft individual agreement for consulting and information services.',
+        'Draft individual agreement for consulting and information services',
     },
     dogovor: {
       title: 'Service agreement',
       about:
-        'Draft agreement and appendices. Scope, timeline, price and payment are agreed before signing.',
+        'Draft agreement and appendices. Scope, timeline, price and payment are agreed before signing',
     },
     privacy: {
       title: 'Privacy policy',
       about:
         'What data I receive when you get in touch, how I store it and what I use it for. ' +
-        'Nothing beyond what the call and the work require.',
+        'Nothing beyond what the call and the work require',
     },
     statusTag: 'status',
     statusText:
       'This document is being finalised. I will send the current version on request ' +
-      'in Telegram before we start, and we sign it before any paid step.',
+      'in Telegram before we start, and we sign it before any paid step',
     statusCta: 'Request in Telegram',
   },
 } as const;
