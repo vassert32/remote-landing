@@ -115,7 +115,7 @@ export const en = {
 
   ladder: {
     title: 'My path. Your goal.',
-    panelTag: 'income by stage',
+    panelTag: 'my income by stage',
     chartLabel: 'Income growth across career stages',
     timeStart: '2024',
     timeMid: '2025',

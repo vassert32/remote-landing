@@ -840,7 +840,10 @@ function animateSectionEntrances(): void {
 
     // Тёмная секция сначала закрывает экран целиком чёрным полотном и
     // только потом наполняется: старт входа отложен почти до её верха.
-    const isDark = section.matches('[data-band="dark"]');
+    const band = window.matchMedia('(min-width: 901px)').matches
+      ? section.dataset.bandDesktop ?? section.dataset.band
+      : section.dataset.band;
+    const isDark = band === 'dark';
 
     const tl = gsap.timeline({
       defaults: { ease: 'power3.out' },

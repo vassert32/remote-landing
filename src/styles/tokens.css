@@ -129,6 +129,24 @@
   color: var(--fg);
 }
 
+/* Объединённый экран ментора тёмный только на десктопе:
+   на мобильных между ним и следующим блоком остаётся отдельный Путь. */
+@media (min-width: 901px) {
+  [data-band-desktop='dark'] {
+    --bg: var(--coal);
+    --bg-band: #131311;
+    --bg-deep: #1b1b18;
+    --fg: var(--paper);
+    --fg-soft: color-mix(in srgb, var(--paper) 80%, var(--coal));
+    --fg-mute: color-mix(in srgb, var(--paper) 60%, var(--coal));
+    --fg-faint: color-mix(in srgb, var(--paper) 38%, var(--coal));
+    --stamp: #ff9e5e;
+    --stamp-deep: #f07f34;
+    background: var(--bg);
+    color: var(--fg);
+  }
+}
+
 /* На телефоне вертикаль дороже: секционный ритм и высота хедера ужимаются,
    иначе контент секции перестаёт помещаться в экран. */
 @media (max-width: 780px) {

@@ -63,7 +63,7 @@
       width: 100%;
       min-width: 0;
       margin-top: auto;
-      padding-top: var(--space-8);
+      padding-top: var(--space-2);
     }
   }
 
@@ -88,11 +88,11 @@
   }
 
 .mentor-income { --income-height: clamp(6rem, 14vh, 9rem); width: 100%; min-width: 0; }
-  .mentor-income__label { margin-bottom: var(--space-6); font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--fg-mute); }
+  .mentor-income__label { position: relative; top: var(--space-3); margin-bottom: var(--space-3); font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--fg-mute); }
   .mentor-income__columns { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(0.75rem, 1vw, 1rem); }
   .mentor-income__item { display: grid; grid-template-rows: var(--income-height) auto; gap: var(--space-3); min-width: 0; }
   .mentor-income__plot { display: flex; align-items: flex-end; height: var(--income-height); }
-  .mentor-income__bar { position: relative; display: block; width: 100%; height: max(0.4rem, calc(var(--income-height) * var(--income-weight))); background: var(--bg-band); box-shadow: inset 0 2px 0 var(--stamp); transform-origin: bottom center; }
+  .mentor-income__bar { position: relative; display: block; width: 100%; height: max(0.4rem, calc(var(--income-height) * var(--income-weight))); background: color-mix(in srgb, var(--fg) 9%, var(--bg)); box-shadow: inset 0 2px 0 var(--stamp); transform-origin: bottom center; }
   .mentor-income__value { position: absolute; bottom: calc(100% + var(--space-2)); left: 0; font-size: clamp(0.6875rem, 0.8vw, 0.75rem); font-weight: var(--fw-num); line-height: 1; white-space: nowrap; }
   .mentor-income__stage { min-height: 2.8em; font-size: var(--fs-micro); line-height: 1.4; color: var(--fg-soft); }
   .mentor-income__item--peak .mentor-income__bar { background: color-mix(in srgb, var(--stamp) 22%, var(--bg)); }
