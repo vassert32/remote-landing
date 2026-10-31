@@ -742,11 +742,21 @@ function splitTexts(): void {
   }
 
   for (const el of document.querySelectorAll<HTMLElement>('[data-reveal="blur"]')) {
-    const text = el.textContent ?? '';
-    const words = text.trim().split(/\s+/).filter(Boolean);
-    if (!words.length) continue;
-    el.setAttribute('aria-label', words.join(' '));
-    el.innerHTML = words.map((w) => `<span class="bw" aria-hidden="true">${w}</span>`).join(' ');
+    const text = (el.textContent ?? '').trim();
+    if (!text) continue;
+    el.setAttribute('aria-label', text);
+    const fragment = document.createDocumentFragment();
+    // Пробелы получают отдельный элемент с сохранением whitespace:
+    // они не пропадают между анимируемыми словами и при смене раскладки.
+    for (const chunk of text.split(/(\s+)/)) {
+      if (!chunk) continue;
+      const span = document.createElement('span');
+      span.className = /^\s+$/.test(chunk) ? 'word-space' : 'bw';
+      span.setAttribute('aria-hidden', 'true');
+      span.textContent = chunk;
+      fragment.append(span);
+    }
+    el.replaceChildren(fragment);
   }
 
   // Лид героя режем на месте: подход через textContent, как выше, стёр бы
