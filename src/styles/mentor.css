@@ -45,8 +45,7 @@
   }
 
   .mentor__copy { display: flex; flex-direction: column; gap: inherit; }
-  .mentor__copy--desktop,
-  .mentor__chart { display: none; }
+  .mentor__chart { width: 100%; min-width: 0; }
 
   @media (min-width: 901px) {
     .mentor__grid {
@@ -56,35 +55,24 @@
     }
     .mentor__figure { align-self: start; }
     .mentor__text { gap: var(--space-4); }
-    .mentor__copy--mobile { display: none; }
-    .mentor__copy--desktop { display: flex; }
     .mentor__chart {
-      display: block;
-      width: 100%;
-      min-width: 0;
       margin-top: auto;
       padding-top: var(--space-2);
     }
   }
 
   @media (max-width: 900px) {
-    .mentor__figure { grid-column: 1; }
-    .mentor__text { grid-column: 2; }
+    .mentor__grid { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-6); }
+    .mentor__figure { width: 100%; max-width: 28rem; }
+    .mentor__figure img { aspect-ratio: 1; max-height: none; object-position: center 38%; }
+    .mentor__text { grid-column: 1; gap: var(--space-4); }
+    .mentor__chart { padding-top: var(--space-2); }
   }
 
-  /* Телефон: кадр ниже, текст плотнее — иначе секция вдвое выше экрана. */
+  /* Телефон: квадратный кадр показывает больше корпуса, табличка остаётся внизу. */
   @media (max-width: 780px) {
-    .mentor__grid { row-gap: var(--space-6); }
-    .mentor__text { gap: var(--space-4); }
-    .mentor__figure img { aspect-ratio: 4 / 3; object-position: center 38%; }
     .mentor__plate { padding: 0.2rem 0.8rem 0.35rem; }
     .mentor__plate .doc__row { padding-block: 0.4rem; }
-  }
-
-  @media (max-width: 560px) {
-    .mentor__grid { grid-template-columns: minmax(0, 1fr); }
-    .mentor__text { grid-column: 1; }
-    .mentor__figure { max-width: none; }
   }
 
 .mentor-income { --income-height: clamp(6rem, 14vh, 9rem); width: 100%; min-width: 0; }
@@ -104,6 +92,8 @@
   .mentor-income__years > span:nth-child(2) { padding-left: 0; }
   .mentor-income__years > .mentor-income__year-end { padding-right: 0; color: var(--stamp); }
 
-@media (min-width: 901px) {
-  main > section.section.ladder { display: none; }
+@media (max-width: 560px) {
+  .mentor-income__columns { gap: clamp(0.25rem, 1.5vw, 0.5rem); }
+  .mentor-income__value { font-size: clamp(0.625rem, 2.6vw, 0.6875rem); }
+  .mentor-income__stage { overflow-wrap: anywhere; hyphens: auto; }
 }

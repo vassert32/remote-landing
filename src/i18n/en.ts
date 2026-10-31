@@ -93,23 +93,13 @@ export const en = {
       { key: 'Role', value: 'Senior Backend Engineer' },
       { key: 'Format', value: 'One on one' },
     ],
-    desktopParagraphs: [
+    paragraphs: [
       "I'm Evgeny, a backend engineer. I reached the international market on my own: " +
         'I started at 19, and by 20 I had received several offers for Senior Developer ' +
         'positions at foreign companies',
       'All mentoring is with me personally, not a team of coordinators. ' +
         'We will work through your CV and LinkedIn, shape your individual career story, ' +
         'choose the best job search channels and help you get an offer',
-    ],
-    paragraphs: [
-      "I'm Evgeny, a backend engineer. I reached the international market on my own: " +
-        'I started at 19, and by 20 I had received several offers for Senior Developer ' +
-        'positions at foreign companies',
-      'All mentoring is with me personally, not a team of coordinators. ' +
-        'We work through your CV, LinkedIn, interviews and offer negotiation',
-      'The work is built around your experience: we shape your individual career story, ' +
-        'choose the best job search channels for your skills ' +
-        'and prepare for specific interviews',
     ],
   },
 

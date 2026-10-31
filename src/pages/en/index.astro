@@ -2,7 +2,6 @@
 import Base from '../../layouts/Base.astro';
 import SiteNav from '../../components/SiteNav.astro';
 import Hero from '../../components/Hero.astro';
-import Ladder from '../../components/Ladder.astro';
 import Mentor from '../../components/Mentor.astro';
 import Fit from '../../components/Fit.astro';
 import Program from '../../components/Program.astro';
@@ -14,11 +13,10 @@ import Cursor from '../../components/Cursor.astro';
 
 <Base>
   <SiteNav />
-  <!-- На десктопе путь включён в секцию ментора; на мобильных — отдельная тёмная секция. -->
+  <!-- Фото, знакомство и путь объединены в одном блоке на всех экранах. -->
   <main id="main">
     <Hero />
     <Mentor />
-    <Ladder />
     <Fit />
     <Program />
     <Terms />

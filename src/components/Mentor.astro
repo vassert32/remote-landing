@@ -8,14 +8,14 @@ import '../styles/mentor.css';
 const c = t(Astro.currentLocale);
 ---
 
-<section class="section mentor" id="mentor" data-band-desktop="dark">
+<section class="section mentor" id="mentor" data-band="dark">
   <div class="shell mentor__grid">
     <figure class="mentor__figure" data-reveal="up">
       <Image
         src={mentor}
         alt={c.mentor.photoAlt}
         widths={[420, 620, 900]}
-        sizes="(max-width: 900px) 84vw, 38vw"
+        sizes="(max-width: 560px) 90vw, (max-width: 900px) 448px, 38vw"
         loading="lazy"
         decoding="async"
       />
@@ -34,10 +34,7 @@ const c = t(Astro.currentLocale);
 
     <div class="mentor__text">
       <h2 class="h2" data-split>{c.mentor.title}</h2>
-      <div class="mentor__copy mentor__copy--desktop">
-        {c.mentor.desktopParagraphs.map((p) => <p class="body" data-reveal="blur">{p}</p>)}
-      </div>
-      <div class="mentor__copy mentor__copy--mobile">
+      <div class="mentor__copy">
         {c.mentor.paragraphs.map((p) => <p class="body" data-reveal="blur">{p}</p>)}
       </div>
       <div class="mentor__chart">

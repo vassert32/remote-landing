@@ -534,7 +534,7 @@ function collectSnapPoints(): number[] {
   for (const el of document.querySelectorAll<HTMLElement>(
     'main section:not([data-hero]):not([data-program]), footer.closer',
   )) {
-    // Отдельный Путь скрыт на десктопе: его график входит в секцию ментора.
+    // Скрытые секции не должны становиться точками доводки.
     if (!el.getClientRects().length) continue;
     pts.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
   }
@@ -802,8 +802,8 @@ function wrapWordsInPlace(node: Node): void {
 const numFmt = new Intl.NumberFormat('ru-RU');
 
 function initSectionEntrances(): void {
-  // При смене раскладки пересоздаём входы: у ментора и графика разные
-  // видимые элементы на десктопе и телефоне. GSAP снимает прежние стили.
+  // При смене раскладки пересоздаём входы под новую геометрию.
+  // GSAP снимает прежние стили.
   const mm = gsap.matchMedia();
   mm.add({ desktop: '(min-width: 901px)', mobile: '(max-width: 900px)' }, () => {
     animateSectionEntrances();
@@ -840,10 +840,7 @@ function animateSectionEntrances(): void {
 
     // Тёмная секция сначала закрывает экран целиком чёрным полотном и
     // только потом наполняется: старт входа отложен почти до её верха.
-    const band = window.matchMedia('(min-width: 901px)').matches
-      ? section.dataset.bandDesktop ?? section.dataset.band
-      : section.dataset.band;
-    const isDark = band === 'dark';
+    const isDark = section.matches('[data-band="dark"]');
 
     const tl = gsap.timeline({
       defaults: { ease: 'power3.out' },
