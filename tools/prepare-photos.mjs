@@ -1,22 +1,17 @@
 /**
  * Готовит фотографии для страницы.
  *
- * Исходник mentor-original.jpg это скриншот из iCloud в мобильном браузере:
- * сверху статус-бар и шапка галереи, снизу лента миниатюр, панель иконок и
- * адресная строка. Вырезаем сам кадр и увеличиваем вдвое под ретину,
- * сохраняя исходные цвета фотографии.
+ * Исходник mentor-original.jpg — готовая фотография. Копируем её без
+ * обрезки, увеличения и повторного JPEG-сжатия; размеры для экранов и
+ * WebP-версии подготовит Astro при сборке.
  *
  * Запуск: npm run photos
  */
 import sharp from 'sharp';
+import { copyFile, stat } from 'node:fs/promises';
 
-// Кадр внутри скриншота 590x1280.
-const CROP = { left: 0, top: 215, width: 590, height: 780 };
+await copyFile('assets-source/mentor-original.jpg', 'src/assets/mentor.jpg');
+const info = await sharp('src/assets/mentor.jpg').metadata();
+const { size } = await stat('src/assets/mentor.jpg');
 
-const info = await sharp('assets-source/mentor-original.jpg')
-  .extract(CROP)
-  .resize({ width: CROP.width * 2, height: CROP.height * 2, kernel: 'lanczos3' })
-  .jpeg({ quality: 92, chromaSubsampling: '4:4:4' })
-  .toFile('src/assets/mentor.jpg');
-
-console.log(`src/assets/mentor.jpg ${info.width}x${info.height} ${(info.size / 1024).toFixed(0)}KB`);
+console.log(`src/assets/mentor.jpg ${info.width}x${info.height} ${(size / 1024).toFixed(0)}KB`);

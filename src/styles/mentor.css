@@ -76,7 +76,7 @@
   @media (max-width: 780px) {
     .mentor__grid { row-gap: var(--space-6); }
     .mentor__text { gap: var(--space-4); }
-    .mentor__figure img { aspect-ratio: 4 / 3; }
+    .mentor__figure img { aspect-ratio: 4 / 3; object-position: center 38%; }
     .mentor__plate { padding: 0.2rem 0.8rem 0.35rem; }
     .mentor__plate .doc__row { padding-block: 0.4rem; }
   }
