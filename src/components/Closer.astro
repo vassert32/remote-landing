@@ -80,13 +80,15 @@ const year = new Date().getFullYear();
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.2rem;
+    gap: var(--space-6);
     flex: none;
   }
   .closer__big-num {
     font-size: var(--fs-giant);
     font-weight: var(--fw-display);
     line-height: 0.9;
+    word-spacing: -0.16em;
+    white-space: nowrap;
     color: var(--stamp);
   }
   .closer__big-note {
