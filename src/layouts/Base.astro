@@ -48,12 +48,15 @@ const jsonLd = {
   url: canonical,
   inLanguage: lang,
   areaServed: 'Worldwide',
-  provider: {
-    '@type': 'Person',
-    name: c.site.name,
-    jobTitle: 'Senior Backend Engineer',
-    sameAs: [links.telegram, links.instagram],
-  },
+  // Английская SEO-разметка описывает услугу без персонального профиля.
+  ...(lang === 'ru' ? {
+    provider: {
+      '@type': 'Person',
+      name: c.site.name,
+      jobTitle: 'Senior Backend Engineer',
+      sameAs: [links.telegram, links.instagram],
+    },
+  } : {}),
   offers: pricingPlans.map((plan) => ({
     '@type': 'Offer',
     name: `${c.terms.planLabel} ${plan.id}`,

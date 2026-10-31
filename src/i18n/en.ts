@@ -10,13 +10,14 @@ export const en = {
   switchLabel: 'Переключить на русский',
 
   site: {
-    name: 'Evgeny Gerkulesov',
+    // Neutral name for page metadata; the desktop header keeps the personal name.
+    name: 'Remote career mentorship',
     // Short signature for legacy pages; full provider details are in legal and business.
     legal: 'E. Gerkulesov',
     given: 'Evgeny ',
     family: 'Gerkulesov',
     telegramHandle: '@gerkulesov35',
-    title: 'Evgeny Gerkulesov. Mentorship to a remote offer in hard currency',
+    title: 'Mentorship to a remote offer in hard currency',
     description:
       'One-on-one mentorship for experienced engineers: CV and LinkedIn built for the remote market, ' +
       'interviews in English, offer negotiation. Three payment plans: upfront plus salary-based payments, or full payment upfront',
