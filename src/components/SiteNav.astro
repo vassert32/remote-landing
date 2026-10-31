@@ -251,20 +251,28 @@ const alt = otherLang(Astro.currentLocale);
   @media (max-width: 780px) {
     .nav { height: calc(92px - 20px * var(--nav-t)); }
     .veil { height: calc(118px - 20px * var(--nav-t, 0)); }
-    .nav__socials { display: none; }
-    .nav__mark { font-size: calc(1.2rem - 0.15rem * var(--nav-t)); }
+    .nav__inner,
+    .nav__right { gap: var(--space-3); }
+    .nav__lang { min-width: 44px; min-height: 44px; }
+    .nav__socials { gap: var(--space-2); }
+    .nav__social { width: 44px; height: 44px; }
+    .nav__mark { display: none; }
     .nav__left { gap: var(--space-6); }
   }
 
-  /* Кнопка-компакт: полный «Записаться на разбор» на телефоне спорил
-     шириной с именем и выглядел несуразно. Остаются глагол и стрелка. */
+  /* Компактная кнопка на телефоне: короткая подпись и стрелка. */
   @media (max-width: 780px) {
     .nav__cta-full { display: none; }
     .nav__cta-short { display: inline; }
-    .nav__cta { padding: 0.55rem 0.8rem; gap: var(--space-2); }
+    .nav__cta { min-height: 44px; padding: 0.55rem 0.8rem; gap: var(--space-2); }
   }
-  @media (max-width: 420px) {
-    .nav__given { display: none; }
+
+  /* Узкие телефоны: все три контакта помещаются в одну строку. */
+  @media (max-width: 360px) {
+    .nav__inner { padding-inline: var(--space-2); gap: var(--space-2); }
+    .nav__right { gap: 0.25rem; }
+    .nav__socials { gap: 0; }
+    .nav__cta { padding-inline: var(--space-2); gap: 0.25rem; }
   }
 </style>
 

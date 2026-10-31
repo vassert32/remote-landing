@@ -14,6 +14,15 @@ export default defineConfig({
   integrations: [icon()],
   build: { inlineStylesheets: 'auto' },
   image: { responsiveStyles: true },
+  vite: {
+    // astro check запускает sync в production-режиме. Общий кэш Vite
+    // затирал зависимости работающего dev-сервера (504 Outdated Optimize Dep).
+    cacheDir: `node_modules/.vite-${process.env.NODE_ENV === 'production' ? 'production' : 'development'}`,
+    // Мотор подключается динамически: готовим его зависимости до загрузки страницы.
+    optimizeDeps: {
+      include: ['lenis', 'lenis/snap', 'gsap', 'gsap/ScrollTrigger'],
+    },
+  },
   // Русский живёт в корне, английский под /en. Astro.currentLocale отдаёт
   // язык страницы, по нему компоненты берут словарь.
   i18n: {

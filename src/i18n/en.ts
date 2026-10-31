@@ -166,14 +166,6 @@ export const en = {
     postpayLabel: 'After you start the job',
     postpayNote: 'of each of your first two salaries',
     noPostpayNote: 'No further payments: the full price is paid upfront.',
-    offerLabel: 'With an offer of',
-    offerPeriod: 'per month,',
-    exampleSummary: 'your first salary covers the entire plan',
-    exampleNeutral: 'compare the full plan cost with one monthly salary',
-    totalLabel: 'Full cost —',
-    exampleNote: 'Includes the upfront payment and both salary-based payments, before taxes and fees',
-    exchangeAt: 'at an assumed exchange rate of',
-    exchangeUnit: 'per $1',
     agreementNote: 'We agree on the plan and payment schedule in the contract before starting.',
   },
 
@@ -250,11 +242,11 @@ export const en = {
       },
       {
         q: 'How long does it take?',
-        a: 'The exact timeline depends on your technical skills, your English and how many hours a week you put in. Some mentees start applying within the first few weeks and successfully pass interviews.',
+        a: 'The exact timeline depends on your technical skills, your English and how many hours a week you put in. I received my first offer less than 3 months after starting my job search. Some mentees start applying within the first few weeks and successfully pass interviews.',
       },
       {
-        q: 'How does payment work?',
-        a: 'Two plans combine an upfront payment with a percentage of each of your first two salaries. A third plan is paid in full upfront, with no further payments. We agree on the terms in the contract before starting.',
+        q: 'Is there a job placement guarantee?',
+        a: 'No. The outcome depends on your experience, your English and how much effort you put into preparation and your job search. On plans with salary-based payments, I have a financial incentive to help you get an offer: if you do not get a job, I will not receive most of my fee.',
       },
       {
         q: 'What if I fail every interview?',
