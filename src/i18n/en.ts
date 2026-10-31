@@ -37,7 +37,7 @@ export const en = {
     soon: 'Soon',
     soonAria: (name: string) => `${name}: link coming soon`,
     back: 'Back to home',
-    howItWorks: 'How it works',
+    learnMore: 'Learn more',
   },
 
   /** 404 page: kept inside the document metaphor. */
@@ -79,7 +79,6 @@ export const en = {
       { key: 'Format', value: 'Remote, no relocation' },
       { key: 'Rate', value: 'from USD 5,000 per month' },
       { key: 'Currency', value: 'USD, EUR or GBP' },
-      { key: 'Search time', value: '3-4 months' },
     ],
     signLabel: 'Signature',
     stamp: 'Approved',
@@ -202,7 +201,6 @@ export const en = {
       'in the new job.',
     routeFrom: 'start',
     routeTo: 'offer',
-    routeSpan: '3-4 months',
     steps: [
       {
         num: '1',

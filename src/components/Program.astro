@@ -29,8 +29,7 @@ const roadmap = c.program.steps;
       </div>
 
       <!-- Маршрутная полоса: шесть равных сегментов от старта до оффера.
-           Пропорции условные, поэтому сроков внутри сегментов нет — только
-           общая длительность, уже заявленная на странице. -->
+           Пропорции условные и не задают длительность подготовки и поиска. -->
       <div class="shell program__route">
         <span class="program__route-cap">{c.program.routeFrom}</span>
         <span class="program__route-line">
@@ -38,7 +37,6 @@ const roadmap = c.program.steps;
           <span class="program__progress" data-program-progress></span>
         </span>
         <span class="program__route-cap program__route-cap--end">{c.program.routeTo}</span>
-        <span class="program__route-span">{c.program.routeSpan}</span>
       </div>
     </div>
 
@@ -146,16 +144,6 @@ const roadmap = c.program.steps;
     transform-origin: left center;
   }
 
-  .program__route-span {
-    grid-column: 2;
-    justify-self: center;
-    margin-top: 0.6rem;
-    font-family: var(--font-mono);
-    font-size: var(--fs-micro);
-    letter-spacing: var(--tr-mono);
-    color: var(--fg-mute);
-  }
-
   /* --- Этапы: вертикальный список (база и мобайл) ----------------------- */
 
   .program__viewport { overflow: hidden; }
@@ -250,7 +238,6 @@ const roadmap = c.program.steps;
     .program__counter { display: none; }
     /* Интро на телефоне не несёт нового: полоса и этапы говорят сами. */
     .program__head > :global(.body) { display: none; }
-    .program__route-span { display: none; }
     .program__route { grid-template-columns: auto 1fr auto; }
 
     /* Цифре — свой столбик и отступ от рамки: впритык к заголовку она

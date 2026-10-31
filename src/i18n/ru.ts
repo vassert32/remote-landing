@@ -38,7 +38,7 @@ export const ru = {
     soon: 'Скоро',
     soonAria: (name: string) => `${name}: ссылка скоро появится`,
     back: 'На главную',
-    howItWorks: 'Как это устроено',
+    learnMore: 'Узнать больше',
   },
 
   /** Страница 404: выдержана в метафоре документа. */
@@ -81,7 +81,6 @@ export const ru = {
       { key: 'Формат', value: 'Удалённо, без релокации' },
       { key: 'Ставка', value: 'от 5 000 USD в месяц' },
       { key: 'Валюта', value: 'USD, EUR или GBP' },
-      { key: 'Срок поиска', value: '3-4 месяца' },
     ],
     signLabel: 'Подпись',
     stamp: 'Approved',
@@ -210,7 +209,6 @@ export const ru = {
       'на новом месте.',
     routeFrom: 'старт',
     routeTo: 'оффер',
-    routeSpan: '3-4 месяца',
     steps: [
       {
         num: '1',
