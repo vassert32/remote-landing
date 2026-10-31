@@ -274,28 +274,25 @@ export const en = {
     taxSystem: 'USN, PSN (Russia)',
     navLabel: 'Documents and contact',
     agreementLink: 'Service agreement',
-    draft: 'Draft',
     agreementTitle: 'Service agreement',
     agreementAbout: 'Individual consulting and information services to help prepare for a job search in tech',
-    draftNote: 'Draft for review. The scope, timeline, price and payment schedule are agreed individually before the agreement and its appendices are signed. Viewing or downloading the file does not enter you into an agreement',
-    fileTitle: 'Agreement and appendices',
-    fileMeta: 'PDF · 14 pages · in Russian',
-    openPdf: 'Open PDF',
-    downloadPdf: 'Download file',
+    fileTitle: 'Service agreement',
+    fileMeta: 'DOCX · in Russian',
+    downloadAgreement: 'Download agreement',
     providerTitle: 'Service provider and contact',
     contactNote: 'For questions about the agreement or services, contact me by email or Telegram',
   },
 
   docs: {
     oferta: {
-      title: 'Draft service agreement',
+      title: 'Service agreement',
       about:
-        'Draft individual agreement for consulting and information services',
+        'Individual agreement for consulting and information services',
     },
     dogovor: {
       title: 'Service agreement',
       about:
-        'Draft agreement and appendices. Scope, timeline, price and payment are agreed before signing',
+        'Service agreement. Scope, timeline, price and payment are agreed before signing',
     },
     privacy: {
       title: 'Privacy policy',

@@ -34,12 +34,12 @@ export function socialHref(key: string): string {
  */
 const SITE_BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-/** Публичные реквизиты и исходный проект договора, одинаковые для обоих языков. */
+/** Публичные реквизиты и договор, одинаковые для обоих языков. */
 export const business = {
   inn: '352527993654',
   ogrnip: '326350000031219',
   email: CONTACT_EMAIL,
-  agreementPdf: `${SITE_BASE}/documents/mentorship-agreement-draft.pdf`,
+  agreementDocx: `${SITE_BASE}/documents/mentorship-agreement.docx`,
 };
 
 /** Префикс языка: русский в корне, английский под /en. */

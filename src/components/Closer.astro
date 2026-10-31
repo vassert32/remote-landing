@@ -33,7 +33,6 @@ const year = new Date().getFullYear();
       <nav class="closer__documents" aria-label={c.legal.agreementLink}>
         <a href={docHref(Astro.currentLocale, 'dogovor')}>
           <span>{c.legal.agreementLink}</span>
-          <span class="closer__draft">{c.legal.draft}</span>
         </a>
       </nav>
       <BusinessDetails showContacts={false} inline />
@@ -127,7 +126,6 @@ const year = new Date().getFullYear();
   .closer__documents { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); }
   .closer__documents a { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); color: var(--fg-soft); }
   .closer__documents a:hover, .closer__documents a:focus-visible { color: var(--stamp); }
-  .closer__draft { font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--fg-mute); }
   .closer__copyright { font-family: var(--font-mono); font-size: var(--fs-micro); }
 
   @media (min-width: 901px) {

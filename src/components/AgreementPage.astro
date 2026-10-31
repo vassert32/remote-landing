@@ -8,7 +8,7 @@ const lang = Astro.currentLocale;
 const c = t(lang);
 ---
 
-<Base title={`${c.legal.agreementTitle} (${c.legal.draft}). ${c.site.name}`} description={c.legal.agreementAbout} document="dogovor">
+<Base title={`${c.legal.agreementTitle}. ${c.site.name}`} description={c.legal.agreementAbout} document="dogovor">
   <main id="main" class="agreement">
     <div class="shell agreement__inner">
       <nav class="agreement__nav" aria-label={c.legal.navLabel}>
@@ -20,12 +20,9 @@ const c = t(lang);
       </nav>
 
       <header class="agreement__header">
-        <span class="agreement__status">{c.legal.draft}</span>
         <h1 class="h2">{c.legal.agreementTitle}</h1>
         <p class="lead">{c.legal.agreementAbout}</p>
       </header>
-
-      <p class="agreement__notice">{c.legal.draftNote}</p>
 
       <section class="agreement__file" aria-labelledby="file-title">
         <div>
@@ -33,13 +30,9 @@ const c = t(lang);
           <p class="agreement__meta">{c.legal.fileMeta}</p>
         </div>
         <div class="agreement__actions">
-          <a class="btn btn--ink" href={business.agreementPdf} target="_blank" rel="noopener">
-            <span>{c.legal.openPdf}</span>
-            <Icon name="ph:arrow-up-right-bold" class="btn__arrow" aria-hidden="true" />
-          </a>
-          <a class="agreement__download" href={business.agreementPdf} download>
-            <Icon name="ph:download-simple" aria-hidden="true" />
-            <span>{c.legal.downloadPdf}</span>
+          <a class="btn btn--ink" href={business.agreementDocx} download="Договор_возмездного_оказания_услуг.docx">
+            <span>{c.legal.downloadAgreement}</span>
+            <Icon name="ph:download-simple" class="btn__arrow" aria-hidden="true" />
           </a>
         </div>
       </section>
@@ -61,16 +54,12 @@ const c = t(lang);
   .agreement__nav { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); margin-bottom: clamp(3rem, 2rem + 4vw, 6rem); font-family: var(--font-mono); font-size: var(--fs-small); color: var(--fg-mute); }
   .agreement__nav a:hover, .agreement__nav a:focus-visible { color: var(--stamp-deep); }
   .agreement__back { display: inline-flex; align-items: center; gap: var(--space-3); }
-  .agreement__back svg, .agreement__download svg { width: 1em; height: 1em; flex: none; }
-  .agreement__header { display: grid; justify-items: start; gap: var(--space-6); max-width: 52rem; }
-  .agreement__status { padding: 0.25rem 0.65rem; border: var(--hair) solid var(--line-strong); font-family: var(--font-mono); font-size: var(--fs-small); color: var(--fg-soft); }
+  .agreement__back svg { width: 1em; height: 1em; flex: none; }
+  .agreement__header { display: grid; justify-items: start; gap: var(--space-6); max-width: 52rem; margin-bottom: var(--space-8); }
   .agreement__header .lead { max-width: 48ch; }
-  .agreement__notice { max-width: 68ch; margin-block: var(--space-8) var(--space-12); padding-left: var(--space-6); border-left: 2px solid var(--stamp-deep); font-size: var(--fs-small); color: var(--fg-soft); }
   .agreement__file { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-8); padding: clamp(1.25rem, 0.75rem + 2vw, 2.5rem); border: var(--hair) solid var(--line-strong); background: var(--bg-band); }
   .agreement__meta { margin-top: var(--space-3); font-family: var(--font-mono); font-size: var(--fs-small); color: var(--fg-soft); }
   .agreement__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6); }
-  .agreement__download { display: inline-flex; align-items: center; gap: var(--space-3); min-height: 44px; font-size: var(--fs-small); text-decoration: underline; text-underline-offset: 0.2em; }
-  .agreement__download:hover, .agreement__download:focus-visible { color: var(--stamp-deep); }
   .agreement__provider { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-8); margin-top: var(--space-12); padding-top: var(--space-8); border-top: var(--hair) solid var(--line-strong); }
   .agreement__contact-note { margin-top: var(--space-4); font-size: var(--fs-small); max-width: 36ch; }
   @media (max-width: 780px) {
