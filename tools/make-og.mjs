@@ -62,7 +62,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
   </g>
 
   <text x="80" y="478" font-family="Onest" font-size="26"
-        fill="${MUTE}">Менторство до удалённого оффера за 3-4 месяца</text>
+        fill="${MUTE}">Менторство до удалённого оффера</text>
 
   <!-- Печать -->
   <g transform="translate(1010 268) rotate(-6)">
