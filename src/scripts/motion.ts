@@ -65,7 +65,9 @@ function initLenis(): Lenis {
   const lenis = new Lenis({
     duration: 1.05,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    anchors: { offset: -70 },
+    // Запас под шапку уже есть внутри секций. Якорь должен доводить
+    // до границы фона, иначе сверху остаётся полоса предыдущего экрана.
+    anchors: true,
   });
 
   lenis.on('scroll', ScrollTrigger.update);

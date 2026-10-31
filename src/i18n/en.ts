@@ -19,7 +19,7 @@ export const en = {
     telegramHandle: '@gerkulesov35',
     title: 'Mentorship to a remote offer in hard currency',
     description:
-      'One-on-one mentorship for experienced engineers: CV and LinkedIn built for the remote market, ' +
+      'One-on-one mentorship for experienced IT professionals: CV and LinkedIn built for the remote market, ' +
       'interviews in English, offer negotiation. Three payment plans: upfront plus salary-based payments, or full payment upfront',
   },
 
@@ -63,7 +63,7 @@ export const en = {
     leadParts: [
       { t: 'Personal ' },
       { t: 'one-on-one mentorship', mark: true },
-      { t: ' for experienced engineers: from rebuilding your CV to a signed ' },
+      { t: ' for experienced IT professionals: from rebuilding your CV to a signed ' },
       { t: 'offer', mark: true },
       { t: ' in dollars, euros or pounds' },
     ] as ReadonlyArray<{ t: string; mark?: boolean }>,
