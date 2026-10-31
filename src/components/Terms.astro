@@ -44,7 +44,7 @@ const amount = new Intl.NumberFormat(c.locale, { maximumFractionDigits: 0 });
 
 <style>
   .terms__inner { display: grid; gap: var(--space-8); }
-  .terms__head { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: var(--col-gap); }
+  .terms__head { display: grid; gap: var(--space-6); }
   .terms__title { max-width: 17ch; }
   .terms__body { max-width: 44ch; }
 
@@ -64,7 +64,6 @@ const amount = new Intl.NumberFormat(c.locale, { maximumFractionDigits: 0 });
   .terms__notes { font-size: var(--fs-small); color: var(--fg-soft); max-width: 80ch; }
 
   @media (max-width: 900px) {
-    .terms__head { grid-template-columns: 1fr; gap: var(--space-6); }
     .terms__plans { grid-template-columns: 1fr; gap: var(--space-8); border: 0; background: transparent; }
     .tariff { gap: var(--space-6); border: var(--hair) solid var(--line-strong); background: var(--bg); }
     .tariff__bill { grid-template-columns: 1fr 1fr; gap: var(--space-8); }
