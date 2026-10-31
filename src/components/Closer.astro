@@ -70,8 +70,8 @@ const year = new Date().getFullYear();
   .closer__head {
     display: flex;
     align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--space-8);
+    justify-content: flex-start;
+    gap: clamp(2rem, 5vw, 5rem);
     width: 100%;
   }
   .closer__title { max-width: 16ch; }
@@ -79,7 +79,7 @@ const year = new Date().getFullYear();
   .closer__big {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 0.2rem;
     flex: none;
   }
@@ -98,7 +98,6 @@ const year = new Date().getFullYear();
 
   @media (max-width: 780px) {
     .closer__head { flex-direction: column; align-items: flex-start; gap: var(--space-4); }
-    .closer__big { align-items: flex-start; }
   }
 
   .closer__note { color: var(--fg-soft); max-width: 44ch; }
